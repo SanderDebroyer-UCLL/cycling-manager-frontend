@@ -1,8 +1,8 @@
 export const getAllRaces = async () => {
-  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/race", {
-    method: "GET",
+  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/races', {
+    method: 'GET',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
   });
 
@@ -13,10 +13,8 @@ export const getAllRaces = async () => {
   return res.json();
 };
 
-
-
 const RaceService = {
-  getAllRaces
+  getAllRaces,
 };
 
 export default RaceService;

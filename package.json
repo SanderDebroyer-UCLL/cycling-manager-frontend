@@ -12,6 +12,7 @@
     "@reduxjs/toolkit": "^2.8.1",
     "cycling-manager-2025": "file:",
     "next": "^15.3.2",
+    "postcss": "^8.5.3",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.5",
     "react": "^19.1.0",
@@ -19,12 +20,13 @@
     "react-redux": "^9.2.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.1.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "lucide-react": "^0.510.0",
     "prettier": "3.5.3",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.1.6",
     "typescript": "^5"
   }
 }
