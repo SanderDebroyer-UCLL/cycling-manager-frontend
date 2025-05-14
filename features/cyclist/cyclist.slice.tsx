@@ -1,6 +1,6 @@
 // src/features/race/raceSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { getAllRaces } from '@/services/race.api';
+import { getAllRaces } from '@/services/race.service';
 
 // Define Race type based on your API response
 export interface Race {
