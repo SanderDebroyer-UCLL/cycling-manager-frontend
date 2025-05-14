@@ -3,11 +3,12 @@
 import tourDeFranceBanner from '@/public/images/tour_de_france_banner.webp';
 import giroBanner from '@/public/images/giro_banner.jpg';
 import vueltaBanner from '@/public/images/vuelta_banner.jpg';
-import tdfIcon from '@/public/images/tdf-icon.png';
-import giroIcon from '@/public/images/giro-icon.png';
-import vueltaIcon from '@/public/images/vuelta-icon.png';
+import tdfIconLight from '@/public/images/tdf-icon.png';
+import tdfIconDark from '@/public/images/tdf-icon-dark.png';
+import giroIconLight from '@/public/images/giro-icon.png';
+import giroIconDark from '@/public/images/giro-icon-dark.png';
+import vueltaIconLight from '@/public/images/vuelta-icon.png';
 import { GrandTour } from '@/types/grandtour';
-import { profile } from 'console';
 import { User } from '@/types/user';
 
 export const grandTours: GrandTour[] = [
@@ -15,19 +16,22 @@ export const grandTours: GrandTour[] = [
     name: 'Tour de France',
     image: tourDeFranceBanner,
     href: '/competitions/tour-de-france',
-    icon: tdfIcon,
+    iconLight: tdfIconLight,
+    iconDark: tdfIconDark,
   },
   {
     name: 'Giro d’Italia',
     image: giroBanner,
     href: '/competitions/giro-ditalia',
-    icon: giroIcon,
+    iconLight: giroIconLight,
+    iconDark: giroIconDark,
   },
   {
     name: 'Vuelta a España',
     image: vueltaBanner,
     href: '/competitions/vuelta-a-espana',
-    icon: vueltaIcon,
+    iconLight: vueltaIconLight,
+    iconDark: vueltaIconLight,
   },
 ];
 
@@ -40,6 +44,96 @@ export const users: User[] = [
     password: 'password123',
     role: 'admin',
     score: 100,
-    profilePicture: 'https://randomuser.me/api/portraits',
+    profilePicture: 'https://randomuser.me/api/portraits/men/1.jpg',
+  },
+  {
+    id: 2,
+    firstName: 'Jane',
+    lastName: 'Doe',
+    email: 'janedoe@gmail.com',
+    password: 'password123',
+    role: 'user',
+    score: 50,
+    profilePicture: 'https://randomuser.me/api/portraits/women/2.jpg',
+  },
+  {
+    id: 3,
+    firstName: 'Alice',
+    lastName: 'Smith',
+    email: 'alice.smith@example.com',
+    password: 'alice123',
+    role: 'user',
+    score: 72,
+    profilePicture: 'https://randomuser.me/api/portraits/women/3.jpg',
+  },
+  {
+    id: 4,
+    firstName: 'Bob',
+    lastName: 'Johnson',
+    email: 'bob.johnson@example.com',
+    password: 'bobsecure',
+    role: 'user',
+    score: 85,
+    profilePicture: 'https://randomuser.me/api/portraits/men/4.jpg',
+  },
+  {
+    id: 5,
+    firstName: 'Clara',
+    lastName: 'Williams',
+    email: 'clara.williams@example.com',
+    password: 'clara456',
+    role: 'admin',
+    score: 92,
+    profilePicture: 'https://randomuser.me/api/portraits/women/5.jpg',
+  },
+  {
+    id: 6,
+    firstName: 'David',
+    lastName: 'Brown',
+    email: 'david.brown@example.com',
+    password: 'david789',
+    role: 'user',
+    score: 60,
+    profilePicture: 'https://randomuser.me/api/portraits/men/6.jpg',
+  },
+  {
+    id: 7,
+    firstName: 'Emma',
+    lastName: 'Davis',
+    email: 'emma.davis@example.com',
+    password: 'emma321',
+    role: 'user',
+    score: 77,
+    profilePicture: 'https://randomuser.me/api/portraits/women/7.jpg',
+  },
+  {
+    id: 8,
+    firstName: 'Frank',
+    lastName: 'Miller',
+    email: 'frank.miller@example.com',
+    password: 'frankpass',
+    role: 'user',
+    score: 88,
+    profilePicture: 'https://randomuser.me/api/portraits/men/8.jpg',
+  },
+  {
+    id: 9,
+    firstName: 'Grace',
+    lastName: 'Wilson',
+    email: 'grace.wilson@example.com',
+    password: 'grace2024',
+    role: 'user',
+    score: 66,
+    profilePicture: 'https://randomuser.me/api/portraits/women/9.jpg',
+  },
+  {
+    id: 10,
+    firstName: 'Henry',
+    lastName: 'Moore',
+    email: 'henry.moore@example.com',
+    password: 'henrysecure',
+    role: 'user',
+    score: 59,
+    profilePicture: 'https://randomuser.me/api/portraits/men/10.jpg',
   },
 ];

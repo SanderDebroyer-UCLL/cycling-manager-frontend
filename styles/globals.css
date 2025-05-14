@@ -13,16 +13,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --color-yellow-50: #fef5e7;
-  --color-yellow-100: #fef0da;
-  --color-yellow-200: #fce1b3;
-  --color-yellow-300: #f59e0b;
-  --color-yellow-400: #dd8e0a;
-  --color-yellow-500: #c47e09;
-  --color-yellow-600: #b87708;
-  --color-yellow-700: #935f07;
-  --color-yellow-800: #6e4705;
-  --color-yellow-900: #563704;
+
+  --color-yellow-50:  #fffcf0;   /* Base */
+  --color-yellow-100: #fff7cc;  /* Lighter */
+  --color-yellow-200: #fff199;  /* Light */
+  --color-yellow-300: #ffe75e;  /* Normal */
+  --color-yellow-400: #ffdd2a;  /* Darker */
+  --color-yellow-500: #ffd700;  /* Dark */
+  --color-yellow-600: #e6c100;  /* Darker */
+  --color-yellow-700: #c4a700;  /* Deeper */
+  --color-yellow-800: #9e8800;  /* Deepest */
+  --color-yellow-900: #6f5e00;  /* Darkest */
 
   --color-surface-50: #f9fafb;   /* Base */
   --color-surface-100: #f4f6f9;  /* Lighter */
@@ -35,6 +36,18 @@
   --color-surface-800: #6a7a8d;  /* Deepest */
   --color-surface-900: #4f5b6b;  /* Darkest */
 
+  --color-pink-50:  #fff5f9;   /* Base */
+  --color-pink-100: #ffe3ed;  /* Lighter */
+  --color-pink-200: #ffc1d6;  /* Light */
+  --color-pink-300: #ff9abb;  /* Normal */
+  --color-pink-400: #ff729f;  /* Darker */
+  --color-pink-500: #ff286e;  /* Dark */
+  --color-pink-600: #e02164;  /* Darker */
+  --color-pink-700: #bf1d58;  /* Deeper */
+  --color-pink-800: #991748;  /* Deepest */
+  --color-pink-900: #701132;  /* Darkest */
+
+
   --color-dark-50: #b2bbc6;   /* Lighter */
   --color-dark-100: #a3adbb;  /* Light :hover */
   --color-dark-200: #909dad;  /* Light :active */
@@ -45,7 +58,7 @@
   --color-dark-700: #151a20;  /* Dark :hover */
   --color-dark-800: #090b0e;  /* Dark :active */
 
-    --color-blue-50: #eff6ff;   /* Very light */
+  --color-blue-50: #eff6ff;   /* Very light */
   --color-blue-100: #dbeafe;  /* Extra light */
   --color-blue-200: #bfdbfe;  /* Light */
   --color-blue-300: #93c5fd;  /* Soft blue */

@@ -4,5 +4,6 @@ export interface GrandTour {
   name: string;
   image: StaticImageData;
   href: string;
-  icon: StaticImageData;
+  iconLight: StaticImageData;
+  iconDark: StaticImageData;
 }

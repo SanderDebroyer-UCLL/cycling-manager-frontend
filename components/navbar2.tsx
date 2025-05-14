@@ -15,16 +15,20 @@ const navbar = () => {
           C<span className=" text-blue-500">M</span>
         </Link>
         <ul className="flex gap-7 font-semibold">
-          <li
-            className={`h-16 flex items-center ${isActive('/overview') ? 'border-b-2 border-blue-500' : 'text-dark-700'}`}
-          >
-            <Link href="/overview">Overzicht</Link>
-          </li>
-          <li
-            className={`h-16 flex items-center ${isActive('/competitions') ? 'border-b-2 border-blue-500' : 'text-dark-700'}`}
-          >
-            <Link href="/competitions">Competities</Link>
-          </li>
+          <Link href="/overview">
+            <li
+              className={`h-16 flex items-center ${isActive('/overview') ? 'border-b-2 border-blue-500' : 'text-dark-700'}`}
+            >
+              Overzicht
+            </li>
+          </Link>
+          <Link href="/competitions">
+            <li
+              className={`h-16 flex items-center ${isActive('/competitions') ? 'border-b-2 border-blue-500' : 'text-dark-700'}`}
+            >
+              Competities
+            </li>
+          </Link>
         </ul>
       </div>
       <Link href="/profile">
