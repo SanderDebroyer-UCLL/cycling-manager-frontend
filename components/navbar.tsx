@@ -10,9 +10,12 @@ const navbar = () => {
           CYCLING <span className=" text-blue-500">MANAGER</span>
         </Link>
       </div>
-      <div>
-        <Link href="/authentication">
-          <Button label="Login" />
+      <div className="flex gap-4">
+        <Link href="/authentication/login">
+          <Button label="Login" severity="secondary" outlined />
+        </Link>
+        <Link href="/authentication/register">
+          <Button label="Register" />
         </Link>
       </div>
     </div>
