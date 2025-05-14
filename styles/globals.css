@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant yellow (&:where(.yellow, .yellow *));
+@custom-variant pink (&:where(.pink, .pink *));
+@custom-variant blue (&:where(.blue, .blue *));
+@custom-variant red (&:where(.red, .red *));
 
-@theme inline {
+@theme {
   --font-inter: var(--font-inter);
   --font-manrope: var(--font-manrope);
   --font-anton: var(--font-anton);
@@ -13,17 +13,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-
-  --color-yellow-50:  #fffcf0;   /* Base */
-  --color-yellow-100: #fff7cc;  /* Lighter */
-  --color-yellow-200: #fff199;  /* Light */
-  --color-yellow-300: #ffe75e;  /* Normal */
-  --color-yellow-400: #ffdd2a;  /* Darker */
-  --color-yellow-500: #ffd700;  /* Dark */
-  --color-yellow-600: #e6c100;  /* Darker */
-  --color-yellow-700: #c4a700;  /* Deeper */
-  --color-yellow-800: #9e8800;  /* Deepest */
-  --color-yellow-900: #6f5e00;  /* Darkest */
 
   --color-surface-50: #f9fafb;   /* Base */
   --color-surface-100: #f4f6f9;  /* Lighter */
@@ -36,18 +25,6 @@
   --color-surface-800: #6a7a8d;  /* Deepest */
   --color-surface-900: #4f5b6b;  /* Darkest */
 
-  --color-pink-50:  #fff5f9;   /* Base */
-  --color-pink-100: #ffe3ed;  /* Lighter */
-  --color-pink-200: #ffc1d6;  /* Light */
-  --color-pink-300: #ff9abb;  /* Normal */
-  --color-pink-400: #ff729f;  /* Darker */
-  --color-pink-500: #ff286e;  /* Dark */
-  --color-pink-600: #e02164;  /* Darker */
-  --color-pink-700: #bf1d58;  /* Deeper */
-  --color-pink-800: #991748;  /* Deepest */
-  --color-pink-900: #701132;  /* Darkest */
-
-
   --color-dark-50: #b2bbc6;   /* Lighter */
   --color-dark-100: #a3adbb;  /* Light :hover */
   --color-dark-200: #909dad;  /* Light :active */
@@ -58,6 +35,89 @@
   --color-dark-700: #151a20;  /* Dark :hover */
   --color-dark-800: #090b0e;  /* Dark :active */
 
+  --color-primary-50: #eff6ff;   /* Very light */
+  --color-primary-100: #dbeafe;  /* Extra light */
+  --color-primary-200: #bfdbfe;  /* Light */
+  --color-primary-300: #93c5fd;  /* Soft primary */
+  --color-primary-400: #60a5fa;  /* Mid-light */
+  --color-primary-500: #2563eb;  /* Base */
+  --color-primary-600: #1d4ed8;  /* Stronger */
+  --color-primary-700: #1e40af;  /* Dark */
+  --color-primary-800: #1e3a8a;  /* Darker */
+  --color-primary-900: #172554;  /* Deepest */
+
+    --color-red-50:  #ffe5e7;  /* very light pinkish red */
+  --color-red-100: #fbbfc4;  /* soft light red */
+  --color-red-200: #f58a94;  /* lighter red */
+  --color-red-300: #ef4a5a;  /* soft red */
+  --color-red-400: #e61f34;  /* vibrant red */
+  --color-red-500: #e30613;  /* base: La Vuelta red */
+  --color-red-600: #cb0511;  /* slightly darker */
+  --color-red-700: #b10410;  /* deep red */
+  --color-red-800: #8e030d;  /* darker red */
+  --color-red-900: #6c020a;  /* very dark red */
+
+    --color-yellow-50:  #fffcf0;   /* Base */
+  --color-yellow-100: #fff7cc;  /* Lighter */
+  --color-yellow-200: #fff199;  /* Light */
+  --color-yellow-300: #ffe75e;  /* Normal */
+  --color-yellow-400: #ffdd2a;  /* Darker */
+  --color-yellow-500: #ffd700;  /* Dark */
+  --color-yellow-600: #e6c100;  /* Darker */
+  --color-yellow-700: #c4a700;  /* Deeper */
+  --color-yellow-800: #9e8800;  /* Deepest */
+  --color-yellow-900: #6f5e00;  /* Darkest */
+
+    --color-blue-50: #eff6ff;   /* Very light */
+  --color-blue-100: #dbeafe;  /* Extra light */
+  --color-blue-200: #bfdbfe;  /* Light */
+  --color-blue-300: #93c5fd;  /* Soft blue */
+  --color-blue-400: #60a5fa;  /* Mid-light */
+  --color-blue-500: #2563eb;  /* Base */
+  --color-blue-600: #1d4ed8;  /* Stronger */
+  --color-blue-700: #1e40af;  /* Dark */
+  --color-blue-800: #1e3a8a;  /* Darker */
+  --color-blue-900: #172554;  /* Deepest */
+
+    --color-pink-50:  #fff5f9;   /* Base */
+  --color-pink-100: #ffe3ed;  /* Lighter */
+  --color-pink-200: #ffc1d6;  /* Light */
+  --color-pink-300: #ff9abb;  /* Normal */
+  --color-pink-400: #ff729f;  /* Darker */
+  --color-pink-500: #ff286e;  /* Dark */
+  --color-pink-600: #e02164;  /* Darker */
+  --color-pink-700: #bf1d58;  /* Deeper */
+  --color-pink-800: #991748;  /* Deepest */
+  --color-pink-900: #701132;  /* Darkest */
+}
+
+.yellow {
+  --color-yellow-50:  #fffcf0;   /* Base */
+  --color-yellow-100: #fff7cc;  /* Lighter */
+  --color-yellow-200: #fff199;  /* Light */
+  --color-yellow-300: #ffe75e;  /* Normal */
+  --color-yellow-400: #ffdd2a;  /* Darker */
+  --color-yellow-500: #ffd700;  /* Dark */
+  --color-yellow-600: #e6c100;  /* Darker */
+  --color-yellow-700: #c4a700;  /* Deeper */
+  --color-yellow-800: #9e8800;  /* Deepest */
+  --color-yellow-900: #6f5e00;  /* Darkest */
+}
+
+.pink {
+  --color-pink-50:  #fff5f9;   /* Base */
+  --color-pink-100: #ffe3ed;  /* Lighter */
+  --color-pink-200: #ffc1d6;  /* Light */
+  --color-pink-300: #ff9abb;  /* Normal */
+  --color-pink-400: #ff729f;  /* Darker */
+  --color-pink-500: #ff286e;  /* Dark */
+  --color-pink-600: #e02164;  /* Darker */
+  --color-pink-700: #bf1d58;  /* Deeper */
+  --color-pink-800: #991748;  /* Deepest */
+  --color-pink-900: #701132;  /* Darkest */
+}
+
+.blue {
   --color-blue-50: #eff6ff;   /* Very light */
   --color-blue-100: #dbeafe;  /* Extra light */
   --color-blue-200: #bfdbfe;  /* Light */
@@ -70,15 +130,15 @@
   --color-blue-900: #172554;  /* Deepest */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.red {
+  --color-red-50:  #ffe5e7;  /* very light pinkish red */
+  --color-red-100: #fbbfc4;  /* soft light red */
+  --color-red-200: #f58a94;  /* lighter red */
+  --color-red-300: #ef4a5a;  /* soft red */
+  --color-red-400: #e61f34;  /* vibrant red */
+  --color-red-500: #e30613;  /* base: La Vuelta red */
+  --color-red-600: #cb0511;  /* slightly darker */
+  --color-red-700: #b10410;  /* deep red */
+  --color-red-800: #8e030d;  /* darker red */
+  --color-red-900: #6c020a;  /* very dark red */
 }

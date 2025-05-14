@@ -1,7 +1,6 @@
 import { grandTours } from '@/const/data';
 import React from 'react';
 import Image from 'next/image';
-import { Divider } from 'primereact/divider';
 import Link from 'next/link';
 import { ArrowLeft, Bike, Medal, SquareGanttChart, Users } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -11,8 +10,6 @@ const sidebar = () => {
 
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
-
-  const color = isActive(`/${tour.href}`) ? 'yellow' : 'blue';
 
   return (
     <div className="h-[100vh] w-70 border-r-1 flex flex-col gap-4 text-lg font-regular border-surface-500 bg-surface-100 py-8 text-dark-700">
@@ -33,14 +30,14 @@ const sidebar = () => {
       <div className="flex flex-col gap-2 pb-2">
         <Link
           href={`/${tour.href}`}
-          className=" flex gap-3 items-center hover:border-l-3 border-l-3 border-surface-100 hover:border-blue-500 px-6 py-1 hover:text-dark-500 hover:font-semibold"
+          className=" flex gap-3 items-center hover:border-l-3 border-l-3 border-surface-100 hover:border-primary-500 px-6 py-1 hover:text-dark-500 hover:font-semibold"
         >
           <SquareGanttChart size={18} className="stroke-dark-700" />
           Overview
         </Link>
         <Link
           href={`/${tour.href}`}
-          className="flex gap-3 items-center hover:border-l-3 border-l-3 border-surface-100 hover:border-blue-500 px-6 py-1 hover:text-dark-500 hover:font-semibold"
+          className="flex gap-3 items-center hover:border-l-3 border-l-3 border-surface-100 hover:border-primary-500 px-6 py-1 hover:text-dark-500 hover:font-semibold"
         >
           <Bike size={18} className="stroke-dark-700" />
           Ritten
@@ -52,14 +49,14 @@ const sidebar = () => {
       <div className="flex flex-col gap-2 pb-2">
         <Link
           href={`/${tour.href}`}
-          className=" flex gap-3 items-center hover:border-l-3 border-l-3 border-surface-100 hover:border-blue-500 px-6 py-1 hover:text-dark-500 hover:font-semibold"
+          className=" flex gap-3 items-center hover:border-l-3 border-l-3 border-surface-100 hover:border-primary-500 px-6 py-1 hover:text-dark-500 hover:font-semibold"
         >
           <Users size={18} className="stroke-dark-700" />
           Mijn team
         </Link>
         <Link
           href={`/${tour.href}`}
-          className=" flex gap-3 items-center hover:border-l-3 border-l-3 border-surface-100 hover:border-blue-500 px-6 py-1 hover:text-dark-500 hover:font-semibold"
+          className=" flex gap-3 items-center hover:border-l-3 border-l-3 border-surface-100 hover:border-primary-500 px-6 py-1 hover:text-dark-500 hover:font-semibold"
         >
           <Medal size={18} className="stroke-dark-700" />
           Klassement
