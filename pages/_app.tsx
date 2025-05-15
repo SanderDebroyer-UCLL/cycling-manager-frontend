@@ -46,7 +46,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <div
             className={`${inter.variable} ${manrope.variable} ${anton.variable} font-inter bg-surface-300 min-h-[100vh]`}
           >
-            <div className="sticky top-0">
+            <div className="sticky top-0 z-50">
               <Navbar />
             </div>
             <Component {...pageProps} />

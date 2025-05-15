@@ -9,12 +9,12 @@ export interface Race {
   // add more fields as needed
 }
 
-interface RaceState {
+interface RacesState {
   data: Race[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
-const initialState: RaceState = {
+const initialState: RacesState = {
   data: [],
   status: 'idle',
 };
