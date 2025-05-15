@@ -37,39 +37,41 @@ export default function Overview() {
     <main className="max-w-[70vw] mx-auto p-20 text-dark-700 class flex flex-col gap-12">
       <div className="flex flex-col gap-4">
         <h2 className="text-xl font-semibold">Actieve Competities</h2>
-        <div className="w-full h-70 bg-surface-100 flex items-center justify-between gap-4 rounded-lg shadow-md overflow-auto p-8">
-          {grandTours.map((tour: GrandTour) => (
-            <div
-              className="relative rounded-lg shadow-md overflow-hidden h-full w-full min-w-75"
-              key={tour.name}
-            >
-              <Link href={`${tour.href}`} key={tour.name}>
-                <Image
-                  src={tour.image}
-                  alt={tour.name}
-                  fill
-                  className="object-cover"
-                />
-
-                <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-transparent" />
-
-                <div className="relative z-10 p-4 flex items-center gap-4 text-2xl text-white font-medium font-manrope">
+        <div className="rounded-lg overflow-hidden">
+          <div className="w-full h-70 bg-surface-100 flex items-center justify-between gap-4 shadow-md overflow-x-auto p-8">
+            {grandTours.map((tour: GrandTour) => (
+              <div
+                className="relative rounded-lg shadow-md overflow-hidden h-full w-full min-w-75"
+                key={tour.name}
+              >
+                <Link href={`${tour.href}`} key={tour.name}>
                   <Image
-                    src={tour.iconLight}
-                    className="object-contain h-12 w-12"
-                    alt={''}
+                    src={tour.image}
+                    alt={tour.name}
+                    fill
+                    className="object-cover"
                   />
-                  {tour.name}
-                </div>
-              </Link>
-            </div>
-          ))}
+
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-transparent" />
+
+                  <div className="relative  p-4 flex items-center gap-4 text-2xl text-white font-medium font-manrope">
+                    <Image
+                      src={tour.iconLight}
+                      className="object-contain h-12 w-12"
+                      alt={''}
+                    />
+                    {tour.name}
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-      <div className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold">Klassement</h2>
-        <div className="flex flex-row gap-4 w-full ">
-          <div className="w-fit h-85 bg-surface-100 flex flex-col justify-center gap-6 rounded-lg shadow-md overflow-hidden p-8 flex-1/4">
+      <div className="flex flex-row gap-4">
+        <div className="flex flex-col gap-4 w-full flex-1/4">
+          <h2 className="text-xl font-semibold">Klassement</h2>
+          <div className="w-fit h-80 bg-surface-100 flex flex-col justify-center gap-6 rounded-lg shadow-md overflow-hidden p-8">
             <div className="flex flex-row gap-6 items-end justify-between">
               {topThreeUsers.map((user: User, index) => (
                 <div className="flex flex-col items-center gap-1" key={user.id}>
@@ -103,7 +105,10 @@ export default function Overview() {
               ahead of {sortedUsers[1].firstName}
             </p>
           </div>
-          <div className="max h-85 overflow-auto rounded-lg shadow-md w-full flex-3/4">
+        </div>
+        <div className="flex flex-col gap-4 w-full flex-3/4">
+          <h2 className="text-xl font-semibold">Huidig klassement</h2>
+          <div className="overflow-auto max-h-80 rounded-lg shadow-md w-full flex-3/4">
             <DataTable value={sortedUsers} tableStyle={{ width: '100%' }}>
               <Column
                 header="Position"
