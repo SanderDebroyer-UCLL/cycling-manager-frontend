@@ -44,7 +44,7 @@ const navbar = () => {
             </Link>
             <Link href="/competities">
               <li
-                className={`h-16 flex items-center ${isActive('/competitie') ? 'border-b-2 border-blue-500' : 'text-dark-700'}`}
+                className={`h-16 flex items-center ${isActive('/competities') ? 'border-b-2 border-blue-500' : 'text-dark-700'}`}
               >
                 Competities
               </li>

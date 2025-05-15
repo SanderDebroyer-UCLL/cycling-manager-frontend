@@ -84,7 +84,7 @@ export default function Login() {
       sessionStorage.setItem('jwtToken', user.jwtToken);
       sessionStorage.setItem('email', user.email);
 
-      router.push('/overview'); // Replace with your target page
+      router.push('/overzicht'); // Replace with your target page
       dispatch(resetStatus()); // reset status to avoid repeated redirects
     }
   }, [status, router]);
