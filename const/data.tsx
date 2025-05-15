@@ -8,7 +8,7 @@ import tdfIconDark from '@/public/images/tdf-icon-dark.png';
 import giroIconLight from '@/public/images/giro-icon.png';
 import giroIconDark from '@/public/images/giro-icon-dark.png';
 import vueltaIconLight from '@/public/images/vuelta-icon.png';
-import { GrandTour } from '@/types/grandtour';
+import { GrandTour, Stage, StageResult } from '@/types/grandtour';
 import { User } from '@/types/user';
 
 export const grandTours: GrandTour[] = [
@@ -159,5 +159,69 @@ export const users: User[] = [
     score: 59,
     profilePicture: 'https://randomuser.me/api/portraits/men/10.jpg',
     name: '',
+  },
+
+];
+
+export const stageResults: StageResult[] = [
+  {
+    position: 1,
+    rider: 'PEDERSEN Mads',
+    team: 'Lidl - Trek',
+    timeGap: '0:00',
+  },
+  {
+    position: 2,
+    rider: 'ROGLIČ Primož',
+    team: 'Red Bull - BORA - hansgrohe',
+    timeGap: '0:17',
+  },
+  {
+    position: 3,
+    rider: 'VACEK Mathias',
+    team: 'Lidl - Trek',
+    timeGap: '0:24',
+  },
+  {
+    position: 4,
+    rider: 'MCNULTY Brandon',
+    team: 'UAE Team Emirates - XRG',
+    timeGap: '0:31',
+  },
+  {
+    position: 5,
+    rider: 'DEL TORO Isaac',
+    team: 'UAE Team Emirates - XRG',
+    timeGap: '0:32',
+  },
+  {
+    position: 6,
+    rider: 'AYUSO Juan',
+    team: 'UAE Team Emirates - XRG',
+    timeGap: '0:35',
+  },
+  {
+    position: 7,
+    rider: 'POOLE Max',
+    team: 'Team Picnic PostNL',
+    timeGap: '0:43',
+  },
+  {
+    position: 8,
+    rider: 'TIBERI Antonio',
+    team: 'Bahrain - Victorious',
+    timeGap: '0:44',
+  },
+  {
+    position: 9,
+    rider: 'STORER Michael',
+    team: 'Tudor Pro Cycling Team',
+    timeGap: '0:46',
+  },
+  {
+    position: 10,
+    rider: 'PELLIZZARI Giulio',
+    team: 'Red Bull - BORA - hansgrohe',
+    timeGap: '0:50',
   },
 ];

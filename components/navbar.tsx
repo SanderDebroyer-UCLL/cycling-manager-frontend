@@ -2,30 +2,50 @@ import { selectCurrentUser } from '@/features/user/user.selector';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from 'primereact/button';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { User } from 'lucide-react';
 import { AppDispatch } from '@/store/store';
 import { setUser } from '@/features/user/user.slice';
+import { Menu } from 'primereact/menu';
+import { MenuItem } from 'primereact/menuitem';
+import router from 'next/router';
 
 const navbar = () => {
   const user = useSelector(selectCurrentUser);
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
+
   const dispatch = useDispatch<AppDispatch>();
 
-  useEffect(() => {
-    const email = sessionStorage.getItem('email');
-    const jwtToken = sessionStorage.getItem('jwtToken');
+const logoutHandler = () => {
+  dispatch(setUser(null)); // Of een specifieke logout action als je die hebt
+  sessionStorage.removeItem('email');
+  sessionStorage.removeItem('token');
+  router.push('/'); // Redirect naar de login pagina
+};
 
-    if (user?.email === email && user?.jwtToken == jwtToken) {
-      return;
-    }
 
-    if (email && jwtToken) {
-      dispatch(setUser({ email, jwtToken }));
+  const menuLeft = useRef<Menu>(null);
+  
+  const items: MenuItem[] = [
+    {
+        label: 'Profile',
+        items: [
+            {
+                label: 'Settings',
+                icon: 'pi pi-cog'
+            },
+            {
+                label: 'Logout',
+                icon: 'pi pi-sign-out',
+                command: () => {
+                    logoutHandler();
+                }
+            },
+        ]
     }
-  }, [dispatch]);
+];
 
   return (
     <div className="flex items-center justify-between text-dark-700 h-16 border-b-1 border-surface-500 backdrop-blur-md px-20">
@@ -59,9 +79,10 @@ const navbar = () => {
         </div>
       )}
       {user ? (
-        <Link href="/profiel">
+        <><div onClick={(event) => menuLeft.current!.toggle(event)} className='cursor-pointer' >
           <User size={24} className="stroke-blue-500" />
-        </Link>
+        </div><Menu model={items} popup ref={menuLeft} id="popup_menu_left" /></>
+
       ) : (
         <div className="flex gap-4">
           <Link href="/authenticatie/login">
