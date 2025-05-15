@@ -9,6 +9,8 @@ import 'primereact/resources/themes/lara-light-blue/theme.css';
 import { PrimeReactProvider } from 'primereact/api';
 import { Inter, Manrope, Anton } from 'next/font/google';
 import Navbar from '@/components/navbar';
+import { useRouter } from 'next/router';
+import Sidebar from '@/components/sidebar';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -27,17 +29,29 @@ const manrope = Manrope({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+  const isCompetitionRoute = router.pathname.includes('/competitions/');
+
   return (
     <PrimeReactProvider value={{ ripple: true }}>
       <Provider store={store}>
-        <div
-          className={`${inter.variable} ${manrope.variable} ${anton.variable} font-inter bg-surface-300 min-h-[100vh]`}
-        >
-          <div className="sticky top-0">
-            <Navbar />
+        {isCompetitionRoute ? (
+          <div
+            className={`${inter.variable} ${manrope.variable} ${anton.variable} font-inter bg-surface-300 min-h-[100vh] flex`}
+          >
+            <Sidebar />
+            <Component {...pageProps} />
           </div>
-          <Component {...pageProps} />
-        </div>
+        ) : (
+          <div
+            className={`${inter.variable} ${manrope.variable} ${anton.variable} font-inter bg-surface-300 min-h-[100vh]`}
+          >
+            <div className="sticky top-0">
+              <Navbar />
+            </div>
+            <Component {...pageProps} />
+          </div>
+        )}
       </Provider>
     </PrimeReactProvider>
   );
