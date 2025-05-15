@@ -30,7 +30,7 @@ const manrope = Manrope({
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
-  const isCompetitionRoute = router.pathname.includes('/competitions/');
+  const isCompetitionRoute = router.pathname.includes('/competities/');
 
   return (
     <PrimeReactProvider value={{ ripple: true }}>

@@ -14,10 +14,13 @@ const navbar = () => {
   const isActive = (path: string) => pathname === path;
   const dispatch = useDispatch<AppDispatch>();
 
-
   useEffect(() => {
     const email = sessionStorage.getItem('email');
     const jwtToken = sessionStorage.getItem('jwtToken');
+
+    if (user?.email === email && user?.jwtToken == jwtToken) {
+      return;
+    }
 
     if (email && jwtToken) {
       dispatch(setUser({ email, jwtToken }));
@@ -32,16 +35,16 @@ const navbar = () => {
             C<span className=" text-blue-500">M</span>
           </Link>
           <ul className="flex gap-7 font-semibold">
-            <Link href="/overview">
+            <Link href="/overzicht">
               <li
-                className={`h-16 flex items-center ${isActive('/overview') ? 'border-b-2 border-blue-500' : 'text-dark-700'}`}
+                className={`h-16 flex items-center ${isActive('/overzicht') ? 'border-b-2 border-blue-500' : 'text-dark-700'}`}
               >
                 Overzicht
               </li>
             </Link>
-            <Link href="/competitions">
+            <Link href="/competities">
               <li
-                className={`h-16 flex items-center ${isActive('/competitions') ? 'border-b-2 border-blue-500' : 'text-dark-700'}`}
+                className={`h-16 flex items-center ${isActive('/competitie') ? 'border-b-2 border-blue-500' : 'text-dark-700'}`}
               >
                 Competities
               </li>
@@ -56,15 +59,15 @@ const navbar = () => {
         </div>
       )}
       {user ? (
-        <Link href="/profile">
+        <Link href="/profiel">
           <User size={24} className="stroke-blue-500" />
         </Link>
       ) : (
         <div className="flex gap-4">
-          <Link href="/authentication/login">
+          <Link href="/authenticatie/login">
             <Button label="Login" severity="secondary" outlined />
           </Link>
-          <Link href="/authentication/register">
+          <Link href="/authenticatie/register">
             <Button label="Register" />
           </Link>
         </div>
