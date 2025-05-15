@@ -108,15 +108,17 @@ export default function Overview() {
         </div>
         <div className="flex flex-col gap-4 w-full flex-3/4">
           <h2 className="text-xl font-semibold">Huidig klassement</h2>
-          <div className="overflow-auto max-h-80 rounded-lg shadow-md w-full flex-3/4">
-            <DataTable value={sortedUsers} tableStyle={{ width: '100%' }}>
-              <Column
-                header="Position"
-                body={(rowData, { rowIndex }) => rowIndex + 1}
-              />
-              <Column header="Name" body={nameBodyTemplate}></Column>
-              <Column field="score" header="Score"></Column>
-            </DataTable>
+          <div className="overflow-hidden rounded-lg">
+            <div className="overflow-auto max-h-80 shadow-md w-full flex-3/4">
+              <DataTable value={sortedUsers} tableStyle={{ width: '100%' }}>
+                <Column
+                  header="Position"
+                  body={(rowData, { rowIndex }) => rowIndex + 1}
+                />
+                <Column header="Name" body={nameBodyTemplate}></Column>
+                <Column field="score" header="Score"></Column>
+              </DataTable>
+            </div>
           </div>
         </div>
       </div>
