@@ -10,15 +10,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Home() {
-  const dispatch = useDispatch<AppDispatch>();
-  const races = useSelector((state: RootState) => state.race.data);
-  const raceStatus = useSelector((state: RootState) => state.race.status);
-
   return (
     <>
-      <div className="sticky top-0">
-        <Navbar />
-      </div>
       <main className="flex flex-col gap-16 max-w-[70vw] mx-auto p-20 text-dark-700">
         <div className="w-full h-60 bg-surface-100 flex items-center justify-between gap-4 rounded-lg shadow-md overflow-hidden">
           <div className="flex flex-col gap-4 py-6 px-12">
@@ -28,7 +21,7 @@ export default function Home() {
             <p className="text-md">
               Race, manage your team, and lead them to victory!
             </p>
-            <Link href={'/authentication'}>
+            <Link href={'/authentication/register'}>
               <Button label="Get started" />
             </Link>
           </div>

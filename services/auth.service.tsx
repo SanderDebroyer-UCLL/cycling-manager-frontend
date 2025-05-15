@@ -1,4 +1,5 @@
 import { Credentials } from '@/types/credentials';
+import { User } from '@/types/user';
 
 export const loginUser = async (Credentials: Credentials) => {
   const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/auth/login', {
@@ -10,25 +11,34 @@ export const loginUser = async (Credentials: Credentials) => {
   });
 
   if (!res.ok) {
-    throw new Error('Failed to fetch user data');
+    throw new Error('Failed to login user');
   }
 
   return res.json();
 };
 
-const signupUser = (Credentials: Credentials) => {
-  return fetch(process.env.NEXT_PUBLIC_API_URL + '/api/auth/create-user', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+export const registerUser = async (userInfo: User) => {
+  const res = await fetch(
+    process.env.NEXT_PUBLIC_API_URL + '/api/auth/register',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userInfo),
     },
-    body: JSON.stringify(Credentials),
-  });
+  );
+
+  if (!res.ok) {
+    throw new Error('Failed to register user');
+  }
+
+  return res.json();
 };
 
 const AuthService = {
   loginUser,
-  signupUser,
+  registerUser,
 };
 
 export default AuthService;
