@@ -154,13 +154,13 @@ export const stageResults: StageResult[] = [
     position: 1,
     rider: 'PEDERSEN Mads',
     team: 'Lidl - Trek',
-    timeGap: '0:30',
+    timeGap: '0:00',
   },
   {
     position: 2,
     rider: 'ROGLIČ Primož',
     team: 'Red Bull - BORA - hansgrohe',
-    timeGap: '0:32',
+    timeGap: '0:17',
   },
   {
     position: 3,
@@ -199,6 +199,40 @@ export const stageResults: StageResult[] = [
     timeGap: '0:44',
   },
   {
+    position: 9,
+    rider: 'STORER Michael',
+    team: 'Tudor Pro Cycling Team',
+    timeGap: '0:46',
+  },
+  {
+    position: 10,
+    rider: 'PELLIZZARI Giulio',
+    team: 'Red Bull - BORA - hansgrohe',
+    timeGap: '0:50',
+  },
+  {
+    position: 9,
+    rider: 'STORER Michael',
+    team: 'Tudor Pro Cycling Team',
+    timeGap: '0:46',
+  },
+  {
+    position: 10,
+    rider: 'PELLIZZARI Giulio',
+    team: 'Red Bull - BORA - hansgrohe',
+    timeGap: '0:50',
+  },  {
+    position: 9,
+    rider: 'STORER Michael',
+    team: 'Tudor Pro Cycling Team',
+    timeGap: '0:46',
+  },
+  {
+    position: 10,
+    rider: 'PELLIZZARI Giulio',
+    team: 'Red Bull - BORA - hansgrohe',
+    timeGap: '0:50',
+  },  {
     position: 9,
     rider: 'STORER Michael',
     team: 'Tudor Pro Cycling Team',
