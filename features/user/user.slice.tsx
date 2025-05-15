@@ -39,6 +39,12 @@ const userSlice = createSlice({
       state.status = 'idle';
     },
     setUser(state, action) {
+      if (action.payload === null) {
+        state.data = null;
+        return;
+      }
+
+      
       if (state.data === null) {
         state.data = {
           email: '',
