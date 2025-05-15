@@ -142,3 +142,9 @@
   --color-red-800: #8e030d;  /* darker red */
   --color-red-900: #6c020a;  /* very dark red */
 }
+
+.p-treeselect-panel {
+  width: 100% !important;
+  max-width: 402px !important;
+  box-sizing: border-box;
+}

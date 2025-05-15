@@ -1,8 +1,6 @@
-// src/features/user/userSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { loginUser, registerUser } from '@/services/auth.service';
 import { Credentials } from '@/types/credentials';
-
 import { User } from '@/types/user';
 
 interface UserState {
@@ -10,7 +8,7 @@ interface UserState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
-const initialState: UserState = {
+const initialUserState: UserState = {
   data: null,
   status: 'idle',
 };
@@ -33,7 +31,7 @@ export const registerUserRequest = createAsyncThunk(
 
 const userSlice = createSlice({
   name: 'user',
-  initialState,
+  initialState: initialUserState,
   reducers: {
     resetStatus(state) {
       state.status = 'idle';
