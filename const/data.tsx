@@ -8,7 +8,7 @@ import tdfIconDark from '@/public/images/tdf-icon-dark.png';
 import giroIconLight from '@/public/images/giro-icon.png';
 import giroIconDark from '@/public/images/giro-icon-dark.png';
 import vueltaIconLight from '@/public/images/vuelta-icon.png';
-import { GrandTour, StageResult } from '@/types/grandtour';
+import { GrandTour, Stage, StageResult } from '@/types/grandtour';
 import { User } from '@/types/user';
 
 export const grandTours: GrandTour[] = [
@@ -199,40 +199,6 @@ export const stageResults: StageResult[] = [
     timeGap: '0:44',
   },
   {
-    position: 9,
-    rider: 'STORER Michael',
-    team: 'Tudor Pro Cycling Team',
-    timeGap: '0:46',
-  },
-  {
-    position: 10,
-    rider: 'PELLIZZARI Giulio',
-    team: 'Red Bull - BORA - hansgrohe',
-    timeGap: '0:50',
-  },
-  {
-    position: 9,
-    rider: 'STORER Michael',
-    team: 'Tudor Pro Cycling Team',
-    timeGap: '0:46',
-  },
-  {
-    position: 10,
-    rider: 'PELLIZZARI Giulio',
-    team: 'Red Bull - BORA - hansgrohe',
-    timeGap: '0:50',
-  },  {
-    position: 9,
-    rider: 'STORER Michael',
-    team: 'Tudor Pro Cycling Team',
-    timeGap: '0:46',
-  },
-  {
-    position: 10,
-    rider: 'PELLIZZARI Giulio',
-    team: 'Red Bull - BORA - hansgrohe',
-    timeGap: '0:50',
-  },  {
     position: 9,
     rider: 'STORER Michael',
     team: 'Tudor Pro Cycling Team',
