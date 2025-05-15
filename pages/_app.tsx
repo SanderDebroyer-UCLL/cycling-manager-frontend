@@ -8,6 +8,7 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import { PrimeReactProvider } from 'primereact/api';
 import { Inter, Manrope, Anton } from 'next/font/google';
+import Navbar from '@/components/navbar';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -32,6 +33,9 @@ export default function App({ Component, pageProps }: AppProps) {
         <div
           className={`${inter.variable} ${manrope.variable} ${anton.variable} font-inter bg-surface-300 min-h-[100vh]`}
         >
+          <div className="sticky top-0">
+            <Navbar />
+          </div>
           <Component {...pageProps} />
         </div>
       </Provider>
