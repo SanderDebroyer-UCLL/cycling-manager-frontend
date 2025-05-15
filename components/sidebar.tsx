@@ -55,7 +55,7 @@ const sidebar = () => {
           Mijn team
         </Link>
         <Link
-          href={`/${tour.href}`}
+          href={`/competitions/tour-de-france/klassement`}
           className=" flex gap-3 items-center hover:border-l-3 border-l-3 border-surface-100 hover:border-primary-500 px-6 py-1 hover:text-dark-500 hover:font-semibold"
         >
           <Medal size={18} className="stroke-dark-700" />

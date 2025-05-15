@@ -7,3 +7,11 @@ export interface GrandTour {
   iconLight: StaticImageData;
   iconDark: StaticImageData;
 }
+
+
+export interface StageResult {
+  position: number;
+  rider: string;
+  team: string;
+  timeGap: string;
+};
