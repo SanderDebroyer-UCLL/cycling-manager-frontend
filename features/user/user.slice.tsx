@@ -1,16 +1,18 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { loginUser, registerUser } from '@/services/auth.service';
 import { Credentials } from '@/types/credentials';
-import { User } from '@/types/user';
+import { RegisterUserDetails, User } from '@/types/user';
 
 interface UserState {
   data: User | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  error: string | null;
 }
 
 const initialUserState: UserState = {
   data: null,
   status: 'idle',
+  error: null,
 };
 
 export const loginUserRequest = createAsyncThunk(
@@ -18,15 +20,15 @@ export const loginUserRequest = createAsyncThunk(
   async (credentials: Credentials) => {
     const user = await loginUser(credentials);
     return user;
-  },
+  }
 );
 
 export const registerUserRequest = createAsyncThunk(
   'user/registerUser',
-  async (userInfo: User) => {
+  async (userInfo: RegisterUserDetails) => {
     const user = await registerUser(userInfo);
     return user;
-  },
+  }
 );
 
 const userSlice = createSlice({
@@ -42,7 +44,6 @@ const userSlice = createSlice({
         return;
       }
 
-      
       if (state.data === null) {
         state.data = {
           email: '',
@@ -59,17 +60,20 @@ const userSlice = createSlice({
     builder
       .addCase(loginUserRequest.pending, (state) => {
         state.status = 'loading';
+        state.error = null; // clear previous errors on new request
       })
       .addCase(
         loginUserRequest.fulfilled,
         (state, action: PayloadAction<User>) => {
           state.status = 'succeeded';
           state.data = action.payload;
-        },
+          state.error = null;
+        }
       )
-
-      .addCase(loginUserRequest.rejected, (state) => {
+      .addCase(loginUserRequest.rejected, (state, action) => {
         state.status = 'failed';
+        // save the error message in state.error
+        state.error = action.error.message || 'Failed to login';
       })
       .addCase(registerUserRequest.pending, (state) => {
         state.status = 'loading';
@@ -79,7 +83,7 @@ const userSlice = createSlice({
         (state, action: PayloadAction<User>) => {
           state.status = 'succeeded';
           state.data = action.payload;
-        },
+        }
       )
       .addCase(registerUserRequest.rejected, (state) => {
         state.status = 'failed';

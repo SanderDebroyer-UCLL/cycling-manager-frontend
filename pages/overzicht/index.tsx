@@ -34,7 +34,7 @@ export default function Overview() {
   };
 
   return (
-    <main className="max-w-[70vw] mx-auto p-20 text-dark-700 class flex flex-col gap-12">
+    <main className="max-w-[80vw] mx-auto p-20 text-dark-700 class flex flex-col gap-12">
       <div className="flex flex-col gap-4">
         <h2 className="text-xl font-semibold">Actieve Competities</h2>
         <div className="rounded-lg overflow-hidden">
@@ -100,9 +100,8 @@ export default function Overview() {
               ))}
             </div>
             <p className="text-center">
-              {sortedUsers[0].firstName} is in first place{' '}
-              {sortedUsers[0].score ?? 0 - (sortedUsers[1].score ?? 0)} points
-              ahead of {sortedUsers[1].firstName}
+              {sortedUsers[0].firstName} staat op de eerste plaats{' '}
+              {sortedUsers[0].score ?? 0 - (sortedUsers[1].score ?? 0)} punten voor op {sortedUsers[1].firstName}
             </p>
           </div>
         </div>

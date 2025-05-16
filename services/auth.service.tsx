@@ -1,5 +1,5 @@
 import { Credentials } from '@/types/credentials';
-import { User } from '@/types/user';
+import { RegisterUserDetails } from '@/types/user';
 
 export const loginUser = async (Credentials: Credentials) => {
   const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/auth/login', {
@@ -10,14 +10,17 @@ export const loginUser = async (Credentials: Credentials) => {
     body: JSON.stringify(Credentials),
   });
 
+  const data = await res.json();
+
   if (!res.ok) {
-    throw new Error('Failed to login user');
+    // throw the error message so it triggers rejected action
+    throw new Error(data.error || 'Something went wrong');
   }
 
-  return res.json();
+  return data;
 };
 
-export const registerUser = async (userInfo: User) => {
+export const registerUser = async (userInfo: RegisterUserDetails) => {
   const res = await fetch(
     process.env.NEXT_PUBLIC_API_URL + '/api/auth/register',
     {
@@ -26,7 +29,7 @@ export const registerUser = async (userInfo: User) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(userInfo),
-    },
+    }
   );
 
   if (!res.ok) {
@@ -42,4 +45,3 @@ const AuthService = {
 };
 
 export default AuthService;
-  

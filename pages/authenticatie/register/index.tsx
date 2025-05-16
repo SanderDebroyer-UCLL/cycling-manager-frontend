@@ -20,7 +20,10 @@ export default function Login() {
   const [repeatPassword, setRepeatPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [nameError, setNameError] = useState<string>('');
+  const [firstName, setFirstName] = useState<string>('');
+  const [lastName, setLastName] = useState<string>('');
+  const [firstNameError, setFirstNameError] = useState<string>('');
+  const [lastNameError, setLastNameError] = useState<string>('');
   const [emailError, setEmailError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [repeatPasswordError, setRepeatPasswordError] = useState<string>('');
@@ -32,66 +35,68 @@ export default function Login() {
   const dispatch = useDispatch<AppDispatch>();
 
   const handleRegister = () => {
-    setNameError('');
     setEmailError('');
     setPasswordError('');
     setRepeatPasswordError('');
 
     if (!name && !email && !password && !repeatPassword) {
-      setNameError('Name is required');
-      setEmailError('Email is required');
-      setPasswordError('Password is required');
-      setRepeatPasswordError('Repeat password is required');
+      setEmailError('Email is verplicht');
+      setPasswordError('Wachtwoord is verplicht');
+      setRepeatPasswordError('Herhalen van wachtwoord is verplicht');
+    if (!firstName && !lastName && !email && !password && !repeatPassword) {
+      setFirstNameError('Voornaam is verplicht');
+      setLastNameError('Achternaam is verplicht');
+      setEmailError('Email is verplicht');
+      setPasswordError('Wachtwoord is verplicht');
+      setRepeatPasswordError('herhalen van wachtwoord is verplicht');
       return;
     }
-    if (!name) {
-      setNameError('Name is required');
+    if (!firstName) {
+      setFirstNameError('Voornaam is verplicht');
+      return;
+    }
+
+    if (!lastName) {
+      setLastNameError('Achternaam is verplicht');
       return;
     }
 
     if (!email) {
-      setEmailError('Email is required');
+      setEmailError('Email  is verplicht');
       return;
     }
 
     if (!password) {
-      setPasswordError('Password is required');
+      setPasswordError('Wachtwoord is verplicht');
       return;
     }
 
     if (!repeatPassword) {
-      setRepeatPasswordError('Repeat password is required');
+      setRepeatPasswordError('Herhalen van wachtwoord is verplicht');
       return;
     }
 
     if (password !== repeatPassword) {
-      setPasswordError('Passwords do not match');
+      setPasswordError('Wachtwoorden komen niet overeen');
       return;
     }
 
     if (validateEmail(email) === false) {
-      setEmailError('Invalid email format');
+      setEmailError('Ongeldig emailadres');
       return;
     }
 
-    dispatch(registerUserRequest({ name, email, password }));
+    dispatch(registerUserRequest({ firstName, lastName, email, password }));
   };
 
   useEffect(() => {
     if (status === 'succeeded') {
-       showSuccessToast({
+      router.push('/overzicht'); // Replace with your target page
+      router.push('/authenticatie/login'); // Replace with your target page
+      showSuccessToast({
         summary: 'Registratie succesvol.',
         detail: 'Login in met je nieuwe account.',
       });
-      if (!user || !user.jwtToken) {
-        setEmailError('Invalid email or password');
-        return;
-      }
-     
-      sessionStorage.setItem('jwtToken', user.jwtToken);
-      sessionStorage.setItem('email', user.email);
-
-      router.push('/overzicht'); // Replace with your target page
       dispatch(resetStatus()); // reset status to avoid repeated redirects
     } else if (status === 'failed') {
       showErrorToast({
@@ -113,19 +118,32 @@ export default function Login() {
     <>
       <main className="flex items-center justify-center max-w-[70vw] mx-auto p-20 text-dark-700">
         <div className="bg-surface-100 flex flex-col justify-center gap-4 px-16 py-20  rounded-lg">
-          <h2 className="font-semibold text-lg">Register</h2>
-          <p>Please enter your details</p>
+          <h2 className="font-semibold text-lg">Registreer</h2>
+          <p>Vul uw gegevens in a.u.b.</p>
           <div>
             <IconField iconPosition="left">
               <InputIcon className="pi pi-user"> </InputIcon>
               <InputText
-                placeholder="Username"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                placeholder="Voornaam"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
               />
             </IconField>
-            {nameError && (
-              <p className="text-red-500 text-sm pt-2">{nameError}</p>
+            {firstNameError && (
+              <p className="text-red-500 text-sm pt-2">{firstNameError}</p>
+            )}
+          </div>
+          <div>
+            <IconField iconPosition="left">
+              <InputIcon className="pi pi-user"> </InputIcon>
+              <InputText
+                placeholder="Achternaam"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </IconField>
+            {lastNameError && (
+              <p className="text-red-500 text-sm pt-2">{lastNameError}</p>
             )}
           </div>
           <div>
@@ -147,7 +165,7 @@ export default function Login() {
               <InputIcon className="pi pi-lock"> </InputIcon>
               <InputText
                 type="password"
-                placeholder="Password"
+                placeholder="Wachtwoord"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -161,7 +179,7 @@ export default function Login() {
               <InputIcon className="pi pi-lock"> </InputIcon>
               <InputText
                 type="password"
-                placeholder="Repeat password"
+                placeholder="Herhaal wachtwoord"
                 value={repeatPassword}
                 onChange={(e) => setRepeatPassword(e.target.value)}
               />
@@ -171,7 +189,7 @@ export default function Login() {
             )}
           </div>
           <Button
-            label="Register"
+            label="Registreer"
             loading={loading}
             className="w-full"
             onClick={handleRegister}
@@ -180,4 +198,5 @@ export default function Login() {
       </main>
     </>
   );
+}
 }

@@ -3,8 +3,8 @@ import { User } from './user';
 
 export interface CreateCompetitionDetails {
   name: string;
-  races: string[];
-  users: string[];
+  userEmails: string[];
+  raceIds: number[];
 }
 
 export interface Competition {

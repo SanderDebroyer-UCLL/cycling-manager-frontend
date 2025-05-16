@@ -13,6 +13,9 @@ import { useRouter } from 'next/router';
 import Sidebar from '@/components/sidebar';
 import { Toast } from 'primereact/toast';
 import { toastRef } from '@/services/toast.service';
+import { NextPage } from 'next';
+import { ReactElement, ReactNode } from 'react';
+import Layout from '@/components/layout';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -30,31 +33,25 @@ const manrope = Manrope({
   variable: '--font-manrope',
 });
 
-export default function App({ Component, pageProps }: AppProps) {
+type NextPageWithLayout = NextPage & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
+
+export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter();
   const isCompetitionRoute = router.pathname.includes('/competities/');
+
+  const getLayout = Component.getLayout ?? ((page) => <Layout>{page}</Layout>);
 
   return (
     <PrimeReactProvider value={{ ripple: true }}>
       <Provider store={store}>
         <Toast ref={toastRef} position="bottom-right" />
-        {isCompetitionRoute ? (
-          <div
-            className={`${inter.variable} ${manrope.variable} ${anton.variable} font-inter bg-surface-300 min-h-[100vh] flex`}
-          >
-            <Sidebar />
-            <Component {...pageProps} />
-          </div>
-        ) : (
-          <div
-            className={`${inter.variable} ${manrope.variable} ${anton.variable} font-inter bg-surface-300 min-h-[100vh]`}
-          >
-            <div className="sticky top-0 z-50">
-              <Navbar />
-            </div>
-            <Component {...pageProps} />
-          </div>
-        )}
+        {getLayout(<Component {...pageProps} />)}
       </Provider>
     </PrimeReactProvider>
   );

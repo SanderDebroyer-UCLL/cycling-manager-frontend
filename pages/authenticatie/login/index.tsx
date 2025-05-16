@@ -32,22 +32,22 @@ export default function Login() {
     setPasswordError('');
 
     if (!email && !password) {
-      setEmailError('Email is required');
-      setPasswordError('Password is required');
+      setEmailError('Email is verplicht');
+      setPasswordError('Wachtwoord is verplicht');
       return;
     }
     if (!email) {
-      setEmailError('Email is required');
+      setEmailError('Email is verplicht');
       return;
     }
 
     if (!password) {
-      setPasswordError('Password is required');
+      setPasswordError('Password is verplicht');
       return;
     }
 
     if (validateEmail(email) === false) {
-      setEmailError('Invalid email format');
+      setEmailError('Ongeldig emailadres');
     }
 
     dispatch(loginUserRequest({ email, password }));
@@ -56,7 +56,6 @@ export default function Login() {
   useEffect(() => {
     if (status === 'succeeded') { 
       if (!user || !user.jwtToken) {
-        setEmailError('Invalid email or password');
         return;
       }
       showSuccessToast({"summary": "Login succesvol.", "detail": "Herleiden naar de overzicht pagina..."});
@@ -83,7 +82,7 @@ export default function Login() {
       <main className="flex items-center justify-center max-w-[70vw] mx-auto p-20 text-dark-700">
         <div className="bg-surface-100 flex flex-col justify-center gap-4 px-16 py-20  rounded-lg">
           <h2 className="font-semibold text-lg">Log in</h2>
-          <p>Please enter your details</p>
+          <p>Vul uw gegeven in a.u.b.</p>
 
           <div>
             <IconField iconPosition="left">
@@ -105,7 +104,7 @@ export default function Login() {
               <InputIcon className="pi pi-lock" />
               <InputText
                 type="password"
-                placeholder="Password"
+                placeholder="Wachtwoord"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />

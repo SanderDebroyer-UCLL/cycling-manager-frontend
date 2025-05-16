@@ -1,45 +1,26 @@
+import React, { useEffect, useState, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser } from '@/features/user/user.selector';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Button } from 'primereact/button';
-import React, { use, useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { User } from 'lucide-react';
-import { AppDispatch } from '@/store/store';
 import { setUser } from '@/features/user/user.slice';
 import { Menu } from 'primereact/menu';
 import { MenuItem } from 'primereact/menuitem';
+import Link from 'next/link';
 import router from 'next/router';
+import { AppDispatch } from '@/store/store';
+import { User } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Button } from 'primereact/button';
 
 const navbar = () => {
   const user = useSelector(selectCurrentUser);
+  const dispatch = useDispatch<AppDispatch>();
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
-
-  const dispatch = useDispatch<AppDispatch>();
-
-  useEffect(() => {
-    const email = sessionStorage.getItem('email');
-    const jwtToken = sessionStorage.getItem('jwtToken');
-
-    if (user?.email === email && user?.jwtToken == jwtToken) {
-      return;
-    }
-
-    if (email && jwtToken) {
-      dispatch(
-        setUser({
-          email: email,
-          jwtToken: jwtToken,
-        }),
-      );
-    }
-  }, [dispatch]);
 
   const logoutHandler = () => {
     dispatch(setUser(null)); // Of een specifieke logout action als je die hebt
     sessionStorage.removeItem('email');
-    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('jwtToken');
     router.push('/'); // Redirect naar de login pagina
   };
 
