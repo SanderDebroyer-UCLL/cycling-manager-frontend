@@ -12,13 +12,14 @@ export interface User {
 }
 
 
-export interface registerUserDetails {
-  name: string;
+export interface RegisterUserDetails {
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 }
 
-export interface loginUserDetails {
+export interface LoginUserDetails {
   email: string;
   password: string;
 }

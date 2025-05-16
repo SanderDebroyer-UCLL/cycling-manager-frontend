@@ -1,5 +1,5 @@
 import { Credentials } from '@/types/credentials';
-import { User } from '@/types/user';
+import { RegisterUserDetails, User } from '@/types/user';
 
 export const loginUser = async (Credentials: Credentials) => {
   const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/auth/login', {
@@ -17,7 +17,7 @@ export const loginUser = async (Credentials: Credentials) => {
   return res.json();
 };
 
-export const registerUser = async (userInfo: User) => {
+export const registerUser = async (userInfo: RegisterUserDetails) => {
   const res = await fetch(
     process.env.NEXT_PUBLIC_API_URL + '/api/auth/register',
     {

@@ -12,38 +12,45 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function Login() {
-  const [name, setName] = useState<string>('');
+  const [firstName, setFirstName] = useState<string>('');
+  const [lastName, setLastName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [repeatPassword, setRepeatPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-
-  const [nameError, setNameError] = useState<string>('');
+  const [firstNameError, setFirstNameError] = useState<string>('');
+  const [lastNameError, setLastNameError] = useState<string>('');
   const [emailError, setEmailError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [repeatPasswordError, setRepeatPasswordError] = useState<string>('');
 
   const router = useRouter();
   const status = useSelector((state: RootState) => state.user.status);
-  const user = useSelector(selectCurrentUser);
 
   const dispatch = useDispatch<AppDispatch>();
 
   const handleRegister = () => {
-    setNameError('');
+    setFirstNameError('');
+    setLastNameError('');
     setEmailError('');
     setPasswordError('');
     setRepeatPasswordError('');
 
-    if (!name && !email && !password && !repeatPassword) {
-      setNameError('Name is required');
+    if (!firstName && !lastName && !email && !password && !repeatPassword) {
+      setFirstNameError('First name is required');
+      setLastNameError('Last name is required');
       setEmailError('Email is required');
       setPasswordError('Password is required');
       setRepeatPasswordError('Repeat password is required');
       return;
     }
-    if (!name) {
-      setNameError('Name is required');
+    if (!firstName) {
+      setFirstNameError('First name is required');
+      return;
+    }
+
+    if (!lastName) {
+      setLastNameError('Last name is required');
       return;
     }
 
@@ -72,19 +79,12 @@ export default function Login() {
       return;
     }
 
-    dispatch(registerUserRequest({ name, email, password }));
+    dispatch(registerUserRequest({ firstName, lastName, email, password }));
   };
 
   useEffect(() => {
     if (status === 'succeeded') {
-      if (!user || !user.jwtToken) {
-        setEmailError('Invalid email or password');
-        return;
-      }
-      sessionStorage.setItem('jwtToken', user.jwtToken);
-      sessionStorage.setItem('email', user.email);
-
-      router.push('/overzicht'); // Replace with your target page
+      router.push('/authenticatie/login'); // Replace with your target page
       dispatch(resetStatus()); // reset status to avoid repeated redirects
     }
   }, [status, router]);
@@ -107,13 +107,26 @@ export default function Login() {
             <IconField iconPosition="left">
               <InputIcon className="pi pi-user"> </InputIcon>
               <InputText
-                placeholder="Username"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                placeholder="Voornaam"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
               />
             </IconField>
-            {nameError && (
-              <p className="text-red-500 text-sm pt-2">{nameError}</p>
+            {firstNameError && (
+              <p className="text-red-500 text-sm pt-2">{firstNameError}</p>
+            )}
+          </div>
+          <div>
+            <IconField iconPosition="left">
+              <InputIcon className="pi pi-user"> </InputIcon>
+              <InputText
+                placeholder="Achternaam"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </IconField>
+            {lastNameError && (
+              <p className="text-red-500 text-sm pt-2">{lastNameError}</p>
             )}
           </div>
           <div>

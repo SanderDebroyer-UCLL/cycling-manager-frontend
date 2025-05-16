@@ -55,7 +55,6 @@ export default function Login() {
   useEffect(() => {
     if (status === 'succeeded') {
       if (!user || !user.jwtToken) {
-        setEmailError('Invalid email or password');
         return;
       }
       sessionStorage.setItem('jwtToken', user.jwtToken);
