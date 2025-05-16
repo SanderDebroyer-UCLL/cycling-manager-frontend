@@ -18,6 +18,9 @@ import { fetchUsers } from '@/features/users/users.slice';
 import { InputText } from 'primereact/inputtext';
 import { createCompetitionRequest } from '@/features/competition/competition.slice';
 import { fetchCompetitions } from '@/features/competitions/competitions.slice';
+import { Competition } from '@/types/competition';
+import router from 'next/router';
+import Link from 'next/link';
 
 const Index = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -128,6 +131,16 @@ const Index = () => {
     );
   };
 
+  const LinkBodyTemplate = (competition: Competition) => {
+    return (
+      <Link href={`/competities/${competition.id}`}>
+        <Button
+          label="Naar Competitie"
+        />
+      </Link>
+    );
+  };
+
   return (
     <>
       <div className="p-10 flex flex-col gap-8">
@@ -142,6 +155,7 @@ const Index = () => {
               body={(rowData, { rowIndex }) => rowIndex + 1}
             />
             <Column header="Name" field="name" />
+            <Column header="Link" body={LinkBodyTemplate} />
           </DataTable>
         </div>
       </div>
