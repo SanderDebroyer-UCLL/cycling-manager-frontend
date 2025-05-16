@@ -17,7 +17,10 @@ import { User } from '@/types/user';
 import { fetchUsers } from '@/features/users/users.slice';
 import { InputText } from 'primereact/inputtext';
 import { createCompetitionRequest } from '@/features/competition/competition.slice';
-import { fetchCompetitions } from '@/features/competitions/competitions.slice';
+import {
+  fetchCompetitions,
+  resetCompetitionsStatus,
+} from '@/features/competitions/competitions.slice';
 import { Competition } from '@/types/competition';
 import Link from 'next/link';
 import { Race } from '@/types/cyclist';
@@ -138,6 +141,7 @@ const Index = () => {
       setSelectedRaces(null);
       setSelectedUsers([]);
       dispatch(fetchCompetitions());
+      dispatch(resetCompetitionsStatus());
     }
   }, [competitionStatus, dispatch]);
 

@@ -35,7 +35,7 @@ const userSlice = createSlice({
   name: 'user',
   initialState: initialUserState,
   reducers: {
-    resetStatus(state) {
+    resetUserStatus(state) {
       state.status = 'idle';
     },
     setUser(state, action) {
@@ -91,6 +91,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { resetStatus } = userSlice.actions;
+export const { resetUserStatus } = userSlice.actions;
 export const { setUser } = userSlice.actions;
 export default userSlice.reducer;
