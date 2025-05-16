@@ -21,7 +21,7 @@ const navbar = () => {
   const logoutHandler = () => {
     dispatch(setUser(null)); // Of een specifieke logout action als je die hebt
     sessionStorage.removeItem('email');
-    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('jwtToken');
     router.push('/'); // Redirect naar de login pagina
   };
 

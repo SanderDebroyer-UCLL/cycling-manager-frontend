@@ -89,13 +89,6 @@ export default function Login() {
 
   useEffect(() => {
     if (status === 'succeeded') {
-      if (!user || !user.jwtToken) {
-        setEmailError('Ongeldige inloggegevens');
-        return;
-      }
-      sessionStorage.setItem('jwtToken', user.jwtToken);
-      sessionStorage.setItem('email', user.email);
-
       router.push('/overzicht'); // Replace with your target page
       router.push('/authenticatie/login'); // Replace with your target page
       dispatch(resetStatus()); // reset status to avoid repeated redirects

@@ -55,7 +55,6 @@ export default function Login() {
   useEffect(() => {
     if (status === 'succeeded') {
       if (!user || !user.jwtToken) {
-        setEmailError('Ongeldige inloggegevens');
         return;
       }
       sessionStorage.setItem('jwtToken', user.jwtToken);

@@ -1,18 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
-import Sidebar from '@/components/sidebar';
+import React, { ReactNode, useState } from 'react';
 import { users } from '@/const/data';
 import { User } from '@/types/user';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { Stage } from '@/types/grandtour';
+import CompetitieLayout from '@/components/competitieLayout';
 
 const LeaderboardWithSidebar = () => {
   // Sorteer gebruikers op score aflopend
   const sortedUsers = users.sort(
-    (a: User, b: User) => (b.score ?? 0) - (a.score ?? 0),
+    (a: User, b: User) => (b.score ?? 0) - (a.score ?? 0)
   );
 
   const stages: Stage[] = [
@@ -97,37 +97,48 @@ const LeaderboardWithSidebar = () => {
   const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
 
   return (
-      <main className="p-10 w-full">
-        {/* Etappe Dropdown */}
-        <div className="mb-4">
-          <Dropdown
-            value={selectedStage}
-            onChange={(e) => setSelectedStage(e.value)}
-            options={stages}
-            optionLabel="name"
-            placeholder="Selecteer een etappe"
-            className="w-full md:w-60"
-          />
-        </div>
+    <main className="p-10 w-full">
+      {/* Etappe Dropdown */}
+      <div className="mb-4">
+        <Dropdown
+          value={selectedStage}
+          onChange={(e) => setSelectedStage(e.value)}
+          options={stages}
+          optionLabel="name"
+          placeholder="Selecteer een etappe"
+          className="w-full md:w-60"
+        />
+      </div>
 
-        {/* Etapperesultaten */}
-        {selectedStage ? (
-          <>
-            <h2 className="text-xl font-semibold mb-4">{selectedStage.name} Resultaten</h2>
-            <div className="rounded-lg shadow-md bg-surface-100 overflow-auto w-full max-h-[80vh]">
-              <DataTable value={selectedStage.results} tableStyle={{ width: '100%' }}>
-                <Column field="position" header="Positie" />
-                <Column field="rider" header="Renner" />
-                <Column field="team" header="Team" />
-                <Column field="timeGap" header="Tijd achterstand" />
-              </DataTable>
-            </div>
-          </>
-        ) : (
-          <p className="text-gray-500 mt-4">Selecteer een etappe om de resultaten te bekijken.</p>
-        )}
-      </main>
+      {/* Etapperesultaten */}
+      {selectedStage ? (
+        <>
+          <h2 className="text-xl font-semibold mb-4">
+            {selectedStage.name} Resultaten
+          </h2>
+          <div className="rounded-lg shadow-md bg-surface-100 overflow-auto w-full max-h-[80vh]">
+            <DataTable
+              value={selectedStage.results}
+              tableStyle={{ width: '100%' }}
+            >
+              <Column field="position" header="Positie" />
+              <Column field="rider" header="Renner" />
+              <Column field="team" header="Team" />
+              <Column field="timeGap" header="Tijd achterstand" />
+            </DataTable>
+          </div>
+        </>
+      ) : (
+        <p className="text-gray-500 mt-4">
+          Selecteer een etappe om de resultaten te bekijken.
+        </p>
+      )}
+    </main>
   );
 };
+
+LeaderboardWithSidebar.getLayout = (page: ReactNode) => (
+  <CompetitieLayout>{page}</CompetitieLayout>
+);
 
 export default LeaderboardWithSidebar;
