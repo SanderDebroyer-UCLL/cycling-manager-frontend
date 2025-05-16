@@ -18,7 +18,10 @@ export default function Login() {
   const [repeatPassword, setRepeatPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [nameError, setNameError] = useState<string>('');
+  const [firstName, setFirstName] = useState<string>('');
+  const [lastName, setLastName] = useState<string>('');
+  const [firstNameError, setFirstNameError] = useState<string>('');
+  const [lastNameError, setLastNameError] = useState<string>('');
   const [emailError, setEmailError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [repeatPasswordError, setRepeatPasswordError] = useState<string>('');
@@ -30,33 +33,29 @@ export default function Login() {
   const dispatch = useDispatch<AppDispatch>();
 
   const handleRegister = () => {
-    setNameError('');
     setEmailError('');
     setPasswordError('');
     setRepeatPasswordError('');
 
     if (!name && !email && !password && !repeatPassword) {
-      setNameError('Naam is verplicht');
       setEmailError('Email is verplicht');
       setPasswordError('Wachtwoord is verplicht');
       setRepeatPasswordError('Herhalen van wachtwoord is verplicht');
     if (!firstName && !lastName && !email && !password && !repeatPassword) {
-      setFirstNameError('First name is required');
-      setLastNameError('Last name is required');
-      setEmailError('Email is required');
-      setPasswordError('Password is required');
-      setRepeatPasswordError('Repeat password is required');
+      setFirstNameError('Voornaam is verplicht');
+      setLastNameError('Achternaam is verplicht');
+      setEmailError('Email is verplicht');
+      setPasswordError('Wachtwoord is verplicht');
+      setRepeatPasswordError('herhalen van wachtwoord is verplicht');
       return;
     }
-    if (!name) {
-      setNameError('Naam is verplicht');
     if (!firstName) {
-      setFirstNameError('First name is required');
+      setFirstNameError('Voornaam is verplicht');
       return;
     }
 
     if (!lastName) {
-      setLastNameError('Last name is required');
+      setLastNameError('Achternaam is verplicht');
       return;
     }
 
@@ -85,7 +84,7 @@ export default function Login() {
       return;
     }
 
-    dispatch(registerUserRequest({ name, email, password }));
+    dispatch(registerUserRequest({ firstName, lastName, email, password }));
   };
 
   useEffect(() => {
@@ -121,9 +120,6 @@ export default function Login() {
             <IconField iconPosition="left">
               <InputIcon className="pi pi-user"> </InputIcon>
               <InputText
-                placeholder="Gebruikersnaam"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
                 placeholder="Voornaam"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
@@ -142,8 +138,8 @@ export default function Login() {
                 onChange={(e) => setLastName(e.target.value)}
               />
             </IconField>
-            {nameError && (
-              <p className="text-red-500 text-sm pt-2">{nameError}</p>
+            {lastNameError && (
+              <p className="text-red-500 text-sm pt-2">{lastNameError}</p>
             )}
           </div>
           <div>
@@ -179,7 +175,7 @@ export default function Login() {
               <InputIcon className="pi pi-lock"> </InputIcon>
               <InputText
                 type="password"
-                placeholder="Repeat password"
+                placeholder="Herhaal wachtwoord"
                 value={repeatPassword}
                 onChange={(e) => setRepeatPassword(e.target.value)}
               />
@@ -189,7 +185,7 @@ export default function Login() {
             )}
           </div>
           <Button
-            label="Register"
+            label="Registreer"
             loading={loading}
             className="w-full"
             onClick={handleRegister}
@@ -198,4 +194,5 @@ export default function Login() {
       </main>
     </>
   );
+}
 }
