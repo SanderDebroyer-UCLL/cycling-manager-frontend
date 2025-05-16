@@ -19,7 +19,6 @@ import { InputText } from 'primereact/inputtext';
 import { createCompetitionRequest } from '@/features/competition/competition.slice';
 import { fetchCompetitions } from '@/features/competitions/competitions.slice';
 import { Competition } from '@/types/competition';
-import router from 'next/router';
 import Link from 'next/link';
 
 const Index = () => {
