@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { loginUser, registerUser } from '@/services/auth.service';
 import { Credentials } from '@/types/credentials';
-import { User } from '@/types/user';
+import { RegisterUserDetails, User } from '@/types/user';
 
 interface UserState {
   data: User | null;
@@ -23,7 +23,7 @@ export const loginUserRequest = createAsyncThunk(
 
 export const registerUserRequest = createAsyncThunk(
   'user/registerUser',
-  async (userInfo: User) => {
+  async (userInfo: RegisterUserDetails) => {
     const user = await registerUser(userInfo);
     return user;
   },

@@ -1,7 +1,5 @@
 // src/features/user/userSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { loginUser, registerUser } from '@/services/auth.service';
-import { Credentials } from '@/types/credentials';
 import { Competition, CreateCompetitionDetails } from '@/types/competition';
 import { createCompetition } from '@/services/competition.service';
 

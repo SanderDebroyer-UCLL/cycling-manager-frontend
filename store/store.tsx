@@ -4,6 +4,8 @@ import raceReducer from '@/features/race/race.slice';
 import userReducer from '@/features/user/user.slice';
 import usersReducer from '@/features/users/users.slice';
 import competitionReducer from '@/features/competition/competition.slice';
+import competitionsReducer from '@/features/competitions/competitions.slice'
+
 
 const store = configureStore({
   reducer: {
@@ -11,6 +13,7 @@ const store = configureStore({
     user: userReducer,
     users: usersReducer,
     competition: competitionReducer,
+    competitions: competitionsReducer,
   },
 });
 

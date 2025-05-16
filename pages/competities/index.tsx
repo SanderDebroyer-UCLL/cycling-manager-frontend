@@ -17,6 +17,10 @@ import { User } from '@/types/user';
 import { fetchUsers } from '@/features/users/users.slice';
 import { InputText } from 'primereact/inputtext';
 import { createCompetitionRequest } from '@/features/competition/competition.slice';
+import { fetchCompetitions } from '@/features/competitions/competitions.slice';
+import { Competition } from '@/types/competition';
+import router from 'next/router';
+import Link from 'next/link';
 
 const Index = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,14 +28,17 @@ const Index = () => {
   const users = useSelector((state: RootState) => state.users.data);
   const raceStatus = useSelector((state: RootState) => state.race.status);
   const usersStatus = useSelector((state: RootState) => state.users.status);
+  const competitionsStatus = useSelector(
+    (state: RootState) => state.competitions.status
+  );
+  const competitions = useSelector(
+    (state: RootState) => state.competitions.data
+  );
   const competitionStatus = useSelector(
-    (state: RootState) => state.competition.status,
+    (state: RootState) => state.competition.status
   );
   const [name, setName] = useState('');
-  const [nodes, setNodes] = useState<TreeNode[]>([]);
-  const [visible, setVisible] = React.useState(false);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
   const [selectedRaces, setSelectedRaces] = useState<
     | string
     | TreeSelectSelectionKeysType
@@ -39,6 +46,16 @@ const Index = () => {
     | null
     | undefined
   >(null);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [selectedRacesError, setSelectedRacesError] = useState<string | null>(
+    null
+  );
+  const [selectedUsersError, setSelectedUsersError] = useState<string | null>(
+    null
+  );
+  const [nodes, setNodes] = useState<TreeNode[]>([]);
+  const [visible, setVisible] = React.useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (races.length) {
@@ -54,6 +71,12 @@ const Index = () => {
   }, [dispatch, raceStatus]);
 
   useEffect(() => {
+    if (competitionsStatus === 'idle') {
+      dispatch(fetchCompetitions());
+    }
+  }, [dispatch, competitionsStatus]);
+
+  useEffect(() => {
     if (usersStatus === 'idle') {
       dispatch(fetchUsers());
     }
@@ -67,26 +90,36 @@ const Index = () => {
     }
   }, [competitionStatus]);
 
-  const handleCreateCompetition = async () => {
-    if (!name) {
-      return;
+  const handleCreateCompetition = () => {
+    setNameError('');
+    setSelectedRacesError('');
+    setSelectedUsersError('');
+
+    let hasError = false;
+
+    if (!name.trim()) {
+      setNameError('Naam is verplicht');
+      hasError = true;
     }
 
-    if (!selectedRaces) {
-      return;
+    if (!selectedRaces || Object.keys(selectedRaces).length === 0) {
+      setSelectedRacesError('Selecteer ten minste 1 race');
+      hasError = true;
     }
 
-    if (!selectedUsers) {
-      return;
+    if (!selectedUsers || selectedUsers.length === 0) {
+      setSelectedUsersError('Selecteer ten minste 1 deelnemer');
+      hasError = true;
     }
+
+    if (hasError) return;
 
     const usersEmail = selectedUsers.map((user) => user.email);
-
-    const selectedRacesArray = Object.keys(selectedRaces);
-
-    const selectedKeys = Object.keys(selectedRaces); // ["1", "2", "9"]
+    const selectedKeys =
+      selectedRaces && typeof selectedRaces === 'object'
+        ? Object.keys(selectedRaces)
+        : [];
     const selectedNodes = findSelectedRaceData(selectedKeys, nodes);
-
     const selectedRaceIds = selectedNodes.map((node) => Number(node.key));
 
     dispatch(
@@ -94,7 +127,17 @@ const Index = () => {
         name,
         userEmails: usersEmail,
         raceIds: selectedRaceIds,
-      }),
+      })
+    );
+  };
+
+  const LinkBodyTemplate = (competition: Competition) => {
+    return (
+      <Link href={`/competities/${competition.id}`}>
+        <Button
+          label="Naar Competitie"
+        />
+      </Link>
     );
   };
 
@@ -106,12 +149,13 @@ const Index = () => {
           <Button label="Creëer Competite" onClick={() => setVisible(true)} />
         </div>
         <div className="overflow-hidden overflow-y-auto rounded-lg max-h-[75vh]">
-          <DataTable value={races} tableStyle={{ width: '100%' }}>
+          <DataTable value={competitions} tableStyle={{ width: '100%' }}>
             <Column
               header="Position"
               body={(rowData, { rowIndex }) => rowIndex + 1}
             />
             <Column header="Name" field="name" />
+            <Column header="Link" body={LinkBodyTemplate} />
           </DataTable>
         </div>
       </div>
@@ -130,6 +174,9 @@ const Index = () => {
           <div className="flex flex-col w-full gap-2">
             <label htmlFor="">Naam</label>
             <InputText value={name} onChange={(e) => setName(e.target.value)} />
+            {nameError && (
+              <div className="text-red-500 text-sm mt-2">{nameError}</div>
+            )}
           </div>
           <div className="flex flex-col w-full gap-2">
             <label htmlFor="">Race(s)</label>
@@ -143,6 +190,11 @@ const Index = () => {
               selectionMode="multiple"
               unselectable="on"
             ></TreeSelect>
+            {selectedRacesError && (
+              <div className="text-red-500 text-sm mt-2">
+                {selectedRacesError}
+              </div>
+            )}
           </div>
           <div className="flex flex-col w-full gap-2">
             <label htmlFor="">Deelnemers</label>
@@ -150,12 +202,21 @@ const Index = () => {
               value={selectedUsers}
               options={users}
               onChange={(e) => setSelectedUsers(e.value)}
-              optionLabel="name"
+              itemTemplate={(user: User) =>
+                `${user.firstName} ${user.lastName}`
+              }
+              selectedItemTemplate={(user: User | undefined) =>
+                user ? `${user.firstName} ${user.lastName}` : ''
+              }
               placeholder="Selecteer deelnemers"
-              // itemTemplate={countryTemplate}
               className="w-full md:w-20rem"
               display="chip"
             />
+            {selectedUsersError && (
+              <div className="text-red-500 text-sm mt-2">
+                {selectedUsersError}
+              </div>
+            )}
           </div>
 
           <div className="flex gap-8 justify-between">

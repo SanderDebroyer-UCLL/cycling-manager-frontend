@@ -40,10 +40,23 @@ export default function Login() {
       setEmailError('Email is verplicht');
       setPasswordError('Wachtwoord is verplicht');
       setRepeatPasswordError('Herhalen van wachtwoord is verplicht');
+    if (!firstName && !lastName && !email && !password && !repeatPassword) {
+      setFirstNameError('First name is required');
+      setLastNameError('Last name is required');
+      setEmailError('Email is required');
+      setPasswordError('Password is required');
+      setRepeatPasswordError('Repeat password is required');
       return;
     }
     if (!name) {
       setNameError('Naam is verplicht');
+    if (!firstName) {
+      setFirstNameError('First name is required');
+      return;
+    }
+
+    if (!lastName) {
+      setLastNameError('Last name is required');
       return;
     }
 
@@ -85,6 +98,7 @@ export default function Login() {
       sessionStorage.setItem('email', user.email);
 
       router.push('/overzicht'); // Replace with your target page
+      router.push('/authenticatie/login'); // Replace with your target page
       dispatch(resetStatus()); // reset status to avoid repeated redirects
     }
   }, [status, router]);
@@ -110,6 +124,22 @@ export default function Login() {
                 placeholder="Gebruikersnaam"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                placeholder="Voornaam"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </IconField>
+            {firstNameError && (
+              <p className="text-red-500 text-sm pt-2">{firstNameError}</p>
+            )}
+          </div>
+          <div>
+            <IconField iconPosition="left">
+              <InputIcon className="pi pi-user"> </InputIcon>
+              <InputText
+                placeholder="Achternaam"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
               />
             </IconField>
             {nameError && (
@@ -149,7 +179,7 @@ export default function Login() {
               <InputIcon className="pi pi-lock"> </InputIcon>
               <InputText
                 type="password"
-                placeholder="Herhaal wachtwoord"
+                placeholder="Repeat password"
                 value={repeatPassword}
                 onChange={(e) => setRepeatPassword(e.target.value)}
               />
@@ -159,7 +189,7 @@ export default function Login() {
             )}
           </div>
           <Button
-            label="Registreer"
+            label="Register"
             loading={loading}
             className="w-full"
             onClick={handleRegister}
