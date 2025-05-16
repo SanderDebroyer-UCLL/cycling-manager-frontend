@@ -8,7 +8,10 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { TreeSelect, TreeSelectSelectionKeysType } from 'primereact/treeselect';
 import { TreeNode } from 'primereact/treenode';
-import { createTreeNodesFromRaces } from '@/utils/createRaceNodes';
+import {
+  createTreeNodesFromRaces,
+  findSelectedRaceData,
+} from '@/utils/createRaceNodes';
 import { MultiSelect } from 'primereact/multiselect';
 import { User } from '@/types/user';
 import { fetchUsers } from '@/features/users/users.slice';
@@ -27,7 +30,7 @@ const Index = () => {
   const [name, setName] = useState('');
   const [nodes, setNodes] = useState<TreeNode[]>([]);
   const [visible, setVisible] = React.useState(false);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedRaces, setSelectedRaces] = useState<
     | string
@@ -77,11 +80,20 @@ const Index = () => {
       return;
     }
 
+    const usersEmail = selectedUsers.map((user) => user.email);
+
+    const selectedRacesArray = Object.keys(selectedRaces);
+
+    const selectedKeys = Object.keys(selectedRaces); // ["1", "2", "9"]
+    const selectedNodes = findSelectedRaceData(selectedKeys, nodes);
+
+    const selectedRaceIds = selectedNodes.map((node) => Number(node.key));
+
     dispatch(
       createCompetitionRequest({
         name,
-        races: Object.keys(selectedRaces),
-        users: selectedUsers,
+        userEmails: usersEmail,
+        raceIds: selectedRaceIds,
       }),
     );
   };

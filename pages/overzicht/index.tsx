@@ -34,7 +34,7 @@ export default function Overview() {
   };
 
   return (
-    <main className="max-w-[70vw] mx-auto p-20 text-dark-700 class flex flex-col gap-12">
+    <main className="max-w-[80vw] mx-auto p-20 text-dark-700 class flex flex-col gap-12">
       <div className="flex flex-col gap-4">
         <h2 className="text-xl font-semibold">Actieve Competities</h2>
         <div className="rounded-lg overflow-hidden">

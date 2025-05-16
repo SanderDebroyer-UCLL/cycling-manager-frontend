@@ -1,6 +1,6 @@
 export const createCompetition = async (competitionData: any) => {
   const res = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + '/api/competitions',
+    process.env.NEXT_PUBLIC_API_URL + '/competitions/create-competition',
     {
       method: 'POST',
       headers: {
