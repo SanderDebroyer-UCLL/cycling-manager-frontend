@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ProgressSpinner } from 'primereact/progressspinner';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser } from '@/features/user/user.selector';
 import { setUser } from '@/features/user/user.slice';
