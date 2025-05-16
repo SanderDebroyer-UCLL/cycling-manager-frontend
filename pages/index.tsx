@@ -16,10 +16,10 @@ export default function Home() {
         <div className="w-full h-60 bg-surface-100 flex items-center justify-between gap-4 rounded-lg shadow-md overflow-hidden">
           <div className="flex flex-col gap-4 py-6 px-12">
             <h1 className="text-2xl font-semibold">
-              Welcome to the cycling manager{' '}
+              Welkom op cycling manager{' '}
             </h1>
             <p className="text-md">
-              Race, manage your team, and lead them to victory!
+              Race, manage je team, en leid ze tot de overwinning!
             </p>
             <Link href={'/authentication/register'}>
               <Button label="Get started" />
@@ -38,9 +38,9 @@ export default function Home() {
             <div className="flex flex-col items-start">
               <CalendarSearch size={48} className="stroke-blue-500" />
             </div>
-            <h3 className="font-medium text-md"> Choose your race</h3>
+            <h3 className="font-medium text-md"> Kies je race</h3>
             <p className="text-sm">
-              Select riders, assign roles, and form a winning strategy.
+            Selecteer renners, wijs rollen toe en vorm een winnende strategie.
             </p>
           </div>
           <div className="bg-surface-50 h-full w-full flex flex-col rounded-lg shadow-md p-4 gap-2">
@@ -48,17 +48,17 @@ export default function Home() {
               <Swords size={48} className="stroke-blue-500" />
             </div>
             <h3 className="font-medium text-md">
-              Compete against your friends
+            Neem het op tegen je vrienden
             </h3>
-            <p className="text-sm">Prove who's the best manager.</p>
+            <p className="text-sm">Bewijs wie de beste manager is.</p>
           </div>
           <div className="bg-surface-50 h-full w-full flex flex-col rounded-lg shadow-md p-4 gap-2">
             <div className="flex flex-col items-start">
               <Trophy size={48} className="stroke-blue-500" />
             </div>
-            <h3 className="font-medium text-md">Achieve greatness</h3>
+            <h3 className="font-medium text-md">Bereik grootse dingen</h3>
             <p className="text-sm">
-              Beat your friends and climb the leaderboard.
+             Versla je vrienden en klim naar de top van het klassement.
             </p>
           </div>
         </div>

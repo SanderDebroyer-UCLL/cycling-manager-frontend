@@ -1,7 +1,7 @@
 import React from 'react';
 
 const index = () => {
-  return <div>Profile Page</div>;
+  return <div>Profiel Pagina</div>;
 };
 
 export default index;

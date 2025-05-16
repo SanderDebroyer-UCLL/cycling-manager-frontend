@@ -5,7 +5,7 @@ import React, { ReactNode } from 'react';
 const index = () => {
   const router = useRouter();
   const { competitionId } = router.query;
-  return <div>{competitionId} overview</div>;
+  return <div>{competitionId} Overzicht</div>;
 };
 
 index.getLayout = (page: ReactNode) => (
