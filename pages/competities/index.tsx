@@ -23,7 +23,7 @@ import {
 } from '@/features/competitions/competitions.slice';
 import { Competition } from '@/types/competition';
 import Link from 'next/link';
-import { Race } from '@/types/cyclist';
+import { Race } from '@/types/race';
 
 const Index = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -201,7 +201,67 @@ const Index = () => {
             <TreeSelect
               filter
               value={selectedRaces}
-              onChange={(e) => setSelectedRaces(e.value)}
+              showClear
+              onChange={(e) => {
+                const newValue = e.value as TreeSelectSelectionKeysType | null;
+
+                // If nothing selected (deselected all)
+                if (!newValue || Object.keys(newValue).length === 0) {
+                  setSelectedRaces(null);
+                  return;
+                }
+
+                const newKeys = Object.keys(newValue);
+                const oldKeys = selectedRaces ? Object.keys(selectedRaces) : [];
+
+                // Detect added key (in new but not old)
+                const addedKey = newKeys.find((key) => !oldKeys.includes(key));
+                // Detect removed key (in old but not new)
+                const removedKey = oldKeys.find(
+                  (key) => !newKeys.includes(key)
+                );
+
+                const oldSelectedNodes = findSelectedRaceData(oldKeys, nodes);
+                const addedNode = addedKey
+                  ? findSelectedRaceData([addedKey], nodes)[0]
+                  : null;
+
+                const oldHasNiveau2 = oldSelectedNodes.some((node) =>
+                  node.data?.niveau?.startsWith('2')
+                );
+
+                const addedIsNiveau2 = addedNode?.data?.niveau?.startsWith('2');
+
+                if (removedKey) {
+                  // User deselected something
+                  // Just update selection to newValue as is, no forcing
+                  setSelectedRaces(newValue);
+                  return;
+                }
+
+                if (oldHasNiveau2) {
+                  if (addedIsNiveau2) {
+                    // Switching niveau 2 race: keep only that
+                    setSelectedRaces({ [addedKey!]: true });
+                  } else {
+                    // Trying to add non-niveau 2 while niveau 2 selected -> ignore, keep old
+                    setSelectedRaces(
+                      oldKeys.reduce(
+                        (acc, key) => ({ ...acc, [key]: true }),
+                        {}
+                      )
+                    );
+                  }
+                } else {
+                  if (addedIsNiveau2) {
+                    // New niveau 2 selected: force single select
+                    setSelectedRaces({ [addedKey!]: true });
+                  } else {
+                    // Normal multi-select
+                    setSelectedRaces(newValue);
+                  }
+                }
+              }}
               options={nodes}
               className="md:w-20rem w-full"
               placeholder="Selecteer race(s)"

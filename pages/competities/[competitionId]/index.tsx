@@ -40,7 +40,12 @@ const index = () => {
 
   return (
     <div className=" py-12 px-8 ">
-      <h1 className="font-bold text-xl">Overzicht {competition.name} </h1>
+      {competition.races[0].niveau.startsWith('2') && (
+        <div className="flex">Ronde Race</div>
+      )}
+      <div className="flex flex-col">
+        <h2></h2>
+      </div>
     </div>
   );
 };
