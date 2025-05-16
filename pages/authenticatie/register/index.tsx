@@ -10,6 +10,8 @@ import { InputIcon } from 'primereact/inputicon';
 import { InputText } from 'primereact/inputtext';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Toast } from 'primereact/toast';
+import { showErrorToast, showSuccessToast } from '@/services/toast.service';
 
 export default function Login() {
   const [name, setName] = useState<string>('');
@@ -77,15 +79,25 @@ export default function Login() {
 
   useEffect(() => {
     if (status === 'succeeded') {
+       showSuccessToast({
+        summary: 'Registratie succesvol.',
+        detail: 'Login in met je nieuwe account.',
+      });
       if (!user || !user.jwtToken) {
         setEmailError('Invalid email or password');
         return;
       }
+     
       sessionStorage.setItem('jwtToken', user.jwtToken);
       sessionStorage.setItem('email', user.email);
 
       router.push('/overzicht'); // Replace with your target page
       dispatch(resetStatus()); // reset status to avoid repeated redirects
+    } else if (status === 'failed') {
+      showErrorToast({
+        summary: 'Registratie mislukt.',
+        detail: "Probeer het opnieuw.",
+      });
     }
   }, [status, router]);
 

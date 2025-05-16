@@ -11,6 +11,7 @@ import { loginUserRequest, resetStatus } from '@/features/user/user.slice';
 import { useRouter } from 'next/router';
 import { validateEmail } from '@/utils/email';
 import { selectCurrentUser } from '@/features/user/user.selector';
+import { showErrorToast, showSuccessToast } from '@/services/toast.service';
 
 export default function Login() {
   const [email, setEmail] = useState<string>('');
@@ -53,14 +54,18 @@ export default function Login() {
   };
 
   useEffect(() => {
-    if (status === 'succeeded') {
+    if (status === 'succeeded') { 
       if (!user || !user.jwtToken) {
         setEmailError('Invalid email or password');
         return;
       }
+      showSuccessToast({"summary": "Login succesvol.", "detail": "Herleiden naar de overzicht pagina..."});
       sessionStorage.setItem('jwtToken', user.jwtToken);
       sessionStorage.setItem('email', user.email);
-      router.push('/overzicht'); // Replace with your target page
+      setTimeout(() => {
+         router.push('/overzicht');
+      }, 3000);
+      // Replace with your target page
       dispatch(resetStatus());
     }
   }, [status, router]);
