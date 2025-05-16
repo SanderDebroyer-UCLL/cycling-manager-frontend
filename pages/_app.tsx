@@ -11,6 +11,8 @@ import { Inter, Manrope, Anton } from 'next/font/google';
 import Navbar from '@/components/navbar';
 import { useRouter } from 'next/router';
 import Sidebar from '@/components/sidebar';
+import { Toast } from 'primereact/toast';
+import { toastRef } from '@/services/toast.service';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -35,6 +37,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <PrimeReactProvider value={{ ripple: true }}>
       <Provider store={store}>
+        <Toast ref={toastRef} position="bottom-right" />
         {isCompetitionRoute ? (
           <div
             className={`${inter.variable} ${manrope.variable} ${anton.variable} font-inter bg-surface-300 min-h-[100vh] flex`}
