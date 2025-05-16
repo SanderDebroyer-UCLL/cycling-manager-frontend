@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -20,6 +20,7 @@ import { createCompetitionRequest } from '@/features/competition/competition.sli
 import { fetchCompetitions } from '@/features/competitions/competitions.slice';
 import { Competition } from '@/types/competition';
 import Link from 'next/link';
+import { Race } from '@/types/cyclist';
 
 const Index = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -130,12 +131,20 @@ const Index = () => {
     );
   };
 
+  useEffect(() => {
+    if (competitionStatus === 'succeeded') {
+      setVisible(false);
+      setName('');
+      setSelectedRaces(null);
+      setSelectedUsers([]);
+      dispatch(fetchCompetitions());
+    }
+  }, [competitionStatus, dispatch]);
+
   const LinkBodyTemplate = (competition: Competition) => {
     return (
       <Link href={`/competities/${competition.id}`}>
-        <Button
-          label="Naar Competitie"
-        />
+        <Button label="Naar Competitie" />
       </Link>
     );
   };
@@ -154,6 +163,12 @@ const Index = () => {
               body={(rowData, { rowIndex }) => rowIndex + 1}
             />
             <Column header="Name" field="name" />
+            <Column
+              header="Races"
+              body={(rowData) =>
+                rowData.races.map((race: Race) => race.name).join(', ')
+              }
+            />{' '}
             <Column header="Link" body={LinkBodyTemplate} />
           </DataTable>
         </div>
