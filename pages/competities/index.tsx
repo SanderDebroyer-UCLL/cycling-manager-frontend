@@ -168,7 +168,7 @@ const Index = () => {
               body={(rowData) =>
                 rowData.races.map((race: Race) => race.name).join(', ')
               }
-            />{' '}
+            />
             <Column header="Link" body={LinkBodyTemplate} />
           </DataTable>
         </div>

@@ -16,7 +16,7 @@ const index = () => {
   const { competitionId } = router.query;
 
   useEffect(() => {
-    if (!competition && competitionId) {
+    if (competitionId) {
       dispatch(fetchCompetitionById(competitionId.toString()));
     }
   }, [dispatch, competition, competitionId]);
