@@ -1,3 +1,5 @@
+import { Stage } from "./grandtour";
+
 export interface Race2 {
   age: number;
   ranking: number;
@@ -10,8 +12,9 @@ export interface Race2 {
 export interface Race {
   id: string;
   name: string;
-  end_date: string;
-  start_date: string;
+  stages: Stage[]
+  startDate: Date;
+  endDate: Date;
   niveau: string;
   distance: string;
 }

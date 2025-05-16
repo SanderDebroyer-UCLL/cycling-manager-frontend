@@ -148,7 +148,7 @@ const Index = () => {
   const LinkBodyTemplate = (competition: Competition) => {
     return (
       <Link href={`/competities/${competition.id}`}>
-        <Button label="Naar Competitie" />
+        <Button label="Naar Competitie" size="small" />
       </Link>
     );
   };

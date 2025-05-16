@@ -8,11 +8,15 @@ export interface GrandTour {
   iconDark: StaticImageData;
 }
 
-export interface Stage{
+export interface Stage {
+  id: string;
   name: string;
+  departure: string;
+  arrival: string;
   date: string;
+  startTime: string;
   distance: string;
-  type: string;
+  verticalMeters: string;
   results: StageResult[];
 }
 
@@ -21,4 +25,4 @@ export interface StageResult {
   rider: string;
   team: string;
   timeGap: string;
-};
+}
