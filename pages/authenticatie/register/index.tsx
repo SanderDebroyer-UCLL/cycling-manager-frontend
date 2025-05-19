@@ -1,6 +1,6 @@
 import Navbar from '@/components/navbar';
 import { selectCurrentUser } from '@/features/user/user.selector';
-import { registerUserRequest, resetStatus } from '@/features/user/user.slice';
+import { registerUserRequest, resetUserStatus } from '@/features/user/user.slice';
 import { AppDispatch, RootState } from '@/store/store';
 import { validateEmail } from '@/utils/email';
 import { useRouter } from 'next/router';
@@ -30,6 +30,7 @@ export default function Login() {
 
   const router = useRouter();
   const status = useSelector((state: RootState) => state.user.status);
+  const error = useSelector((state: RootState) => state.user.error);
   const user = useSelector(selectCurrentUser);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -43,66 +44,65 @@ export default function Login() {
       setEmailError('Email is verplicht');
       setPasswordError('Wachtwoord is verplicht');
       setRepeatPasswordError('Herhalen van wachtwoord is verplicht');
-    if (!firstName && !lastName && !email && !password && !repeatPassword) {
-      setFirstNameError('Voornaam is verplicht');
-      setLastNameError('Achternaam is verplicht');
-      setEmailError('Email is verplicht');
-      setPasswordError('Wachtwoord is verplicht');
-      setRepeatPasswordError('herhalen van wachtwoord is verplicht');
-      return;
-    }
-    if (!firstName) {
-      setFirstNameError('Voornaam is verplicht');
-      return;
-    }
+      if (!firstName && !lastName && !email && !password && !repeatPassword) {
+        setFirstNameError('Voornaam is verplicht');
+        setLastNameError('Achternaam is verplicht');
+        setEmailError('Email is verplicht');
+        setPasswordError('Wachtwoord is verplicht');
+        setRepeatPasswordError('herhalen van wachtwoord is verplicht');
+        return;
+      }
+      if (!firstName) {
+        setFirstNameError('Voornaam is verplicht');
+        return;
+      }
 
-    if (!lastName) {
-      setLastNameError('Achternaam is verplicht');
-      return;
-    }
+      if (!lastName) {
+        setLastNameError('Achternaam is verplicht');
+        return;
+      }
 
-    if (!email) {
-      setEmailError('Email  is verplicht');
-      return;
-    }
+      if (!email) {
+        setEmailError('Email  is verplicht');
+        return;
+      }
 
-    if (!password) {
-      setPasswordError('Wachtwoord is verplicht');
-      return;
-    }
+      if (!password) {
+        setPasswordError('Wachtwoord is verplicht');
+        return;
+      }
 
-    if (!repeatPassword) {
-      setRepeatPasswordError('Herhalen van wachtwoord is verplicht');
-      return;
-    }
+      if (!repeatPassword) {
+        setRepeatPasswordError('Herhalen van wachtwoord is verplicht');
+        return;
+      }
 
-    if (password !== repeatPassword) {
-      setPasswordError('Wachtwoorden komen niet overeen');
-      return;
-    }
+      if (password !== repeatPassword) {
+        setPasswordError('Wachtwoorden komen niet overeen');
+        return;
+      }
 
-    if (validateEmail(email) === false) {
-      setEmailError('Ongeldig emailadres');
-      return;
-    }
+      if (validateEmail(email) === false) {
+        setEmailError('Ongeldig emailadres');
+        return;
+      }
 
+    }
     dispatch(registerUserRequest({ firstName, lastName, email, password }));
-  };
+  }
 
   useEffect(() => {
     if (status === 'succeeded') {
-      router.push('/overzicht'); // Replace with your target page
-      router.push('/authenticatie/login'); // Replace with your target page
+      setTimeout(() => {
+        router.push('/authenticatie/login'); // Replace 
+      }, 3000);
       showSuccessToast({
         summary: 'Registratie succesvol.',
         detail: 'Login in met je nieuwe account.',
       });
-      dispatch(resetStatus()); // reset status to avoid repeated redirects
+      dispatch(resetUserStatus()); // reset status to avoid repeated redirects
     } else if (status === 'failed') {
-      showErrorToast({
-        summary: 'Registratie mislukt.',
-        detail: "Probeer het opnieuw.",
-      });
+      showErrorToast({"summary": "Registreren mislukt.", "detail": error || "Er is een fout opgetreden."});
     }
   }, [status, router]);
 
@@ -199,4 +199,4 @@ export default function Login() {
     </>
   );
 }
-}
+
