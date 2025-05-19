@@ -9,6 +9,8 @@ import 'primereact/resources/themes/lara-light-blue/theme.css';
 import { addLocale, PrimeReactProvider } from 'primereact/api';
 import { Inter, Manrope, Anton } from 'next/font/google';
 import { useRouter } from 'next/router';
+import { Toast } from 'primereact/toast';
+import { toastRef } from '@/services/toast.service';
 import { NextPage } from 'next';
 import { ReactElement, ReactNode } from 'react';
 import Layout from '@/components/layout';
@@ -93,6 +95,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <PrimeReactProvider value={{ ripple: true }}>
       <Provider store={store}>
+        <Toast ref={toastRef} position="bottom-right" />
         {getLayout(<Component {...pageProps} />)}
       </Provider>
     </PrimeReactProvider>

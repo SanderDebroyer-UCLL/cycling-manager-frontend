@@ -14,7 +14,7 @@ export const loginUser = async (Credentials: Credentials) => {
 
   if (!res.ok) {
     // throw the error message so it triggers rejected action
-    throw new Error(data.error || 'Something went wrong');
+    throw new Error(data.error || 'Er is iets misgegaan.');
   }
 
   return data;
@@ -32,12 +32,14 @@ export const registerUser = async (userInfo: RegisterUserDetails) => {
     }
   );
 
+  const data = await res.json();
+
   if (!res.ok) {
-    throw new Error('Failed to register user');
+    throw new Error(data.error || 'Er is iets misgegaan.');
   }
 
-  return res.json();
-};
+  return data;
+}
 
 const AuthService = {
   loginUser,

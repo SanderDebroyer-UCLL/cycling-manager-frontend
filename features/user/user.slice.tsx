@@ -77,16 +77,20 @@ const userSlice = createSlice({
       })
       .addCase(registerUserRequest.pending, (state) => {
         state.status = 'loading';
+        state.error = null; // clear previous errors on new request
+
       })
       .addCase(
         registerUserRequest.fulfilled,
         (state, action: PayloadAction<User>) => {
           state.status = 'succeeded';
           state.data = action.payload;
+          state.error = null;
         }
       )
-      .addCase(registerUserRequest.rejected, (state) => {
+      .addCase(registerUserRequest.rejected, (state, action) => {
         state.status = 'failed';
+        state.error = action.error.message || 'Failed to register';
       });
   },
 });
