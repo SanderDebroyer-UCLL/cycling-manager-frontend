@@ -32,12 +32,14 @@ export const registerUser = async (userInfo: RegisterUserDetails) => {
     }
   );
 
+  const data = await res.json();
+
   if (!res.ok) {
-    throw new Error('Failed to register user');
+    throw new Error(data.error || 'Something went wrong');
   }
 
-  return res.json();
-};
+  return data;
+}
 
 const AuthService = {
   loginUser,
