@@ -105,9 +105,6 @@ const index = () => {
         elevations = races.map((race) => race.distance ?? 0);
       }
 
-      console.log('Distances:', distances);
-      console.log('Elevations:', elevations);
-
       const data = {
         labels,
         datasets: [

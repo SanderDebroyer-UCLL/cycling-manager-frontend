@@ -21,8 +21,6 @@ import {
   fetchCompetitions,
   resetCompetitionsStatus,
 } from '@/features/competitions/competitions.slice';
-import { Competition } from '@/types/competition';
-import Link from 'next/link';
 import { Race } from '@/types/race';
 import LinkBodyTemplate from '@/components/LinkBodyTemplate';
 
@@ -33,13 +31,13 @@ const Index = () => {
   const raceStatus = useSelector((state: RootState) => state.race.status);
   const usersStatus = useSelector((state: RootState) => state.users.status);
   const competitionsStatus = useSelector(
-    (state: RootState) => state.competitions.status
+    (state: RootState) => state.competitions.status,
   );
   const competitions = useSelector(
-    (state: RootState) => state.competitions.data
+    (state: RootState) => state.competitions.data,
   );
   const competitionStatus = useSelector(
-    (state: RootState) => state.competition.status
+    (state: RootState) => state.competition.status,
   );
   const [name, setName] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
@@ -52,10 +50,10 @@ const Index = () => {
   >(null);
   const [nameError, setNameError] = useState<string | null>(null);
   const [selectedRacesError, setSelectedRacesError] = useState<string | null>(
-    null
+    null,
   );
   const [selectedUsersError, setSelectedUsersError] = useState<string | null>(
-    null
+    null,
   );
   const [nodes, setNodes] = useState<TreeNode[]>([]);
   const [visible, setVisible] = React.useState(false);
@@ -71,7 +69,7 @@ const Index = () => {
   useEffect(() => {
     if (raceStatus === 'idle') {
       dispatch(fetchRace());
-    } 
+    }
   }, [dispatch, raceStatus]);
 
   useEffect(() => {
@@ -131,7 +129,7 @@ const Index = () => {
         name,
         userEmails: usersEmail,
         raceIds: selectedRaceIds,
-      })
+      }),
     );
   };
 
@@ -154,13 +152,9 @@ const Index = () => {
         </div>
         <div className="overflow-hidden overflow-y-auto rounded-lg max-h-[75vh]">
           <DataTable value={competitions} tableStyle={{ width: '100%' }}>
-            <Column
-              header="Positie"
-              body={(rowData, { rowIndex }) => rowIndex + 1}
-            />
             <Column header="Naam" field="name" />
             <Column
-              header="Races"
+              header="Wedstrijden"
               body={(rowData) =>
                 rowData.races.map((race: Race) => race.name).join(', ')
               }
@@ -210,7 +204,7 @@ const Index = () => {
                 const addedKey = newKeys.find((key) => !oldKeys.includes(key));
                 // Detect removed key (in old but not new)
                 const removedKey = oldKeys.find(
-                  (key) => !newKeys.includes(key)
+                  (key) => !newKeys.includes(key),
                 );
 
                 const oldSelectedNodes = findSelectedRaceData(oldKeys, nodes);
@@ -219,7 +213,7 @@ const Index = () => {
                   : null;
 
                 const oldHasNiveau2 = oldSelectedNodes.some((node) =>
-                  node.data?.niveau?.startsWith('2')
+                  node.data?.niveau?.startsWith('2'),
                 );
 
                 const addedIsNiveau2 = addedNode?.data?.niveau?.startsWith('2');
@@ -240,8 +234,8 @@ const Index = () => {
                     setSelectedRaces(
                       oldKeys.reduce(
                         (acc, key) => ({ ...acc, [key]: true }),
-                        {}
-                      )
+                        {},
+                      ),
                     );
                   }
                 } else {
