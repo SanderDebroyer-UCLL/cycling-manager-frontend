@@ -6,14 +6,13 @@ import '@/styles/globals.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
-import { PrimeReactProvider } from 'primereact/api';
+import { addLocale, PrimeReactProvider } from 'primereact/api';
 import { Inter, Manrope, Anton } from 'next/font/google';
-import Navbar from '@/components/navbar';
 import { useRouter } from 'next/router';
-import Sidebar from '@/components/sidebar';
 import { NextPage } from 'next';
 import { ReactElement, ReactNode } from 'react';
 import Layout from '@/components/layout';
+import { locale } from 'primereact/api';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -41,7 +40,53 @@ type AppPropsWithLayout = AppProps & {
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter();
-  const isCompetitionRoute = router.pathname.includes('/competities/');
+  addLocale('nl', {
+    firstDayOfWeek: 1,
+    dayNames: [
+      'maandag',
+      'dinsdag',
+      'woensdag',
+      'donderdag',
+      'vrijdag',
+      'zaterdag',
+      'zondag',
+    ],
+    dayNamesShort: ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'],
+    dayNamesMin: ['M', 'D', 'W', 'D', 'V', 'Z', 'Z'],
+    monthNames: [
+      'januari',
+      'februari',
+      'maart',
+      'april',
+      'mei',
+      'juni',
+      'juli',
+      'augustus',
+      'september',
+      'oktober',
+      'november',
+      'december',
+    ],
+    monthNamesShort: [
+      'jan',
+      'feb',
+      'mrt',
+      'apr',
+      'mei',
+      'jun',
+      'jul',
+      'aug',
+      'sep',
+      'okt',
+      'nov',
+      'dec',
+    ],
+    today: 'Vandaag',
+    clear: 'Wissen',
+    //...
+  });
+
+  locale('nl');
 
   const getLayout = Component.getLayout ?? ((page) => <Layout>{page}</Layout>);
 

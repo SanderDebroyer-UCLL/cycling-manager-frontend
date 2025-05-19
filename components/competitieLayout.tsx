@@ -41,7 +41,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   return (
     <div className="min-h-[100vh] flex">
       <Sidebar />
-      <main>{children}</main>
+      {children}
     </div>
   );
 };

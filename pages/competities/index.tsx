@@ -163,10 +163,10 @@ const Index = () => {
         <div className="overflow-hidden overflow-y-auto rounded-lg max-h-[75vh]">
           <DataTable value={competitions} tableStyle={{ width: '100%' }}>
             <Column
-              header="Position"
+              header="Positie"
               body={(rowData, { rowIndex }) => rowIndex + 1}
             />
-            <Column header="Name" field="name" />
+            <Column header="Naam" field="name" />
             <Column
               header="Races"
               body={(rowData) =>

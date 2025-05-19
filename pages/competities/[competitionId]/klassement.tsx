@@ -20,7 +20,6 @@ const LeaderboardWithSidebar = () => {
       name: 'Etappe 1',
       date: '2023-07-01',
       distance: '180 km',
-      type: 'vlakke etappe',
       results: [
         {
           position: 1,
@@ -53,12 +52,16 @@ const LeaderboardWithSidebar = () => {
           timeGap: '0:32',
         },
       ],
+      id: '',
+      departure: '',
+      arrival: '',
+      startTime: '',
+      verticalMeters: '',
     },
     {
       name: 'Etappe 2',
       date: '2023-07-02',
       distance: '200 km',
-      type: 'bergetappe',
       results: [
         {
           position: 6,
@@ -91,6 +94,11 @@ const LeaderboardWithSidebar = () => {
           timeGap: '0:50',
         },
       ],
+      id: '',
+      departure: '',
+      arrival: '',
+      startTime: '',
+      verticalMeters: '',
     },
   ];
 
