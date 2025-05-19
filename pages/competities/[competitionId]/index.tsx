@@ -16,6 +16,8 @@ const index = () => {
   const [dates, setDates] = useState<Nullable<(Date | null)[]>>(null);
   const [chartData, setChartData] = useState({});
   const [chartOptions, setChartOptions] = useState({});
+  const [totalDistance, setTotalDistance] = useState(0);
+  const [totalElevation, setTotalElevation] = useState(0);
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
   const textColorSecondary = documentStyle.getPropertyValue(
@@ -27,6 +29,34 @@ const index = () => {
   );
   const dispatch = useDispatch<AppDispatch>();
   const { competitionId } = router.query;
+
+  useEffect(() => {
+    if (competition) {
+      if (competition.races[0].stages.length > 0) {
+        const distance = competition.races[0].stages
+          .map((stage) => Number(stage.distance))
+          .reduce((total, distance) => total + distance, 0)
+          .toFixed(1);
+        setTotalDistance(Number(distance));
+        const elevation = competition.races[0].stages
+          .map((stage) => Number(stage.verticalMeters))
+          .reduce((total, distance) => total + distance, 0)
+          .toFixed(1);
+        setTotalElevation(Number(elevation));
+      } else {
+        const distance = competition.races
+          .map((race) => Number(race.distance))
+          .reduce((total, distance) => total + distance, 0)
+          .toFixed(1);
+        setTotalDistance(Number(distance));
+        const elevation = competition.races
+          .map((race) => Number(race.distance))
+          .reduce((total, distance) => total + distance, 0)
+          .toFixed(1);
+        setTotalElevation(Number(elevation));
+      }
+    }
+  });
 
   useEffect(() => {
     if (
@@ -53,28 +83,37 @@ const index = () => {
           ? new Date(Math.max(...endDates.map((date) => date.getTime())))
           : null;
       if (startDate && endDate) {
-        console.log('Start:', startDate);
-        console.log('End:', endDate);
         setDates([startDate, endDate]);
-        console.log(dates);
       }
 
-      // Take the first race's stages
       const races = competition.races;
-      const stages: Stage[] = races[0]?.stages || [];
+      const firstRaceWithStages = races.find((race) => race.stages.length > 0);
+      const stages: Stage[] = firstRaceWithStages?.stages || [];
 
-      const labels = stages.map((_, idx) => idx + 1);
-      const distancesRaw = stages.map((stage) => stage.distance ?? 0);
-      const elevationsRaw = stages.map((stage) => stage.verticalMeters ?? 0);
-      const distances = stages.map((stage) => stage.distance ?? null);
-      const elevations = stages.map((stage) => stage.verticalMeters ?? null);
+      let labels: number[] = [];
+      let distances: string[] = [];
+      let elevations: string[] = [];
+
+      if (stages.length > 0) {
+        labels = stages.map((_, idx) => idx + 1);
+        distances = stages.map((stage) => stage.distance ?? 0);
+        elevations = stages.map((stage) => stage.verticalMeters ?? 0);
+      } else {
+        labels = races.map((_, idx) => idx + 1);
+        distances = races.map((race) => race.distance ?? 0);
+        // We assume elevation is 0 if stages are missing
+        elevations = races.map((race) => race.distance ?? 0);
+      }
+
+      console.log('Distances:', distances);
+      console.log('Elevations:', elevations);
 
       const data = {
         labels,
         datasets: [
           {
             label: 'Distance (km)',
-            data: distancesRaw,
+            data: distances,
             yAxisID: 'y', // Left axis
             barThickness: 30, // Adjust width here
 
@@ -82,7 +121,7 @@ const index = () => {
           },
           {
             label: 'Elevation (m)',
-            data: elevationsRaw,
+            data: elevations,
             yAxisID: 'y1', // Right axis
             barThickness: 30, // Adjust width here
             backgroundColor: documentStyle.getPropertyValue('--primary-800'),
@@ -170,32 +209,26 @@ const index = () => {
             <div className="flex flex-1 flex-col gap-2">
               <h3 className="font-semibold">Totale afstand</h3>
               <div className="flex flex-col justify-center h-26 gap-2 p-4  bg-surface-200 rounded-lg shadow-md font-semibold text-xl">
-                {competition.races[0].stages
-                  .map((stage) => Number(stage.distance))
-                  .reduce((total, distance) => total + distance, 0)
-                  .toFixed(1)}{' '}
-                km
-                <span className="text-sm font-normal">
-                  verdeeld over {competition.races[0].stages.length} ritten{' '}
-                </span>
+                {totalDistance} km
+                {competition.races[0].stages.length > 0 ? (
+                  <span className="text-sm font-normal">
+                    verdeeld over {competition.races[0].stages.length}{' '}
+                    ritten{' '}
+                  </span>
+                ) : (
+                  <span className="text-sm font-normal">
+                    verdeeld over {competition.races.length}{' '}
+                    wedstrijden{' '}
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex flex-1 flex-col gap-2">
               <h3 className="font-semibold">Totaal hoogtemeters</h3>
               <div className="flex flex-col justify-center h-26 gap-2 p-4  bg-surface-200 rounded-lg shadow-md font-semibold text-xl">
-                {competition.races[0].stages
-                  .map((stage) => Number(stage.verticalMeters))
-                  .reduce((total, distance) => total + distance, 0)
-                  .toFixed(0)}{' '}
-                m
+                {totalElevation} m
                 <span className="text-sm font-normal">
-                  Dat is{' '}
-                  {(
-                    competition.races[0].stages
-                      .map((stage) => Number(stage.verticalMeters))
-                      .reduce((total, distance) => total + distance, 0) / 1.82
-                  ).toFixed(0)}{' '}
-                  keer Niels
+                  Dat is {(totalElevation / 1.82).toFixed(0)} keer Niels
                 </span>
               </div>
             </div>
