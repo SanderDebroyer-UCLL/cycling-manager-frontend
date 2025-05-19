@@ -59,16 +59,15 @@ export default function Login() {
       if (!user || !user.jwtToken) {
         return;
       }
-      showSuccessToast({"summary": "Login succesvol.", "detail": "Herleiden naar de overzicht pagina..."});
+      showSuccessToast({"summary": "Login succesvol", "detail": "Herleiden naar de overzicht pagina..."});
       sessionStorage.setItem('jwtToken', user.jwtToken);
       sessionStorage.setItem('email', user.email);
       setTimeout(() => {
          router.push('/overzicht');
       }, 3000);
-      // Replace with your target page
       dispatch(resetUserStatus());
     } else if (status === 'failed') {
-      showErrorToast({"summary": "Login mislukt.", "detail": error || "Er is een fout opgetreden."});
+      showErrorToast({"summary": "Login mislukt", "detail": error || "Er is iets misgegaan."});
     }
   }, [status, router]);
 
