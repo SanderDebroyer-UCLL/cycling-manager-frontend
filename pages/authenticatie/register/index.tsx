@@ -93,13 +93,14 @@ export default function Login() {
 
   useEffect(() => {
     if (status === 'succeeded') {
-      setTimeout(() => {
-        router.push('/authenticatie/login'); 
-      }, 3000);
       showSuccessToast({
         summary: 'Registratie succesvol',
         detail: 'Login in met je nieuwe account.',
       });
+      setTimeout(() => {
+        router.push('/authenticatie/login'); 
+      }, 3000);
+      
       dispatch(resetUserStatus()); // reset status to avoid repeated redirects
     } else if (status === 'failed') {
       showErrorToast({"summary": "Registreren mislukt", "detail": error || "Er is iets misgegaan."});
