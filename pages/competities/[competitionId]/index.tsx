@@ -194,7 +194,9 @@ const index = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-6">
-          <h2>Races in competitie</h2>
+          <h2 className=" text-xl font-bold">
+            <h2>Overzicht {competition.name} </h2>
+          </h2>
         </div>
       )}
       <div className="flex gap-6 w-full">
@@ -217,8 +219,7 @@ const index = () => {
                   </span>
                 ) : (
                   <span className="text-sm font-normal">
-                    verdeeld over {competition.races.length}{' '}
-                    wedstrijden{' '}
+                    verdeeld over {competition.races.length} wedstrijden{' '}
                   </span>
                 )}
               </div>
