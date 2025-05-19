@@ -21,7 +21,7 @@ const initialState: RacesState = {
 
 export const fetchRace = createAsyncThunk('race/fetchRace', async () => {
   const data = await getAllRaces();
-  return data as Race[];
+  return data;
 });
 
 const raceSlice = createSlice({
