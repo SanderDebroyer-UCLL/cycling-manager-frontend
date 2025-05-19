@@ -11,6 +11,7 @@ import { loginUserRequest, resetUserStatus } from '@/features/user/user.slice';
 import { useRouter } from 'next/router';
 import { validateEmail } from '@/utils/email';
 import { selectCurrentUser } from '@/features/user/user.selector';
+import { showErrorToast, showSuccessToast } from '@/services/toast.service';
 
 export default function Login() {
   const [email, setEmail] = useState<string>('');
@@ -22,6 +23,7 @@ export default function Login() {
 
   const router = useRouter();
   const status = useSelector((state: RootState) => state.user.status);
+  const error = useSelector((state: RootState) => state.user.error);
   const user = useSelector(selectCurrentUser);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -53,14 +55,19 @@ export default function Login() {
   };
 
   useEffect(() => {
-    if (status === 'succeeded') {
+    if (status === 'succeeded') { 
       if (!user || !user.jwtToken) {
         return;
       }
+      showSuccessToast({"summary": "Login succesvol", "detail": "Herleiden naar de overzicht pagina..."});
       sessionStorage.setItem('jwtToken', user.jwtToken);
       sessionStorage.setItem('email', user.email);
-      router.push('/overzicht'); // Replace with your target page
+      setTimeout(() => {
+         router.push('/overzicht');
+      }, 3000);
       dispatch(resetUserStatus());
+    } else if (status === 'failed') {
+      showErrorToast({"summary": "Login mislukt", "detail": error || "Er is iets misgegaan."});
     }
   }, [status, router]);
 
