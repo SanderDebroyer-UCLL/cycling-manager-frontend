@@ -24,6 +24,7 @@ import {
 import { Competition } from '@/types/competition';
 import Link from 'next/link';
 import { Race } from '@/types/race';
+import LinkBodyTemplate from '@/components/LinkBodyTemplate';
 
 const Index = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -70,7 +71,7 @@ const Index = () => {
   useEffect(() => {
     if (raceStatus === 'idle') {
       dispatch(fetchRace());
-    }
+    } 
   }, [dispatch, raceStatus]);
 
   useEffect(() => {
@@ -140,18 +141,9 @@ const Index = () => {
       setName('');
       setSelectedRaces(null);
       setSelectedUsers([]);
-      dispatch(fetchCompetitions());
       dispatch(resetCompetitionsStatus());
     }
   }, [competitionStatus, dispatch]);
-
-  const LinkBodyTemplate = (competition: Competition) => {
-    return (
-      <Link href={`/competities/${competition.id}`}>
-        <Button label="Naar Competitie" size="small" />
-      </Link>
-    );
-  };
 
   return (
     <>
