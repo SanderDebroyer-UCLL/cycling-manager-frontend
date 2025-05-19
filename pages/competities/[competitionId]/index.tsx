@@ -186,19 +186,14 @@ const index = () => {
 
   return (
     <div className="flex flex-col gap-12 py-12 px-8 w-full">
-      {competition.races[0].niveau.startsWith('2') ? (
-        <div className="flex flex-col gap-6">
-          <h2 className=" text-xl font-bold">
-            Overzicht {competition.races[0].name}{' '}
-          </h2>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-6">
-          <h2 className=" text-xl font-bold">
-            <h2>Overzicht {competition.name} </h2>
-          </h2>
-        </div>
-      )}
+      <div className="flex flex-col gap-6">
+        <h2 className=" text-xl font-bold">
+          Overzicht{' '}
+          {competition.races[0].stages.length > 0
+            ? competition.races[0].name
+            : competition.name}
+        </h2>
+      </div>
       <div className="flex gap-6 w-full">
         <div className="flex flex-1/3 flex-col gap-2">
           <h3 className="font-semibold">Duur Competitie</h3>

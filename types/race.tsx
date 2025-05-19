@@ -13,8 +13,8 @@ export interface Race {
   id: string;
   name: string;
   stages: Stage[]
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   niveau: string;
   distance: string;
 }

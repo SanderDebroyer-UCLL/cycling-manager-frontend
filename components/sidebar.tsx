@@ -10,7 +10,7 @@ import { Competition } from '@/types/competition';
 
 const Sidebar = () => {
   const competition: Competition = useSelector(
-    (state: any) => state.competition.data
+    (state: any) => state.competition.data,
   );
   const dispatch = useDispatch<AppDispatch>();
 
@@ -32,7 +32,7 @@ const Sidebar = () => {
   }
 
   return (
-    <div className="h-[100vh] min-w-[350px] w-70 border-r-1 flex flex-col gap-4 text-lg font-regular border-surface-500 bg-surface-100 py-8 text-dark-700">
+    <div className="h-[100vh] w-[350px] border-r-1 flex flex-col gap-4 text-lg font-regular border-surface-500 bg-surface-100 py-8 text-dark-700">
       <div className="px-6 py-1 flex gap-2 items-center text-xl font-bold font-manrope pb-6">
         {competition.name}
       </div>
