@@ -19,11 +19,11 @@ const index = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
   const textColorSecondary = documentStyle.getPropertyValue(
-    '--text-color-secondary'
+    '--text-color-secondary',
   );
   const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
   const competition: Competition = useSelector(
-    (state: any) => state.competition.data
+    (state: any) => state.competition.data,
   );
   const dispatch = useDispatch<AppDispatch>();
   const { competitionId } = router.query;
@@ -41,7 +41,7 @@ const index = () => {
   useEffect(() => {
     if (competition) {
       const startDates = competition.races.map(
-        (race) => new Date(race.startDate)
+        (race) => new Date(race.startDate),
       );
       const endDates = competition.races.map((race) => new Date(race.endDate));
       const startDate =
@@ -146,7 +146,7 @@ const index = () => {
   }
 
   return (
-    <div className=" py-12 px-8 w-full">
+    <div className="flex flex-col gap-12 py-12 px-8 w-full">
       {competition.races[0].niveau.startsWith('2') ? (
         <div className="flex flex-col gap-6">
           <h2 className=" text-xl font-bold">
@@ -161,7 +161,9 @@ const index = () => {
       <div className="flex gap-6 w-full">
         <div className="flex flex-1/3 flex-col gap-2">
           <h3 className="font-semibold">Duur Competitie</h3>
-          <Calendar value={dates} inline selectionMode="range" />
+          <div className="h-full p-4 flex justify-center rounded-lg shadow-md bg-surface-200">
+            <Calendar value={dates} inline selectionMode="range" />
+          </div>
         </div>
         <div className="flex flex-col flex-2/3 gap-4 w-full">
           <div className="flex gap-4">
