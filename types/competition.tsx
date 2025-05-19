@@ -1,4 +1,4 @@
-import { Race } from './cyclist';
+import { Race } from './race';
 import { User } from './user';
 
 export interface CreateCompetitionDetails {

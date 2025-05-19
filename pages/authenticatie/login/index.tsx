@@ -7,7 +7,7 @@ import { InputText } from 'primereact/inputtext';
 import { use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store'; // adjust path if needed
-import { loginUserRequest, resetStatus } from '@/features/user/user.slice';
+import { loginUserRequest, resetUserStatus } from '@/features/user/user.slice';
 import { useRouter } from 'next/router';
 import { validateEmail } from '@/utils/email';
 import { selectCurrentUser } from '@/features/user/user.selector';
@@ -66,7 +66,7 @@ export default function Login() {
          router.push('/overzicht');
       }, 3000);
       // Replace with your target page
-      dispatch(resetStatus());
+      dispatch(resetUserStatus());
     } else if (status === 'failed') {
       showErrorToast({"summary": "Login mislukt.", "detail": error || "Er is een fout opgetreden."});
     }

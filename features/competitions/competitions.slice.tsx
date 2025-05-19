@@ -25,7 +25,7 @@ const competitionsSlice = createSlice({
   name: 'user',
   initialState: initialCompetitionsState,
   reducers: {
-    resetStatus(state) {
+    resetCompetitionsStatus(state) {
       state.status = 'idle';
     },
   },
@@ -46,5 +46,7 @@ const competitionsSlice = createSlice({
       });
   },
 });
+
+export const { resetCompetitionsStatus } = competitionsSlice.actions;
 
 export default competitionsSlice.reducer;

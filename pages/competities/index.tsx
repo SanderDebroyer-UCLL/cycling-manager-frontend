@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -17,9 +17,13 @@ import { User } from '@/types/user';
 import { fetchUsers } from '@/features/users/users.slice';
 import { InputText } from 'primereact/inputtext';
 import { createCompetitionRequest } from '@/features/competition/competition.slice';
-import { fetchCompetitions } from '@/features/competitions/competitions.slice';
+import {
+  fetchCompetitions,
+  resetCompetitionsStatus,
+} from '@/features/competitions/competitions.slice';
 import { Competition } from '@/types/competition';
 import Link from 'next/link';
+import { Race } from '@/types/race';
 
 const Index = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -130,12 +134,21 @@ const Index = () => {
     );
   };
 
+  useEffect(() => {
+    if (competitionStatus === 'succeeded') {
+      setVisible(false);
+      setName('');
+      setSelectedRaces(null);
+      setSelectedUsers([]);
+      dispatch(fetchCompetitions());
+      dispatch(resetCompetitionsStatus());
+    }
+  }, [competitionStatus, dispatch]);
+
   const LinkBodyTemplate = (competition: Competition) => {
     return (
       <Link href={`/competities/${competition.id}`}>
-        <Button
-          label="Naar Competitie"
-        />
+        <Button label="Naar Competitie" size="small" />
       </Link>
     );
   };
@@ -154,6 +167,12 @@ const Index = () => {
               body={(rowData, { rowIndex }) => rowIndex + 1}
             />
             <Column header="Name" field="name" />
+            <Column
+              header="Races"
+              body={(rowData) =>
+                rowData.races.map((race: Race) => race.name).join(', ')
+              }
+            />
             <Column header="Link" body={LinkBodyTemplate} />
           </DataTable>
         </div>
@@ -182,7 +201,67 @@ const Index = () => {
             <TreeSelect
               filter
               value={selectedRaces}
-              onChange={(e) => setSelectedRaces(e.value)}
+              showClear
+              onChange={(e) => {
+                const newValue = e.value as TreeSelectSelectionKeysType | null;
+
+                // If nothing selected (deselected all)
+                if (!newValue || Object.keys(newValue).length === 0) {
+                  setSelectedRaces(null);
+                  return;
+                }
+
+                const newKeys = Object.keys(newValue);
+                const oldKeys = selectedRaces ? Object.keys(selectedRaces) : [];
+
+                // Detect added key (in new but not old)
+                const addedKey = newKeys.find((key) => !oldKeys.includes(key));
+                // Detect removed key (in old but not new)
+                const removedKey = oldKeys.find(
+                  (key) => !newKeys.includes(key)
+                );
+
+                const oldSelectedNodes = findSelectedRaceData(oldKeys, nodes);
+                const addedNode = addedKey
+                  ? findSelectedRaceData([addedKey], nodes)[0]
+                  : null;
+
+                const oldHasNiveau2 = oldSelectedNodes.some((node) =>
+                  node.data?.niveau?.startsWith('2')
+                );
+
+                const addedIsNiveau2 = addedNode?.data?.niveau?.startsWith('2');
+
+                if (removedKey) {
+                  // User deselected something
+                  // Just update selection to newValue as is, no forcing
+                  setSelectedRaces(newValue);
+                  return;
+                }
+
+                if (oldHasNiveau2) {
+                  if (addedIsNiveau2) {
+                    // Switching niveau 2 race: keep only that
+                    setSelectedRaces({ [addedKey!]: true });
+                  } else {
+                    // Trying to add non-niveau 2 while niveau 2 selected -> ignore, keep old
+                    setSelectedRaces(
+                      oldKeys.reduce(
+                        (acc, key) => ({ ...acc, [key]: true }),
+                        {}
+                      )
+                    );
+                  }
+                } else {
+                  if (addedIsNiveau2) {
+                    // New niveau 2 selected: force single select
+                    setSelectedRaces({ [addedKey!]: true });
+                  } else {
+                    // Normal multi-select
+                    setSelectedRaces(newValue);
+                  }
+                }
+              }}
               options={nodes}
               className="md:w-20rem w-full"
               placeholder="Selecteer race(s)"
