@@ -23,6 +23,7 @@ export default function Login() {
 
   const router = useRouter();
   const status = useSelector((state: RootState) => state.user.status);
+  const error = useSelector((state: RootState) => state.user.error);
   const user = useSelector(selectCurrentUser);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -66,6 +67,8 @@ export default function Login() {
       }, 3000);
       // Replace with your target page
       dispatch(resetStatus());
+    } else if (status === 'failed') {
+      showErrorToast({"summary": "Login mislukt.", "detail": error || "Er is een fout opgetreden."});
     }
   }, [status, router]);
 
