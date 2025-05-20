@@ -1,12 +1,10 @@
-// pages/login.tsx or wherever this file is
-import Navbar from '@/components/navbar';
 import { Button } from 'primereact/button';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { InputText } from 'primereact/inputtext';
 import { use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/store/store'; // adjust path if needed
+import { AppDispatch, RootState } from '@/store/store';
 import { loginUserRequest, resetUserStatus } from '@/features/user/user.slice';
 import { useRouter } from 'next/router';
 import { validateEmail } from '@/utils/email';
@@ -55,19 +53,23 @@ export default function Login() {
   };
 
   useEffect(() => {
-    if (status === 'succeeded') { 
+    if (status === 'succeeded') {
       if (!user || !user.jwtToken) {
         return;
       }
-      showSuccessToast({"summary": "Login succesvol", "detail": "Herleiden naar de overzicht pagina..."});
+      showSuccessToast({
+        summary: 'Login succesvol',
+        detail: 'Herleiden naar de overzicht pagina...',
+      });
       sessionStorage.setItem('jwtToken', user.jwtToken);
       sessionStorage.setItem('email', user.email);
-      setTimeout(() => {
-         router.push('/overzicht');
-      }, 3000);
+      router.push('/overzicht');
       dispatch(resetUserStatus());
     } else if (status === 'failed') {
-      showErrorToast({"summary": "Login mislukt", "detail": error || "Er is iets misgegaan."});
+      showErrorToast({
+        summary: 'Login mislukt',
+        detail: error || 'Er is iets misgegaan.',
+      });
     }
   }, [status, router]);
 
