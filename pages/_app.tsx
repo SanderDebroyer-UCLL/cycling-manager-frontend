@@ -95,7 +95,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <PrimeReactProvider value={{ ripple: true }}>
       <Provider store={store}>
-        <Toast ref={toastRef} position="bottom-right" />
+        <Toast ref={toastRef} />
         {getLayout(<Component {...pageProps} />)}
       </Provider>
     </PrimeReactProvider>

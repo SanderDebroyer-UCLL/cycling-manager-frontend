@@ -1,6 +1,9 @@
 import Navbar from '@/components/navbar';
 import { selectCurrentUser } from '@/features/user/user.selector';
-import { registerUserRequest, resetUserStatus } from '@/features/user/user.slice';
+import {
+  registerUserRequest,
+  resetUserStatus,
+} from '@/features/user/user.slice';
 import { AppDispatch, RootState } from '@/store/store';
 import { validateEmail } from '@/utils/email';
 import { useRouter } from 'next/router';
@@ -86,10 +89,9 @@ export default function Login() {
         setEmailError('Ongeldig emailadres');
         return;
       }
-
     }
     dispatch(registerUserRequest({ firstName, lastName, email, password }));
-  }
+  };
 
   useEffect(() => {
     if (status === 'succeeded') {
@@ -97,13 +99,13 @@ export default function Login() {
         summary: 'Registratie succesvol',
         detail: 'Login in met je nieuwe account.',
       });
-      setTimeout(() => {
-        router.push('/authenticatie/login'); 
-      }, 3000);
-      
+      router.push('/authenticatie/login');
       dispatch(resetUserStatus()); // reset status to avoid repeated redirects
     } else if (status === 'failed') {
-      showErrorToast({"summary": "Registreren mislukt", "detail": error || "Er is iets misgegaan."});
+      showErrorToast({
+        summary: 'Registreren mislukt',
+        detail: error || 'Er is iets misgegaan.',
+      });
     }
   }, [status, router]);
 
@@ -200,4 +202,3 @@ export default function Login() {
     </>
   );
 }
-

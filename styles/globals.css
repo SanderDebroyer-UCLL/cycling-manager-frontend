@@ -17,8 +17,16 @@
   @apply bg-surface-200 border-none p-0;
 }
 
+.p-toast {
+  @apply !top-[80px];
+}
+
 .p-datepicker-header {
   @apply bg-surface-200 rounded-lg p-2;
+}
+
+.p-datepicker span {
+  @apply !h-7 !w-7;
 }
 
 .p-datepicker-header button {

@@ -51,7 +51,7 @@ const index = () => {
   const container: CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: '#E5E7EB', // Equivalent to Tailwind's surface-200 (approximate)
+    backgroundColor: '#e9eff5', // Equivalent to Tailwind's surface-200 (approximate)
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // shadow-md approximation
     borderRadius: '0.5rem', // rounded-lg
     padding: '1rem', // p-4
@@ -146,7 +146,7 @@ const index = () => {
                   {activeStage?.startTime}
                 </div>
                 <div style={container} className="w-full flex-1">
-                  {activeStage?.name}
+                  Type
                 </div>
               </div>
               <div style={container} className="h-full">
