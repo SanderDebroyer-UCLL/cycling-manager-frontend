@@ -56,6 +56,7 @@ const index = () => {
   });
   const email = sessionStorage.getItem('email');
   const [usersState, setUsersState] = useState<User[]>([]);
+  const [cyclistsState, setCyclistsState] = useState<Cyclist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
   const dispatch = useDispatch<AppDispatch>();
@@ -80,12 +81,21 @@ const index = () => {
   const stompClientRef = useRef<Client | null>(null);
 
   useEffect(() => {
-    console.log(competition);
-  });
-
-  useEffect(() => {
     competitionRef.current = competition;
   }, [competition]);
+
+  useEffect(() => {
+    if (cyclistsStatus === 'succeeded' && cyclists) {
+      const filteredCyclists = cyclists.filter((cyclist) => {
+        return !userTeams.some((userTeam: UserTeam) =>
+          userTeam.cyclists.some(
+            (teamCyclist) => teamCyclist.name.trim() === cyclist.name.trim(),
+          ),
+        );
+      });
+      setCyclistsState(filteredCyclists);
+    }
+  }, [cyclists, userTeams, cyclistsStatus]);
 
   useEffect(() => {
     if (usersStatus === 'succeeded' && competition) {
@@ -364,7 +374,7 @@ const index = () => {
             loading={loading}
             globalFilterFields={['name', 'country', 'team']}
             emptyMessage="No customers found."
-            value={cyclists}
+            value={cyclistsState}
             tableStyle={{ width: '100%' }}
           >
             <Column header="Naam" field="name" />
@@ -416,6 +426,9 @@ const index = () => {
 
           <Button
             label="Klaar"
+            disabled={userTeams.some(
+              (userTeam) => userTeam.cyclists.length !== 20,
+            )}
             onClick={() =>
               stompClientRef.current?.publish({
                 destination: '/app/status',
