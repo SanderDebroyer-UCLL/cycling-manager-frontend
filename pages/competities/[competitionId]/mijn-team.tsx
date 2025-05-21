@@ -59,7 +59,6 @@ const index = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
   const dispatch = useDispatch<AppDispatch>();
-  const [pageStatus, setPageStatus] = useState<PageStatus>(PageStatus.SORTING);
   const usersStatus = useSelector((state: RootState) => state.users.status);
   const userTeamsStatus = useSelector(
     (state: RootState) => state.userTeams.status,
@@ -127,7 +126,7 @@ const index = () => {
     } else {
       setLoading(false);
     }
-  });
+  }, [cyclistsStatus]);
 
   useEffect(() => {
     if (
@@ -441,9 +440,3 @@ index.getLayout = (page: ReactNode) => (
 );
 
 export default index;
-
-const enum PageStatus {
-  SORTING = 'SORTING',
-  SELECTING = 'SELECTING',
-  STARTED = 'STARTED',
-}
