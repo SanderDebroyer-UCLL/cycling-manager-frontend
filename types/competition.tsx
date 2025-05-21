@@ -12,4 +12,18 @@ export interface Competition {
   name: string;
   races: Race[];
   users: User[];
+  competitionStatus: CompetitionStatus;
+  competitionPicks: CompetitionPick[];
+}
+
+export interface CompetitionPick {
+  id: string;
+  userId: number;
+  pickOrder: number;
+}
+
+export enum CompetitionStatus {
+  SORTING = 'SORTING',
+  SELECTING = 'SELECTING',
+  STARTED = 'STARTED',
 }

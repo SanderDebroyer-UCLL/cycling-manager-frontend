@@ -2,12 +2,9 @@ import CompetitieLayout from '@/components/competitieLayout';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import { AppDispatch } from '@/store/store';
 import { Competition } from '@/types/competition';
-import { Stage } from '@/types/grandtour';
-import { Race } from '@/types/race';
 import { useRouter } from 'next/router';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
-import { Chart } from 'primereact/chart';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
@@ -198,7 +195,7 @@ const index = () => {
               >
                 <Column header="Naam" field="name" />
                 <Column header="Afstand" field="distance" />
-              </DataTable>{' '}
+              </DataTable>
             </div>
           </div>
         </div>

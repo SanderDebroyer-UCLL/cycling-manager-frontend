@@ -45,4 +45,5 @@ const usersSlice = createSlice({
   },
 });
 
+export const { resetUsersStatus } = usersSlice.actions;
 export default usersSlice.reducer;
