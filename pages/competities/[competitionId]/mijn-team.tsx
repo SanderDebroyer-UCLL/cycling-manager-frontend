@@ -426,9 +426,12 @@ const index = () => {
 
           <Button
             label="Klaar"
-            disabled={userTeams.some(
-              (userTeam) => userTeam.cyclists.length !== 20,
-            )}
+            disabled={userTeams
+              .filter(
+                (userTeam: UserTeam) =>
+                  userTeam.competitionId == competition.id,
+              )
+              .some((userTeam) => userTeam.cyclists.length < 20)}
             onClick={() =>
               stompClientRef.current?.publish({
                 destination: '/app/status',
@@ -444,6 +447,18 @@ const index = () => {
           />
         </div>
       </div>
+    );
+  }
+
+  if (competition.competitionStatus === CompetitionStatus.STARTED) {
+    return (
+      <>
+        <div className="flex flex-col gap-12 py-12 px-8 w-full">
+          <div className="flex flex-col gap-6">
+            <h2 className=" text-xl font-bold">Mijn team</h2>
+          </div>
+        </div>
+      </>
     );
   }
 };
