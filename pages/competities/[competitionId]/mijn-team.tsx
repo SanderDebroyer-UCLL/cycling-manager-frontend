@@ -44,24 +44,17 @@ import { User } from '@/types/user';
 import { fetchUsers, resetUsersStatus } from '@/features/users/users.slice';
 import { Button } from 'primereact/button';
 import { confirmPopup, ConfirmPopup } from 'primereact/confirmpopup';
+import SelectingPhase from '@/components/SelectingPhase';
+import SortingPhase from '@/components/SortingPhase';
 
 const index = () => {
   const router = useRouter();
   const { competitionId } = router.query;
-  const [filters, setFilters] = useState<DataTableFilterMeta>({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    country: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    representative: { value: null, matchMode: FilterMatchMode.IN },
-    status: { value: null, matchMode: FilterMatchMode.EQUALS },
-    verified: { value: null, matchMode: FilterMatchMode.EQUALS },
-  });
   const [usersState, setUsersState] = useState<User[]>([]);
   const [cyclistsState, setCyclistsState] = useState<Cyclist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedCyclist, setSelectedCyclist] = useState<Cyclist | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<Element | null>(null);
-  const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
   const email = sessionStorage.getItem('email');
   const dispatch = useDispatch<AppDispatch>();
   const usersStatus = useSelector((state: RootState) => state.users.status);
@@ -273,32 +266,6 @@ const index = () => {
     });
   };
 
-  const onGlobalFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    let _filters = { ...filters };
-
-    // @ts-ignore
-    _filters['global'].value = value;
-
-    setFilters(_filters);
-    setGlobalFilterValue(value);
-  };
-
-  const renderHeader = () => {
-    return (
-      <div className="flex justify-content-end">
-        <IconField iconPosition="left">
-          <InputIcon className="pi pi-search" />
-          <InputText
-            value={globalFilterValue}
-            onChange={onGlobalFilterChange}
-            placeholder="Keyword Search"
-          />
-        </IconField>
-      </div>
-    );
-  };
-
   const itemTemplate = (user: User, index: number) => {
     return (
       <div className="flex flex-wrap p-2 align-items-center gap-3">
@@ -326,8 +293,6 @@ const index = () => {
     );
   };
 
-  const header = renderHeader();
-
   if (!competition || userTeams === null || userTeams.length === 0) {
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-surface-100 z-9999">
@@ -344,179 +309,33 @@ const index = () => {
   if (competition.competitionStatus === CompetitionStatus.SORTING) {
     return (
       <>
-        <div className="flex flex-col gap-12 w-full">
-          <div className="flex flex-col gap-6">
-            <h2 className=" text-xl font-bold">
-              Bepaal de volgorde van het kiezen van de renners
-            </h2>
-          </div>
-          <div className="flex w-[400px]">
-            <OrderList
-              dataKey="id"
-              value={usersState}
-              onChange={(e) => handleUsersChange(e.value)}
-              itemTemplate={(user) =>
-                itemTemplate(
-                  user,
-                  usersState.findIndex((u) => u.id === user.id),
-                )
-              }
-              header="Deelnemers"
-              dragdrop
-            ></OrderList>
-          </div>
-          <div className="flex justify-between">
-            <div></div>
-            <Button
-              label="Volgende"
-              onClick={() =>
-                stompClientRef.current?.publish({
-                  destination: '/app/status',
-                  headers: {
-                    'content-type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    status: CompetitionStatus.SELECTING,
-                    competitionId: competition.id,
-                  }),
-                })
-              }
-            />
-          </div>
-        </div>
+        <SortingPhase
+          competition={competition}
+          usersState={usersState}
+          handleUsersChange={handleUsersChange}
+          stompClientRef={stompClientRef}
+          itemTemplate={itemTemplate}
+        />
       </>
     );
   }
 
   if (competition.competitionStatus === CompetitionStatus.SELECTING) {
     return (
-      <div className="flex flex-col gap-12 w-full">
-        <div className="flex flex-col gap-6">
-          <h2 className=" text-xl font-bold">Stel je team samen</h2>
-        </div>
-        <ConfirmPopup />
-        <div style={container}>
-          <DataTable
-            header={header}
-            paginator
-            rows={5}
-            selectionMode="single"
-            onSelectionChange={(e) => {
-              const isUserTurn = competition.competitionPicks.find(
-                (competitionPick: CompetitionPick) =>
-                  competitionPick.userId ===
-                    userTeams.find((userTeam) => userTeam.user.email === email)
-                      ?.user.id &&
-                  competitionPick.pickOrder === competition.currentPick,
-              );
-
-              if (isUserTurn) {
-                setSelectedCyclist(e.value);
-                setConfirmTarget(e.originalEvent.currentTarget); // Required for confirmPopup positioning
-              }
-            }}
-            dataKey="id"
-            filters={filters}
-            loading={loading}
-            globalFilterFields={['name', 'country', 'team']}
-            emptyMessage="No customers found."
-            value={cyclistsState}
-            tableStyle={{ width: '100%' }}
-          >
-            <Column header="Naam" field="name" />
-            <Column
-              header="Country"
-              filterField="country.name"
-              style={{ minWidth: '12rem' }}
-              body={countryBodyTemplate}
-            />
-            <Column header="Ranking" field="ranking" />
-          </DataTable>
-        </div>
-        <div className="flex gap-8 overflow-x-auto max-w-[calc(100vw-350px-2rem)]">
-          {userTeams.length > 0 &&
-            userTeams
-              .filter(
-                (userTeam: UserTeam) =>
-                  userTeam.competitionId === competition.id,
-              )
-              .map((userTeam: UserTeam) => (
-                <div
-                  key={userTeam.id}
-                  style={container}
-                  className={`flex-shrink-0 w-[300px] whitespace-nowrap overflow-hidden text-ellipsis ${
-                    competition.competitionPicks.find(
-                      (competitionPick: CompetitionPick) =>
-                        competitionPick.userId == userTeam.user.id &&
-                        competitionPick.pickOrder === competition.currentPick,
-                    )
-                      ? 'border-2 border-primary-500'
-                      : ''
-                  }`}
-                >
-                  <h2 className="text-xl font-semibold overflow-hidden text-ellipsis">
-                    {userTeam.user.email === email
-                      ? 'Mijn Team'
-                      : userTeam.name}
-                  </h2>
-                  <div className="flex flex-col gap-2 w-full overflow-y-auto max-h-[350px] text-nowrap text-ellipsis">
-                    {userTeam.cyclists.map((cyclist: Cyclist, index) => (
-                      <div
-                        key={cyclist.name}
-                        className="flex items-center border-b-1 last:border-b-0 border-surface-400 mx-2 py-2"
-                      >
-                        <span className="mr-2">{index + 1}.</span>
-                        <span className="overflow-hidden text-ellipsis whitespace-nowrap block w-full">
-                          {cyclist.name}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-        </div>
-        <div className="flex justify-between">
-          <Button
-            label="Terug"
-            severity="secondary"
-            outlined
-            onClick={() =>
-              stompClientRef.current?.publish({
-                destination: '/app/status',
-                headers: {
-                  'content-type': 'application/json',
-                },
-                body: JSON.stringify({
-                  status: CompetitionStatus.SORTING,
-                  competitionId: competition.id,
-                }),
-              })
-            }
-          />
-
-          <Button
-            label="Klaar"
-            disabled={userTeams
-              .filter(
-                (userTeam: UserTeam) =>
-                  userTeam.competitionId == competition.id,
-              )
-              .some((userTeam) => userTeam.cyclists.length < 20)}
-            onClick={() =>
-              stompClientRef.current?.publish({
-                destination: '/app/status',
-                headers: {
-                  'content-type': 'application/json',
-                },
-                body: JSON.stringify({
-                  status: CompetitionStatus.STARTED,
-                  competitionId: competition.id,
-                }),
-              })
-            }
-          />
-        </div>
-      </div>
+      <>
+        <SelectingPhase
+          competition={competition}
+          email={email}
+          loading={loading}
+          cyclistsState={cyclistsState}
+          userTeams={userTeams}
+          setSelectedCyclist={setSelectedCyclist}
+          setConfirmTarget={setConfirmTarget}
+          countryBodyTemplate={countryBodyTemplate}
+          stompClientRef={stompClientRef}
+          container={container}
+        />
+      </>
     );
   }
 
