@@ -2,6 +2,7 @@ import CompetitieLayout from '@/components/competitieLayout';
 import {
   fetchCompetitionById,
   updateCompetition,
+  updateCompetitionPick,
   updateCompetitionStatus,
 } from '@/features/competition/competition.slice';
 import { fetchCyclists } from '@/features/cyclists/cyclists.slice';
@@ -42,6 +43,7 @@ import { OrderList } from 'primereact/orderlist';
 import { User } from '@/types/user';
 import { fetchUsers, resetUsersStatus } from '@/features/users/users.slice';
 import { Button } from 'primereact/button';
+import { confirmPopup, ConfirmPopup } from 'primereact/confirmpopup';
 
 const index = () => {
   const router = useRouter();
@@ -54,11 +56,13 @@ const index = () => {
     status: { value: null, matchMode: FilterMatchMode.EQUALS },
     verified: { value: null, matchMode: FilterMatchMode.EQUALS },
   });
-  const email = sessionStorage.getItem('email');
   const [usersState, setUsersState] = useState<User[]>([]);
   const [cyclistsState, setCyclistsState] = useState<Cyclist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedCyclist, setSelectedCyclist] = useState<Cyclist | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<Element | null>(null);
   const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
+  const email = sessionStorage.getItem('email');
   const dispatch = useDispatch<AppDispatch>();
   const usersStatus = useSelector((state: RootState) => state.users.status);
   const userTeamsStatus = useSelector(
@@ -159,6 +163,7 @@ const index = () => {
           const pick: {
             cyclistName: string;
             email: string;
+            currentPick: number;
             competitionId: string;
           } = JSON.parse(message.body);
 
@@ -166,6 +171,7 @@ const index = () => {
             return;
           }
           pick.competitionId = competitionRef.current.id;
+          dispatch(updateCompetitionPick(pick.currentPick));
           dispatch(updateUserTeamCyclists(pick));
         });
         stompClient.subscribe('/topic/order', (message) => {
@@ -187,7 +193,6 @@ const index = () => {
         stompClient.subscribe('/topic/status', (message) => {
           const parsed = JSON.parse(message.body);
           const competitionStatus: CompetitionStatus = parsed.status; // Extract the value
-          console.log('Received competition status update:', competitionStatus);
 
           if (!competitionRef.current) {
             return;
@@ -206,14 +211,47 @@ const index = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (selectedCyclist && confirmTarget) {
+      confirmPopup({
+        target: confirmTarget as HTMLElement,
+        message: `Ben je zeker dat je ${selectedCyclist.name} wilt kiezen?`,
+        icon: 'pi pi-exclamation-triangle',
+        defaultFocus: 'accept',
+        accept: () => {
+          stompClientRef.current?.publish({
+            destination: '/app/pick',
+            body: JSON.stringify({
+              cyclistId: selectedCyclist.id,
+              email,
+              competitionId: competition.id,
+            }),
+          });
+          setSelectedCyclist(null);
+          setConfirmTarget(null);
+        },
+        reject: () => {
+          // toast.current.show({
+          //   severity: 'warn',
+          //   summary: 'Rejected',
+          //   detail: 'You have rejected the selection',
+          //   life: 3000,
+          // });
+          setSelectedCyclist(null);
+          setConfirmTarget(null);
+        },
+      });
+    }
+  }, [selectedCyclist, confirmTarget]);
+
   const container: CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: '#e9eff5', // Equivalent to Tailwind's surface-200 (approximate)
+    backgroundColor: '#f4f6f9', // Equivalent to Tailwind's surface-200 (approximate)
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // shadow-md approximation
     borderRadius: '0.5rem', // rounded-lg
     padding: '1rem', // p-4
-    gap: '0.5rem', // gap-2
+    gap: '1rem', // gap-4
   };
 
   const handleUsersChange = (users: User[]) => {
@@ -306,7 +344,7 @@ const index = () => {
   if (competition.competitionStatus === CompetitionStatus.SORTING) {
     return (
       <>
-        <div className="flex flex-col gap-12 py-12 px-8 w-full">
+        <div className="flex flex-col gap-12 w-full">
           <div className="flex flex-col gap-6">
             <h2 className=" text-xl font-bold">
               Bepaal de volgorde van het kiezen van de renners
@@ -323,7 +361,7 @@ const index = () => {
                   usersState.findIndex((u) => u.id === user.id),
                 )
               }
-              header="Users"
+              header="Deelnemers"
               dragdrop
             ></OrderList>
           </div>
@@ -352,7 +390,11 @@ const index = () => {
 
   if (competition.competitionStatus === CompetitionStatus.SELECTING) {
     return (
-      <div className="flex flex-col gap-12 py-12 px-8 w-full">
+      <div className="flex flex-col gap-12 w-full">
+        <div className="flex flex-col gap-6">
+          <h2 className=" text-xl font-bold">Stel je team samen</h2>
+        </div>
+        <ConfirmPopup />
         <div style={container}>
           <DataTable
             header={header}
@@ -360,14 +402,18 @@ const index = () => {
             rows={5}
             selectionMode="single"
             onSelectionChange={(e) => {
-              stompClientRef.current?.publish({
-                destination: '/app/pick',
-                body: JSON.stringify({
-                  cyclistId: e.value.id,
-                  email,
-                  competitionId: competition.id,
-                }),
-              });
+              const isUserTurn = competition.competitionPicks.find(
+                (competitionPick: CompetitionPick) =>
+                  competitionPick.userId ===
+                    userTeams.find((userTeam) => userTeam.user.email === email)
+                      ?.user.id &&
+                  competitionPick.pickOrder === competition.currentPick,
+              );
+
+              if (isUserTurn) {
+                setSelectedCyclist(e.value);
+                setConfirmTarget(e.originalEvent.currentTarget); // Required for confirmPopup positioning
+              }
             }}
             dataKey="id"
             filters={filters}
@@ -387,7 +433,7 @@ const index = () => {
             <Column header="Ranking" field="ranking" />
           </DataTable>
         </div>
-        <div className="flex gap-8">
+        <div className="flex gap-8 overflow-x-auto max-w-[calc(100vw-350px-2rem)]">
           {userTeams.length > 0 &&
             userTeams
               .filter(
@@ -395,13 +441,37 @@ const index = () => {
                   userTeam.competitionId === competition.id,
               )
               .map((userTeam: UserTeam) => (
-                <div key={userTeam.id} style={container}>
-                  <h2 className="text-xl font-bold">{userTeam.name}</h2>
-                  {userTeam.cyclists.map((cyclist: Cyclist) => (
-                    <div key={cyclist.name} className="flex items-center gap-2">
-                      <span>{cyclist.name}</span>
-                    </div>
-                  ))}
+                <div
+                  key={userTeam.id}
+                  style={container}
+                  className={`flex-shrink-0 w-[300px] whitespace-nowrap overflow-hidden text-ellipsis ${
+                    competition.competitionPicks.find(
+                      (competitionPick: CompetitionPick) =>
+                        competitionPick.userId == userTeam.user.id &&
+                        competitionPick.pickOrder === competition.currentPick,
+                    )
+                      ? 'border-2 border-primary-500'
+                      : ''
+                  }`}
+                >
+                  <h2 className="text-xl font-semibold overflow-hidden text-ellipsis">
+                    {userTeam.user.email === email
+                      ? 'Mijn Team'
+                      : userTeam.name}
+                  </h2>
+                  <div className="flex flex-col gap-2 w-full overflow-y-auto max-h-[350px] text-nowrap text-ellipsis">
+                    {userTeam.cyclists.map((cyclist: Cyclist, index) => (
+                      <div
+                        key={cyclist.name}
+                        className="flex items-center border-b-1 last:border-b-0 border-surface-400 mx-2 py-2"
+                      >
+                        <span className="mr-2">{index + 1}.</span>
+                        <span className="overflow-hidden text-ellipsis whitespace-nowrap block w-full">
+                          {cyclist.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
         </div>
@@ -453,7 +523,7 @@ const index = () => {
   if (competition.competitionStatus === CompetitionStatus.STARTED) {
     return (
       <>
-        <div className="flex flex-col gap-12 py-12 px-8 w-full">
+        <div className="flex flex-col gap-12 w-full">
           <div className="flex flex-col gap-6">
             <h2 className=" text-xl font-bold">Mijn team</h2>
           </div>

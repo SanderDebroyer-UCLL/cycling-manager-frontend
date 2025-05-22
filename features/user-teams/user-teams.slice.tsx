@@ -34,7 +34,6 @@ const userTeamsSlice = createSlice({
       }>,
     ) => {
       const { cyclistName, email, competitionId } = action.payload;
-      console.log(state.data);
       const team = state.data.find(
         (team) =>
           team.user.email === email && team.competitionId === competitionId,

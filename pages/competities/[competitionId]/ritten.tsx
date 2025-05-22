@@ -1,10 +1,17 @@
 import CompetitieLayout from '@/components/competitieLayout';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
+import { fetchRaceResultsByRaceId, resetRaceResultsStatus } from '@/features/race-results/race-results.slice';
+import {
+  fetchStageResultsByStageId,
+  resetStageResultsStatus,
+} from '@/features/stage-results/stage-results.slice';
 import { AppDispatch } from '@/store/store';
 import { Competition } from '@/types/competition';
-import { Stage } from '@/types/grandtour';
-import { Race } from '@/types/race';
+import { Race, Stage, StageResult } from '@/types/race';
+import { RaceResult } from '@/types/race-result';
 import { useRouter } from 'next/router';
+import { Column } from 'primereact/column';
+import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import React, {
   CSSProperties,
@@ -19,12 +26,63 @@ const index = () => {
   const router = useRouter();
   const { competitionId } = router.query;
 
+  const [activeStage, setActiveStage] = useState<Stage | null>(null);
+  const [activeRace, setActiveRace] = useState<Race | null>(null);
+  const [resultLoading, setResultLoading] = useState(false);
+  const [stageResultsState, setStageResultsState] = useState<StageResult[]>([]);
+  const [raceResultsState, setRaceResultsState] = useState<RaceResult[]>([]);
+
+  const dispatch = useDispatch<AppDispatch>();
+
   const competition: Competition = useSelector(
     (state: any) => state.competition.data,
   );
+  const stageResults: StageResult[] = useSelector(
+    (state: any) => state.results.data,
+  );
+  const raceResults: RaceResult[] = useSelector(
+    (state: any) => state.raceResults.data,
+  );
+  const stageResultsStatus: string = useSelector(
+    (state: any) => state.results.status,
+  );
+  const raceResultsStatus: string = useSelector(
+    (state: any) => state.raceResults.status,
+  );
 
-  const [activeStage, setActiveStage] = useState<Stage | null>(null);
-  const [activeRace, setActiveRace] = useState<Race | null>(null);
+  useEffect(() => {
+    setStageResultsState(stageResults);
+  }, [stageResults]);
+
+  useEffect(() => {
+    setRaceResultsState(raceResults);
+  }, [raceResults]);
+
+  useEffect(() => {
+    if (stageResultsStatus === 'idle' && activeStage?.id) {
+      dispatch(fetchStageResultsByStageId(activeStage.id));
+    }
+  }, [dispatch, stageResultsStatus, activeStage?.id]);
+
+  useEffect(() => {
+    if (raceResultsStatus === 'idle' && activeRace?.id) {
+      dispatch(fetchRaceResultsByRaceId(activeRace.id));
+    }
+  }, [dispatch, stageResultsStatus, activeStage?.id]);
+
+  useEffect(() => {
+    if (raceResultsStatus === 'idle' && activeRace?.id) {
+      dispatch(fetchRaceResultsByRaceId(activeRace.id));
+    }
+  }, [dispatch, raceResultsStatus, activeRace?.id]);
+
+  useEffect(() => {
+    if (stageResultsStatus === 'loading') {
+      setResultLoading(true);
+    } else {
+      setResultLoading(false);
+    }
+  }, [resultLoading]);
 
   useEffect(() => {
     if (competition && activeRace === null) {
@@ -37,7 +95,6 @@ const index = () => {
     }
   });
 
-  const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     if (
       competition &&
@@ -51,7 +108,7 @@ const index = () => {
   const container: CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: '#e9eff5', // Equivalent to Tailwind's surface-200 (approximate)
+    backgroundColor: '#f4f6f9', // Equivalent to Tailwind's surface-200 (approximate)
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // shadow-md approximation
     borderRadius: '0.5rem', // rounded-lg
     padding: '1rem', // p-4
@@ -74,15 +131,13 @@ const index = () => {
 
   return (
     <div>
-      <div className="flex flex-col gap-12 py-12 px-8 w-full">
+      <div className="flex flex-col gap-12 w-full">
         <div className="flex flex-col gap-6">
           <h2 className=" text-xl font-bold">
-            <h2>
-              Ritten{' '}
-              {competition.races[0].stages.length > 0
-                ? competition.races[0].name
-                : competition.name}
-            </h2>
+            Ritten{' '}
+            {competition.races[0].stages.length > 0
+              ? competition.races[0].name
+              : competition.name}
           </h2>
         </div>
 
@@ -92,13 +147,14 @@ const index = () => {
                 <div
                   onClick={() => {
                     setActiveStage(stage);
+                    dispatch(resetStageResultsStatus()); // reset before fetch effect can run
                   }}
                   key={stage.id}
-                  className="flex flex-col bg-surface-200 shadow-md rounded-lg mb-4 p-4 cursor-pointer gap-2 w-60"
+                  className="flex flex-col shrink-0 bg-surface-100 shadow-md rounded-lg mb-4 p-4 cursor-pointer gap-2 w-60"
                 >
                   <p>Stage {index + 1}</p>
                   <p className="truncate overflow-hidden whitespace-nowrap">
-                    {stage.name}
+                    {stage.name.split('|')[1]}
                   </p>
                   <p>
                     {(() => {
@@ -116,9 +172,10 @@ const index = () => {
                 <div
                   onClick={() => {
                     setActiveRace(race);
+                    dispatch(resetRaceResultsStatus()); // reset before fetch effect can run
                   }}
                   key={race.id}
-                  className="flex flex-col bg-surface-200 shadow-md rounded-lg mb-4 p-4 cursor-pointer gap-2 w-60"
+                  className="flex flex-col bg-surface-100 shadow-md rounded-lg mb-4 p-4 cursor-pointer gap-2 w-60"
                 >
                   <p>Race {index + 1}</p>
                   <p className="truncate overflow-hidden whitespace-nowrap">
@@ -130,65 +187,139 @@ const index = () => {
         </div>
 
         {competition.races[0].stages.length > 0 ? (
-          <div className="flex gap-6 w-full">
-            <div className="flex flex-1/2 flex-col gap-4 h-80">
+          <div className="flex gap-10 w-full h-[525px]">
+            <div className="flex flex-1/2 flex-col gap-5">
               <h3 className="font-semibold">Overzicht {activeStage?.name}</h3>
-              <div className="flex w-full gap-4">
-                <div style={container} className="w-full flex-1">
-                  {activeStage?.distance} km
+              <div></div>
+
+              <div className="flex w-full gap-5">
+                <div className="flex flex-col flex-1 gap-2">
+                  <h3 className="font-semibold">Afstand</h3>
+                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                    {activeStage?.distance} km
+                    <span className="text-sm font-normal">
+                      Gemiddelde afstand
+                    </span>
+                  </div>
                 </div>
-                <div style={container} className="w-full flex-1">
-                  {activeStage?.verticalMeters} meter
+                <div className="flex flex-col flex-1 gap-2">
+                  <h3 className="font-semibold">Hoogtemeters</h3>
+                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                    {activeStage?.verticalMeters} m
+                    <span className="text-sm font-normal">
+                      Veel hoogtemeters
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="flex w-full gap-4">
-                <div style={container} className="w-full flex-1">
-                  {activeStage?.startTime}
+              <div className="flex w-full gap-5">
+                <div className="flex flex-col flex-1 gap-2">
+                  <h3 className="font-semibold">Lokale Starttijd</h3>
+                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                    {activeStage?.startTime &&
+                    activeStage.startTime !== '-' &&
+                    activeStage.startTime.includes('(')
+                      ? activeStage.startTime.split('(')[0]
+                      : 'Nog niet beschikbaar'}
+
+                    <span className="text-sm font-normal">
+                      {activeStage?.startTime &&
+                      activeStage.startTime !== '-' &&
+                      activeStage.startTime.includes('(')
+                        ? activeStage.startTime.split('(')[1].split(')')[0]
+                        : 'Wordt later aangekondigd'}
+                    </span>
+                  </div>
                 </div>
-                <div style={container} className="w-full flex-1">
-                  Type
+                <div className="flex flex-col flex-1 gap-2">
+                  <h3 className="font-semibold">Type Rit</h3>
+                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                    Bergrit
+                    <span className="text-sm font-normal">
+                      Nog iets toevoegen
+                    </span>
+                  </div>
                 </div>
               </div>
+              <div></div>
               <div style={container} className="h-full">
                 Punten verdiend per speler
               </div>
             </div>
-            <div className="flex flex-col flex-1/2 gap-4 w-full h-80">
-              <h3 className="font-semibold">Uitslagen Rit</h3>
-              <div style={container} className="w-full h-full">
-                {activeStage?.name}
+            <div className="flex flex-col flex-1/2 gap-10 w-full">
+              <div className="py-[10px]"></div>
+              <div className="flex flex-col flex-1 gap-2">
+                <h3 className="font-semibold">Uitslag Rit</h3>
+                <div className="flex flex-col gap-2 p-4 bg-surface-100 rounded-lg shadow-md font-semibold text-xl h-full overflow-auto">
+                  <DataTable
+                    paginator
+                    rows={5}
+                    loading={resultLoading}
+                    value={stageResultsState}
+                    dataKey="id"
+                    sortField="ranking"
+                    sortOrder={1}
+                    emptyMessage="Geen resultaten gevonden"
+                  >
+                    <Column field="ranking" header="Plaats" />
+                    <Column field="name" header="Naam" />
+                    <Column field="time" header="Tijd" />
+                  </DataTable>
+                </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="flex gap-6 w-full">
-            <div className="flex flex-1/2 flex-col gap-4 h-80">
+          <div className="flex gap-10 w-full h-[525px]">
+            <div className="flex flex-1/2 flex-col gap-5">
               <h3 className="font-semibold">Overzicht {activeRace?.name}</h3>
-              <div className="flex w-full gap-4">
-                <div style={container} className="w-full flex-1">
-                  {activeRace?.distance} km
+              <div></div>
+
+              <div className="flex w-full gap-5">
+                <div className="flex flex-col flex-1 gap-2">
+                  <h3 className="font-semibold">Afstand</h3>
+                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                    {activeRace?.distance} km
+                    <span className="text-sm font-normal">
+                      Gemiddelde afstand
+                    </span>
+                  </div>
                 </div>
-                <div style={container} className="w-full flex-1">
-                  {activeRace?.distance} meter
+                <div className="flex flex-col flex-1 gap-2">
+                  <h3 className="font-semibold">Type Rit</h3>
+                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                    Bergrit
+                    <span className="text-sm font-normal">
+                      Nog iets toevoegen
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="flex w-full gap-4">
-                <div style={container} className="w-full flex-1">
-                  {activeRace?.startDate}
-                </div>
-                <div style={container} className="w-full flex-1">
-                  {activeRace?.name}
-                </div>
-              </div>
+              <div></div>
               <div style={container} className="h-full">
                 Punten verdiend per speler
               </div>
             </div>
-            <div className="flex flex-col flex-1/2 gap-4 w-full h-80">
-              <h3 className="font-semibold">Uitslagen Rit</h3>
-
-              <div style={container} className="h-full">
-                {activeRace?.name}
+            <div className="flex flex-col flex-1/2 gap-10 w-full">
+              <div className="py-[10px]"></div>
+              <div className="flex flex-col flex-1 gap-2">
+                <h3 className="font-semibold">Uitslag Race</h3>
+                <div className="flex flex-col gap-2 p-4 bg-surface-100 rounded-lg shadow-md font-semibold text-xl h-full overflow-auto">
+                  <DataTable
+                    paginator
+                    rows={5}
+                    loading={resultLoading}
+                    value={raceResultsState}
+                    dataKey="id"
+                    sortField="ranking"
+                    sortOrder={1}
+                    emptyMessage="Geen resultaten gevonden"
+                  >
+                    <Column field="position" header="Plaats" />
+                    <Column field="name" header="Naam" />
+                    <Column field="time" header="Tijd" />
+                  </DataTable>
+                </div>
               </div>
             </div>
           </div>

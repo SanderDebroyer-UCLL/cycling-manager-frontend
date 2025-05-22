@@ -64,6 +64,13 @@ const competitionSlice = createSlice({
       }
       state.data.competitionStatus = competitionStatus;
     },
+    updateCompetitionPick(state, action: PayloadAction<number>) {
+      const currentPick = action.payload;
+      if (!state.data) {
+        return;
+      }
+      state.data.currentPick = currentPick;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -100,5 +107,6 @@ export const {
   resetCompetitionStatus,
   updateCompetition,
   updateCompetitionStatus,
+  updateCompetitionPick,
 } = competitionSlice.actions;
 export default competitionSlice.reducer;

@@ -14,6 +14,7 @@ export interface Competition {
   users: User[];
   competitionStatus: CompetitionStatus;
   competitionPicks: CompetitionPick[];
+  currentPick: number;
 }
 
 export interface CompetitionPick {
