@@ -105,6 +105,10 @@ const index = () => {
     );
   }
 
+  const reloadRaceData = () => {
+    return 
+  };
+
   return (
     <div className="flex flex-col gap-12 py-12 px-8 w-full">
       <Dialog
@@ -145,6 +149,11 @@ const index = () => {
             : competition.name}
         </h2>
       </div>
+      <Button
+        label="Herlaad race data"
+        className="max-w-48"
+        onClick={reloadRaceData()}
+      ></Button>
       <div className="flex gap-6 w-full">
         <div className="flex flex-1/4 flex-col gap-2">
           <h3 className="font-semibold">Duur Competitie</h3>
