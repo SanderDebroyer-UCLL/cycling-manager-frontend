@@ -1,6 +1,6 @@
 import CompetitieLayout from '@/components/competitieLayout';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
-import { AppDispatch } from '@/store/store';
+import { AppDispatch, RootState } from '@/store/store';
 import { Competition } from '@/types/competition';
 import { useRouter } from 'next/router';
 import { Button } from 'primereact/button';
@@ -12,7 +12,8 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { Nullable } from 'primereact/ts-helpers';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import RaceService from '@/services/race.service';
+import { Race, updateRaceData } from '@/features/race/race.slice';
+import { cookies } from 'next/headers';
 
 const index = () => {
   const router = useRouter();
@@ -20,6 +21,7 @@ const index = () => {
   const [totalDistance, setTotalDistance] = useState(0);
   const [totalElevation, setTotalElevation] = useState(0);
   const [visible, setVisible] = useState(false);
+  const [updateRaceDataLoading, setUpdateRaceDataLoading] = useState(false);
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--text-color');
   const textColorSecondary = documentStyle.getPropertyValue(
@@ -29,6 +31,8 @@ const index = () => {
   const competition: Competition = useSelector(
     (state: any) => state.competition.data,
   );
+  const raceStatus = useSelector((state: RootState) => state.race.status);
+
   const dispatch = useDispatch<AppDispatch>();
   const { competitionId } = router.query;
 
@@ -59,6 +63,14 @@ const index = () => {
       }
     }
   });
+
+  useEffect(() => {
+    if (raceStatus === 'loading') {
+      setUpdateRaceDataLoading(true);
+    } else {
+      setUpdateRaceDataLoading(false);
+    }
+  }, [raceStatus]);
 
   useEffect(() => {
     if (
@@ -103,17 +115,6 @@ const index = () => {
     );
   }
 
-  const reloadRaceData = async () => {
-    try {
-      for (const race of competition.races) {
-        await RaceService.reloadRaceData(race.name);
-      }
-      console.log('Alle races opnieuw ingeladen.');
-    } catch (error) {
-      console.error('Fout bij herladen van races:', error);
-    }
-  };
-
   return (
     <div className="flex flex-col gap-12 w-full">
       <Dialog
@@ -147,18 +148,27 @@ const index = () => {
         </div>
       </Dialog>
       <div className="flex flex-col gap-10">
-        <h2 className=" text-xl font-bold">
+        <h2 className=" text-xl font-bold flex gap-4 items-center">
           Overzicht{' '}
           {competition.races[0].stages.length > 0
             ? competition.races[0].name
             : competition.name}
+          <Button
+            // rounded
+            icon="pi pi-refresh"
+            rounded
+            className="max-w-48"
+            loading={updateRaceDataLoading}
+            onClick={() =>
+              competition.races[0].stages.length > 0
+                ? dispatch(updateRaceData(competition.races[0].name))
+                : competition.races.forEach((race: Race) =>
+                    dispatch(updateRaceData(race.name)),
+                  )
+            }
+          ></Button>
         </h2>
       </div>
-      <Button
-        label="Herlaad race data"
-        className="max-w-48"
-        onClick={reloadRaceData}
-      ></Button>
       <div className="flex gap-10 w-full">
         <div className="flex flex-1/4 flex-col gap-2">
           <h3 className="font-semibold">Duur Competitie</h3>
