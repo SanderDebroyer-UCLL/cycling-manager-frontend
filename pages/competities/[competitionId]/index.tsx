@@ -12,6 +12,7 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { Nullable } from 'primereact/ts-helpers';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import RaceService from '@/services/race.service';
 
 const index = () => {
   const router = useRouter();
@@ -102,8 +103,15 @@ const index = () => {
     );
   }
 
-  const reloadRaceData = () => {
-    return 
+  const reloadRaceData = async () => {
+    try {
+      for (const race of competition.races) {
+        await RaceService.reloadRaceData(race.name);
+      }
+      console.log('Alle races opnieuw ingeladen.');
+    } catch (error) {
+      console.error('Fout bij herladen van races:', error);
+    }
   };
 
   return (
@@ -149,7 +157,7 @@ const index = () => {
       <Button
         label="Herlaad race data"
         className="max-w-48"
-        onClick={reloadRaceData()}
+        onClick={reloadRaceData}
       ></Button>
       <div className="flex gap-10 w-full">
         <div className="flex flex-1/4 flex-col gap-2">
