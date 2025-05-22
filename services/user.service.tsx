@@ -19,6 +19,7 @@ export const getLoggedInUser = async () => {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
+      authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
     },
   });
 

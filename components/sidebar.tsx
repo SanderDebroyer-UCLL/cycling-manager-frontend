@@ -20,11 +20,6 @@ const Sidebar = () => {
   const isNotActive = (paths: string[]) =>
     paths.every((p) => !pathname.includes(p));
 
-  useEffect(() => {
-    console.log(pathname);
-    console.log(pathname?.includes('mijn-team'));
-  });
-
   const router = useRouter();
   const { competitionId } = router.query;
 
