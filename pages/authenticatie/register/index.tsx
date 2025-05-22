@@ -11,12 +11,13 @@ import { Button } from 'primereact/button';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { InputText } from 'primereact/inputtext';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Toast } from 'primereact/toast';
 import { showErrorToast, showSuccessToast } from '@/services/toast.service';
+import HomeLayout from '@/components/homeLayout';
 
-export default function Login() {
+export default function Register() {
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -202,3 +203,5 @@ export default function Login() {
     </>
   );
 }
+
+Register.getLayout = (page: ReactNode) => <HomeLayout>{page}</HomeLayout>;
