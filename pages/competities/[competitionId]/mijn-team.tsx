@@ -19,18 +19,10 @@ import {
 import { Cyclist } from '@/types/cyclist';
 import { UserTeam } from '@/types/user-team';
 import { useRouter } from 'next/router';
-import { FilterMatchMode } from 'primereact/api';
-import { Column } from 'primereact/column';
-import { DataTable, DataTableFilterMeta } from 'primereact/datatable';
-import { IconField } from 'primereact/iconfield';
-import { InputIcon } from 'primereact/inputicon';
-import { InputText } from 'primereact/inputtext';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import React, {
-  ChangeEvent,
   CSSProperties,
   ReactNode,
-  use,
   useEffect,
   useRef,
   useState,
@@ -39,10 +31,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { countryAbbreviationMap } from '@/utils/country-abbreviation-map-lowercase';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
-import { OrderList } from 'primereact/orderlist';
 import { User } from '@/types/user';
 import { fetchUsers, resetUsersStatus } from '@/features/users/users.slice';
-import { Button } from 'primereact/button';
 import { confirmPopup, ConfirmPopup } from 'primereact/confirmpopup';
 import SelectingPhase from '@/components/SelectingPhase';
 import SortingPhase from '@/components/SortingPhase';
@@ -55,8 +45,6 @@ const index = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedCyclist, setSelectedCyclist] = useState<Cyclist | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<Element | null>(null);
-  const email = sessionStorage.getItem('email');
-  const dispatch = useDispatch<AppDispatch>();
   const usersStatus = useSelector((state: RootState) => state.users.status);
   const userTeamsStatus = useSelector(
     (state: RootState) => state.userTeams.status,
@@ -76,6 +64,8 @@ const index = () => {
   );
   const competitionRef = useRef<Competition | null>(null);
   const stompClientRef = useRef<Client | null>(null);
+  const email = sessionStorage.getItem('email');
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     competitionRef.current = competition;
