@@ -2,12 +2,9 @@ import CompetitieLayout from '@/components/competitieLayout';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import { AppDispatch } from '@/store/store';
 import { Competition } from '@/types/competition';
-import { Stage } from '@/types/grandtour';
-import { Race } from '@/types/race';
 import { useRouter } from 'next/router';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
-import { Chart } from 'primereact/chart';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
@@ -110,7 +107,7 @@ const index = () => {
   };
 
   return (
-    <div className="flex flex-col gap-12 py-12 px-8 w-full">
+    <div className="flex flex-col gap-12 w-full">
       <Dialog
         header="Het is tijd om de competitie te starten!"
         visible={visible}
@@ -141,7 +138,7 @@ const index = () => {
           </div>
         </div>
       </Dialog>
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-10">
         <h2 className=" text-xl font-bold">
           Overzicht{' '}
           {competition.races[0].stages.length > 0
@@ -154,18 +151,18 @@ const index = () => {
         className="max-w-48"
         onClick={reloadRaceData()}
       ></Button>
-      <div className="flex gap-6 w-full">
+      <div className="flex gap-10 w-full">
         <div className="flex flex-1/4 flex-col gap-2">
           <h3 className="font-semibold">Duur Competitie</h3>
-          <div className="p-3 flex justify-center rounded-lg shadow-md bg-surface-200">
+          <div className="p-3 flex justify-center rounded-lg shadow-md bg-surface-100">
             <Calendar value={dates} inline selectionMode="range" />
           </div>
         </div>
-        <div className="flex flex-row flex-3/4 gap-4 w-full">
-          <div className="flex flex-col gap-4">
+        <div className="flex flex-row flex-3/4 gap-10 w-full">
+          <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-2">
               <h3 className="font-semibold">Totale afstand</h3>
-              <div className="flex flex-col justify-center gap-2 p-4  bg-surface-200 rounded-lg shadow-md font-semibold text-xl">
+              <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
                 {totalDistance} km
                 {competition.races[0].stages.length > 0 ? (
                   <span className="text-sm font-normal">
@@ -181,7 +178,7 @@ const index = () => {
             </div>
             <div className="flex flex-col gap-2">
               <h3 className="font-semibold">Totaal hoogtemeters</h3>
-              <div className="flex flex-col justify-center gap-2 p-4  bg-surface-200 rounded-lg shadow-md font-semibold text-xl">
+              <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
                 {totalElevation} m
                 <span className="text-sm font-normal">
                   Dat is {(totalElevation / 1.82).toFixed(0)} keer Niels
@@ -191,7 +188,7 @@ const index = () => {
           </div>
           <div className="flex flex-col gap-2">
             <h3 className="font-semibold">Ritten</h3>
-            <div className="bg-surface-200 rounded-lg shadow-md p-4 max-h-[365px] overflow-y-auto">
+            <div className="bg-surface-100 rounded-lg shadow-md p-4 max-h-[365px] overflow-y-auto">
               <DataTable
                 selectionMode="single"
                 selection={null}
@@ -207,7 +204,7 @@ const index = () => {
               >
                 <Column header="Naam" field="name" />
                 <Column header="Afstand" field="distance" />
-              </DataTable>{' '}
+              </DataTable>
             </div>
           </div>
         </div>

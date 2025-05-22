@@ -1,6 +1,11 @@
 // src/features/user/userSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { Competition, CreateCompetitionDetails } from '@/types/competition';
+import {
+  Competition,
+  CompetitionPick,
+  CompetitionStatus,
+  CreateCompetitionDetails,
+} from '@/types/competition';
 import {
   createCompetition,
   getCompetition,
@@ -21,7 +26,7 @@ export const createCompetitionRequest = createAsyncThunk(
   async (competitionData: CreateCompetitionDetails) => {
     const competition = await createCompetition(competitionData);
     return competition;
-  }
+  },
 );
 
 export const fetchCompetitionById = createAsyncThunk(
@@ -29,7 +34,7 @@ export const fetchCompetitionById = createAsyncThunk(
   async (competitionId: string) => {
     const competition = await getCompetition(competitionId);
     return competition;
-  }
+  },
 );
 
 const competitionSlice = createSlice({
@@ -39,6 +44,33 @@ const competitionSlice = createSlice({
     resetCompetitionStatus(state) {
       state.status = 'idle';
     },
+    updateCompetition(
+      state,
+      action: PayloadAction<{
+        competitionPicks: CompetitionPick[];
+        competitionId: string;
+      }>,
+    ) {
+      const { competitionPicks } = action.payload;
+      if (!state.data) {
+        return;
+      }
+      state.data.competitionPicks = competitionPicks;
+    },
+    updateCompetitionStatus(state, action: PayloadAction<CompetitionStatus>) {
+      const competitionStatus = action.payload;
+      if (!state.data) {
+        return;
+      }
+      state.data.competitionStatus = competitionStatus;
+    },
+    updateCompetitionPick(state, action: PayloadAction<number>) {
+      const currentPick = action.payload;
+      if (!state.data) {
+        return;
+      }
+      state.data.currentPick = currentPick;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -50,7 +82,7 @@ const competitionSlice = createSlice({
         (state, action: PayloadAction<Competition>) => {
           state.status = 'succeeded';
           state.data = action.payload;
-        }
+        },
       )
       .addCase(createCompetitionRequest.rejected, (state) => {
         state.status = 'failed';
@@ -63,7 +95,7 @@ const competitionSlice = createSlice({
         (state, action: PayloadAction<Competition>) => {
           state.status = 'succeeded';
           state.data = action.payload;
-        }
+        },
       )
       .addCase(fetchCompetitionById.rejected, (state) => {
         state.status = 'failed';
@@ -71,5 +103,10 @@ const competitionSlice = createSlice({
   },
 });
 
-export const { resetCompetitionStatus } = competitionSlice.actions;
+export const {
+  resetCompetitionStatus,
+  updateCompetition,
+  updateCompetitionStatus,
+  updateCompetitionPick,
+} = competitionSlice.actions;
 export default competitionSlice.reducer;

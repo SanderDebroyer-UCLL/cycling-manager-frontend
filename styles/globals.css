@@ -14,7 +14,7 @@
 @import 'tailwindcss/utilities' layer(utilities);
 
 .p-datepicker {
-  @apply bg-surface-200 border-none p-0;
+  @apply bg-surface-100 border-none p-0;
 }
 
 .p-toast {
@@ -22,7 +22,7 @@
 }
 
 .p-datepicker-header {
-  @apply bg-surface-200 rounded-lg p-2;
+  @apply bg-surface-100 rounded-lg p-2;
 }
 
 .p-datepicker span {
@@ -35,6 +35,22 @@
 
 .p-datepicker table td > span.p-highlight {
   @apply bg-primary-500 rounded-full text-surface-50;
+}
+
+.p-datatable-header {
+  @apply bg-surface-100 border-none;
+}
+
+.p-datatable-thead th {
+  @apply bg-surface-100 border-none;
+}
+
+.p-datatable-tbody tr {
+  @apply bg-surface-100 border-none;
+}
+
+.p-paginator {
+  @apply bg-surface-100 border-none;
 }
 
 @theme {
