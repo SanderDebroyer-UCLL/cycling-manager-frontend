@@ -318,7 +318,11 @@ const index = () => {
   if (competition.competitionStatus === CompetitionStatus.STARTED) {
     return (
       <>
-        <StartedPhase userTeams={userTeams} email={email} competition={competition} />
+        <StartedPhase
+          userTeams={userTeams}
+          email={email}
+          competition={competition}
+        />
       </>
     );
   }

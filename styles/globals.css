@@ -65,6 +65,14 @@
   @apply bg-primary-600;
 }
 
+.p-button.p-button-text {
+  @apply bg-transparent;
+}
+
+.p-button.p-button-text:hover {
+  @apply bg-surface-100;
+}
+
 .p-button-secondary.p-button.p-button-outlined:not(:disabled) {
   @apply border-[#64748b];
 }
