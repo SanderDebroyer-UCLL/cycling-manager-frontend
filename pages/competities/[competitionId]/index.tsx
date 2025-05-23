@@ -1,7 +1,7 @@
 import CompetitieLayout from '@/components/competitieLayout';
 import { container } from '@/const/containerStyle';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
-import { AppDispatch } from '@/store/store';
+import { AppDispatch, RootState } from '@/store/store';
 import { Competition } from '@/types/competition';
 import { useRouter } from 'next/router';
 import { Button } from 'primereact/button';
@@ -13,6 +13,8 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { Nullable } from 'primereact/ts-helpers';
 import React, { CSSProperties, ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Race, updateRaceData } from '@/features/race/race.slice';
+import { cookies } from 'next/headers';
 
 const index = () => {
   const router = useRouter();
@@ -20,10 +22,13 @@ const index = () => {
   const [totalDistance, setTotalDistance] = useState(0);
   const [totalElevation, setTotalElevation] = useState(0);
   const [visible, setVisible] = useState(false);
+  const [updateRaceDataLoading, setUpdateRaceDataLoading] = useState(false);
   const documentStyle = getComputedStyle(document.documentElement);
   const competition: Competition = useSelector(
     (state: any) => state.competition.data,
   );
+  const raceStatus = useSelector((state: RootState) => state.race.status);
+
   const dispatch = useDispatch<AppDispatch>();
   const { competitionId } = router.query;
 
@@ -54,6 +59,14 @@ const index = () => {
       }
     }
   });
+
+  useEffect(() => {
+    if (raceStatus === 'loading') {
+      setUpdateRaceDataLoading(true);
+    } else {
+      setUpdateRaceDataLoading(false);
+    }
+  }, [raceStatus]);
 
   useEffect(() => {
     if (
@@ -131,11 +144,25 @@ const index = () => {
         </div>
       </Dialog>
       <div className="flex flex-col gap-10">
-        <h2 className=" text-xl font-bold">
+        <h2 className=" text-xl font-bold flex gap-4 items-center">
           Overzicht{' '}
           {competition.races[0].stages.length > 0
             ? competition.races[0].name
             : competition.name}
+          <Button
+            // rounded
+            icon="pi pi-refresh"
+            rounded
+            className="max-w-48"
+            loading={updateRaceDataLoading}
+            onClick={() =>
+              competition.races[0].stages.length > 0
+                ? dispatch(updateRaceData(competition.races[0].name))
+                : competition.races.forEach((race: Race) =>
+                    dispatch(updateRaceData(race.name)),
+                  )
+            }
+          ></Button>
         </h2>
       </div>
       <div className="flex gap-10 w-full">
