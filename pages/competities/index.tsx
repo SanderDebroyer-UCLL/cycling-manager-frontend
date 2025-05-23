@@ -59,8 +59,8 @@ const Index = () => {
   const [nodes, setNodes] = useState<TreeNode[]>([]);
   const [visible, setVisible] = React.useState(false);
   const [competitionloading, setCompetitionLoading] = useState<boolean>(false);
-  const [competitionsloading, setCompetitionsLoading] = useState<boolean>(false);
-
+  const [competitionsloading, setCompetitionsLoading] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (races.length) {
@@ -160,7 +160,10 @@ const Index = () => {
           <h2 className="text-xl font-bold">Actieve competities</h2>
           <Button label="Creëer Competite" onClick={() => setVisible(true)} />
         </div>
-        <div style={container} className="overflow-hidden overflow-y-auto rounded-lg max-h-[75vh]">
+        <div
+          style={container}
+          className="overflow-hidden overflow-y-auto rounded-lg max-h-[75vh]"
+        >
           <DataTable
             value={competitions}
             loading={competitionsloading}
@@ -283,15 +286,12 @@ const Index = () => {
               value={selectedUsers}
               options={users}
               onChange={(e) => setSelectedUsers(e.value)}
-              itemTemplate={(user: User) =>
-                `${user.firstName} ${user.lastName}`
-              }
-              selectedItemTemplate={(user: User | undefined) =>
-                user ? `${user.firstName} ${user.lastName}` : ''
+              itemTemplate={(user) => `${user.firstName} ${user.lastName}`}
+              selectedItemTemplate={(user) =>
+                user ? `${user.firstName} ${user.lastName} ` : ''
               }
               placeholder="Selecteer deelnemers"
               className="w-full md:w-20rem"
-              display="chip"
             />
             {selectedUsersError && (
               <div className="text-red-500 text-sm mt-2">
