@@ -151,6 +151,7 @@ const index = () => {
             : competition.name}
           <Button
             // rounded
+            outlined
             icon="pi pi-refresh"
             rounded
             className="max-w-48"
@@ -206,7 +207,10 @@ const index = () => {
           </div>
           <div className="flex flex-col gap-2">
             <h3 className="font-semibold">Ritten</h3>
-            <div style={container} className="flex flex-col h-full overflow-auto">
+            <div
+              style={container}
+              className="flex flex-col h-full overflow-auto"
+            >
               <DataTable
                 selectionMode="single"
                 selection={null}
