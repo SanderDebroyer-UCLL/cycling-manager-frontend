@@ -1,14 +1,18 @@
 import CompetitieLayout from '@/components/competitieLayout';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
-import { fetchRaceResultsByRaceId, resetRaceResultsStatus } from '@/features/race-results/race-results.slice';
+import {
+  fetchRaceResultsByRaceId,
+  resetRaceResultsStatus,
+} from '@/features/race-results/race-results.slice';
 import {
   fetchStageResultsByStageId,
   resetStageResultsStatus,
 } from '@/features/stage-results/stage-results.slice';
 import { AppDispatch } from '@/store/store';
 import { Competition } from '@/types/competition';
-import { Race, Stage, StageResult } from '@/types/race';
+import { ParcoursType, Race, Stage, StageResult } from '@/types/race';
 import { RaceResult } from '@/types/race-result';
+import { parcoursDescriptions, ParcoursTypeKeyMap } from '@/utils/parcours-key-map';
 import { useRouter } from 'next/router';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -195,19 +199,37 @@ const index = () => {
               <div className="flex w-full gap-5">
                 <div className="flex flex-col flex-1 gap-2">
                   <h3 className="font-semibold">Afstand</h3>
-                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                  <div className="flex flex-col justify-center gap-2 p-4 bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
                     {activeStage?.distance} km
                     <span className="text-sm font-normal">
-                      Gemiddelde afstand
+                      {activeStage?.distance !== undefined &&
+                        (Number(activeStage?.distance) < 8
+                          ? 'Proloog'
+                          : Number(activeStage?.distance) < 140
+                            ? 'Korte rit'
+                            : Number(activeStage?.distance) < 180
+                              ? 'Gemiddelde rit'
+                              : Number(activeStage?.distance) < 210
+                                ? 'Lange rit'
+                                : 'Koninklijke rit')}
                     </span>
                   </div>
                 </div>
                 <div className="flex flex-col flex-1 gap-2">
                   <h3 className="font-semibold">Hoogtemeters</h3>
-                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                  <div className="flex flex-col justify-center gap-2 p-4 bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
                     {activeStage?.verticalMeters} m
                     <span className="text-sm font-normal">
-                      Veel hoogtemeters
+                      {activeStage?.verticalMeters !== undefined &&
+                        (Number(activeStage.verticalMeters) < 500
+                          ? 'Vlakke rit'
+                          : Number(activeStage.verticalMeters) < 1000
+                            ? 'Licht geaccidenteerd'
+                            : Number(activeStage.verticalMeters) < 2000
+                              ? 'Geaccidenteerd'
+                              : Number(activeStage.verticalMeters) < 3000
+                                ? 'Bergachtig'
+                                : 'Zware bergrit')}
                     </span>
                   </div>
                 </div>
@@ -233,10 +255,16 @@ const index = () => {
                 </div>
                 <div className="flex flex-col flex-1 gap-2">
                   <h3 className="font-semibold">Type Rit</h3>
-                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
-                    Bergrit
+                  <div className="flex flex-col justify-center gap-2 p-4 bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                    {ParcoursTypeKeyMap[
+                      activeStage?.parcoursType as ParcoursType
+                    ] ?? 'Niet beschikbaar'}
                     <span className="text-sm font-normal">
-                      Nog iets toevoegen
+                      {activeStage?.parcoursType
+                        ? parcoursDescriptions[
+                            activeStage.parcoursType as ParcoursType
+                          ]
+                        : 'Geen parcoursinformatie'}
                     </span>
                   </div>
                 </div>
@@ -278,17 +306,26 @@ const index = () => {
               <div className="flex w-full gap-5">
                 <div className="flex flex-col flex-1 gap-2">
                   <h3 className="font-semibold">Afstand</h3>
-                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                  <div className="flex flex-col justify-center gap-2 p-4 bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
                     {activeRace?.distance} km
                     <span className="text-sm font-normal">
-                      Gemiddelde afstand
+                      {activeRace?.distance !== undefined &&
+                        (Number(activeRace.distance) < 120
+                          ? 'Korte afstand'
+                          : Number(activeRace.distance) < 180
+                            ? 'Gemiddelde afstand'
+                            : Number(activeRace.distance) < 220
+                              ? 'Lange afstand'
+                              : 'Zeer lange afstand')}
                     </span>
                   </div>
                 </div>
                 <div className="flex flex-col flex-1 gap-2">
                   <h3 className="font-semibold">Type Rit</h3>
                   <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
-                    Bergrit
+                    {ParcoursTypeKeyMap[
+                      activeRace?.parcoursType as ParcoursType
+                    ] ?? 'Niet beschikbaar'}
                     <span className="text-sm font-normal">
                       Nog iets toevoegen
                     </span>
