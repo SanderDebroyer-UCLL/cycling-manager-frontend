@@ -4,7 +4,7 @@ export const ParcoursTypeKeyMap: Record<ParcoursType, string> = {
   [ParcoursType.FLAT]: 'Vlakke etappe',
   [ParcoursType.MOUNTAIN]: 'Bergetappe',
   [ParcoursType.HILLY]: 'Heuvelachtige etappe',
-  [ParcoursType.HILLY_HILL_FINISH]: 'Heuvelachtig met aankomst bergop',
+  [ParcoursType.HILLY_HILL_FINISH]: 'Heuvels met aankomst bergop',
   [ParcoursType.MOUNTAIN_HILL_FINISH]: 'Bergen met aankomst bergop',
 };
 

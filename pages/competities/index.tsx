@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -58,7 +58,9 @@ const Index = () => {
   );
   const [nodes, setNodes] = useState<TreeNode[]>([]);
   const [visible, setVisible] = React.useState(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [competitionloading, setCompetitionLoading] = useState<boolean>(false);
+  const [competitionsloading, setCompetitionsLoading] = useState<boolean>(false);
+
 
   useEffect(() => {
     if (races.length) {
@@ -87,12 +89,19 @@ const Index = () => {
 
   useEffect(() => {
     if (competitionStatus === 'loading') {
-      setLoading(true);
+      setCompetitionLoading(true);
     } else {
-      setLoading(false);
+      setCompetitionLoading(false);
     }
   }, [competitionStatus]);
 
+  useEffect(() => {
+    if (competitionsStatus === 'loading') {
+      setCompetitionsLoading(true);
+    } else {
+      setCompetitionsLoading(false);
+    }
+  }, [competitionsStatus]);
   const handleCreateCompetition = () => {
     setNameError('');
     setSelectedRacesError('');
@@ -154,6 +163,7 @@ const Index = () => {
         <div style={container} className="overflow-hidden overflow-y-auto rounded-lg max-h-[75vh]">
           <DataTable
             value={competitions}
+            loading={competitionsloading}
             tableStyle={{ width: '100%' }}
             sortField="name"
             sortOrder={1}
@@ -298,7 +308,7 @@ const Index = () => {
             />
             <Button
               label="Creëer Competite"
-              loading={loading}
+              loading={competitionloading}
               onClick={handleCreateCompetition}
             />
           </div>

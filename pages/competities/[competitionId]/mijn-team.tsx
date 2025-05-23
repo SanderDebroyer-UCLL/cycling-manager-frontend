@@ -37,6 +37,7 @@ import { confirmPopup, ConfirmPopup } from 'primereact/confirmpopup';
 import SelectingPhase from '@/components/SelectingPhase';
 import SortingPhase from '@/components/SortingPhase';
 import { container } from '@/const/containerStyle';
+import StartedPhase from '@/components/StartedPhase';
 
 const index = () => {
   const router = useRouter();
@@ -317,11 +318,7 @@ const index = () => {
   if (competition.competitionStatus === CompetitionStatus.STARTED) {
     return (
       <>
-        <div className="flex flex-col gap-12 w-full">
-          <div className="flex flex-col gap-6">
-            <h2 className=" text-xl font-bold">Mijn team</h2>
-          </div>
-        </div>
+        <StartedPhase userTeams={userTeams} email={email} competition={competition} />
       </>
     );
   }
