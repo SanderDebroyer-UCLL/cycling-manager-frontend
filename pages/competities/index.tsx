@@ -23,6 +23,7 @@ import {
 } from '@/features/competitions/competitions.slice';
 import { Race } from '@/types/race';
 import LinkBodyTemplate from '@/components/LinkBodyTemplate';
+import { container } from '@/const/containerStyle';
 
 const Index = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -150,9 +151,15 @@ const Index = () => {
           <h2 className="text-xl font-bold">Actieve competities</h2>
           <Button label="Creëer Competite" onClick={() => setVisible(true)} />
         </div>
-        <div className="overflow-hidden overflow-y-auto rounded-lg max-h-[75vh]">
-          <DataTable value={competitions} tableStyle={{ width: '100%' }}>
+        <div style={container} className="overflow-hidden overflow-y-auto rounded-lg max-h-[75vh]">
+          <DataTable
+            value={competitions}
+            tableStyle={{ width: '100%' }}
+            sortField="name"
+            sortOrder={1}
+          >
             <Column header="Naam" field="name" />
+
             <Column
               header="Wedstrijden"
               body={(rowData) =>

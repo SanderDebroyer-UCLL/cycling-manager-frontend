@@ -139,7 +139,7 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
                       competitionPick.userId == userTeam.user.id &&
                       competitionPick.pickOrder === competition.currentPick,
                   )
-                    ? 'border-2 border-primary-500'
+                    ? '!border-2 !border-primary-500'
                     : ''
                 }`}
               >

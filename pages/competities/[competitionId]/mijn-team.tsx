@@ -36,6 +36,7 @@ import { fetchUsers, resetUsersStatus } from '@/features/users/users.slice';
 import { confirmPopup, ConfirmPopup } from 'primereact/confirmpopup';
 import SelectingPhase from '@/components/SelectingPhase';
 import SortingPhase from '@/components/SortingPhase';
+import { container } from '@/const/containerStyle';
 
 const index = () => {
   const router = useRouter();
@@ -214,28 +215,12 @@ const index = () => {
           setConfirmTarget(null);
         },
         reject: () => {
-          // toast.current.show({
-          //   severity: 'warn',
-          //   summary: 'Rejected',
-          //   detail: 'You have rejected the selection',
-          //   life: 3000,
-          // });
           setSelectedCyclist(null);
           setConfirmTarget(null);
         },
       });
     }
   }, [selectedCyclist, confirmTarget]);
-
-  const container: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: '#f4f6f9', // Equivalent to Tailwind's surface-200 (approximate)
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // shadow-md approximation
-    borderRadius: '0.5rem', // rounded-lg
-    padding: '1rem', // p-4
-    gap: '1rem', // gap-4
-  };
 
   const handleUsersChange = (users: User[]) => {
     setUsersState(users);

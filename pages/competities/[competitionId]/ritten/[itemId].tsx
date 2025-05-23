@@ -1,4 +1,5 @@
 import CompetitieLayout from '@/components/competitieLayout';
+import { container } from '@/const/containerStyle';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import {
   fetchRaceResultsByRaceId,
@@ -16,6 +17,7 @@ import {
   parcoursDescriptions,
   ParcoursTypeKeyMap,
 } from '@/utils/parcours-key-map';
+import { Calendar, Flag, ListOrdered } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -31,7 +33,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const index = () => {
   const router = useRouter();
-  const { competitionId } = router.query;
+  const { competitionId, itemId } = router.query;
 
   const [activeStage, setActiveStage] = useState<Stage | null>(null);
   const [activeRace, setActiveRace] = useState<Race | null>(null);
@@ -92,15 +94,42 @@ const index = () => {
   }, [resultLoading]);
 
   useEffect(() => {
-    if (competition && activeRace === null) {
-      setActiveRace(competition.races[0]);
+    if (!competition || !itemId) return;
+
+    // Try to find stage or race with this id:
+    const stage = competition.races
+      .flatMap((r) => r.stages)
+      .find((s) => s.id.toString() === itemId);
+    if (stage) {
+      setActiveStage(stage);
+      setActiveRace(null); // clear active race if needed
+      return;
     }
-  });
-  useEffect(() => {
-    if (competition && activeStage === null) {
-      setActiveStage(competition.races[0].stages[0]);
+
+    const race = competition.races.find((r) => r.id.toString() === itemId);
+    if (race) {
+      setActiveRace(race);
+      setActiveStage(null);
     }
-  });
+  }, [competition, itemId]);
+
+  const onSelectStage = (stage: Stage) => {
+    setActiveStage(stage);
+    setActiveRace(null);
+    dispatch(resetStageResultsStatus());
+    router.push(`/competities/${competitionId}/ritten/${stage.id}`, undefined, {
+      shallow: true,
+    });
+  };
+
+  const onSelectRace = (race: Race) => {
+    setActiveRace(race);
+    setActiveStage(null);
+    dispatch(resetRaceResultsStatus());
+    router.push(`/competities/${competitionId}/ritten/${race.id}`, undefined, {
+      shallow: true,
+    });
+  };
 
   useEffect(() => {
     if (
@@ -112,16 +141,10 @@ const index = () => {
     }
   }, [dispatch, competition, competitionId]);
 
-  const container: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: '#f4f6f9', // Equivalent to Tailwind's surface-200 (approximate)
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // shadow-md approximation
-    borderRadius: '0.5rem', // rounded-lg
-    padding: '1rem', // p-4
-    cursor: 'pointer',
-    gap: '0.5rem', // gap-2
-  };
+  useEffect(() => {
+    console.log('itemId', itemId);
+    console.log('activeStage', activeStage?.id);
+  });
 
   if (!competition) {
     return (
@@ -153,17 +176,28 @@ const index = () => {
             ? competition.races[0].stages.map((stage, index) => (
                 <div
                   onClick={() => {
-                    setActiveStage(stage);
+                    onSelectStage(stage);
                     dispatch(resetStageResultsStatus()); // reset before fetch effect can run
                   }}
                   key={stage.id}
-                  className="flex flex-col shrink-0 bg-surface-100 shadow-md rounded-lg mb-4 p-4 cursor-pointer gap-2 w-60"
+                  style={container}
+                  className={`cursor-pointer shrink-0 w-72 mb-4 rounded-lg p-4 border transition-all ${
+                    stage.id.toString() === itemId
+                      ? '!bg-primary-100 !border-primary-500 !text-primary-900'
+                      : ''
+                  }`}
                 >
-                  <p>Stage {index + 1}</p>
-                  <p className="truncate overflow-hidden whitespace-nowrap">
-                    {stage.name.split('|')[1]}
+                  <p className="font-semibold text-lg flex items-center gap-2">
+                    Stage {index + 1}
                   </p>
-                  <p>
+                  <p className="flex items-center gap-2">
+                    <Flag className="w-4 h-4 shrink-0" />
+                    <span className="truncate overflow-hidden whitespace-nowrap">
+                      {stage.name.split('|')[1]}
+                    </span>
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
                     {(() => {
                       const [day, month] = stage.date.split('/').map(Number);
                       const year = new Date(
@@ -178,17 +212,30 @@ const index = () => {
             : competition.races.map((race, index) => (
                 <div
                   onClick={() => {
-                    setActiveRace(race);
-                    dispatch(resetRaceResultsStatus()); // reset before fetch effect can run
+                    onSelectRace(race);
+                    dispatch(resetRaceResultsStatus());
                   }}
                   key={race.id}
-                  className="flex flex-col bg-surface-100 shadow-md rounded-lg mb-4 p-4 cursor-pointer gap-2 w-60"
+                  style={container}
+                  className={`cursor-pointer shrink-0 w-72 mb-4 rounded-lg p-4 border transition-all ${
+                    race.id.toString() === itemId
+                      ? '!bg-primary-100 !border-primary-500 !text-primary-900'
+                      : ''
+                  }`}
                 >
-                  <p>Race {index + 1}</p>
-                  <p className="truncate overflow-hidden whitespace-nowrap">
-                    {race.name}
+                  <p className="font-semibold text-lg flex items-center gap-2">
+                    Race {index + 1}
                   </p>
-                  <p>{new Date(race.startDate).toLocaleDateString('nl')}</p>
+                  <p className="flex items-center gap-2">
+                    <Flag className="w-4 h-4" />
+                    <span className="truncate overflow-hidden whitespace-nowrap">
+                      {race.name}
+                    </span>
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    {new Date(race.startDate).toLocaleDateString('nl')}
+                  </p>
                 </div>
               ))}
         </div>
@@ -202,7 +249,7 @@ const index = () => {
               <div className="flex w-full gap-5">
                 <div className="flex flex-col flex-1 gap-2">
                   <h3 className="font-semibold">Afstand</h3>
-                  <div className="flex flex-col justify-center gap-2 p-4 bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                  <div style={container} className="font-semibold text-xl">
                     {activeStage?.distance} km
                     <span className="text-sm font-normal">
                       {activeStage?.distance !== undefined &&
@@ -220,7 +267,7 @@ const index = () => {
                 </div>
                 <div className="flex flex-col flex-1 gap-2">
                   <h3 className="font-semibold">Hoogtemeters</h3>
-                  <div className="flex flex-col justify-center gap-2 p-4 bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                  <div style={container} className="font-semibold text-xl">
                     {activeStage?.verticalMeters} m
                     <span className="text-sm font-normal">
                       {activeStage?.verticalMeters !== undefined &&
@@ -240,7 +287,7 @@ const index = () => {
               <div className="flex w-full gap-5">
                 <div className="flex flex-col flex-1 gap-2">
                   <h3 className="font-semibold">Lokale Starttijd</h3>
-                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                  <div style={container} className="font-semibold text-xl">
                     {activeStage?.startTime &&
                     activeStage.startTime !== '-' &&
                     activeStage.startTime.includes('(')
@@ -258,7 +305,7 @@ const index = () => {
                 </div>
                 <div className="flex flex-col flex-1 gap-2">
                   <h3 className="font-semibold">Type Rit</h3>
-                  <div className="flex flex-col justify-center gap-2 p-4 bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                  <div style={container} className="font-semibold text-xl">
                     {ParcoursTypeKeyMap[
                       activeStage?.parcoursType as ParcoursType
                     ] ?? 'Niet beschikbaar'}
@@ -281,7 +328,10 @@ const index = () => {
               <div className="py-[10px]"></div>
               <div className="flex flex-col flex-1 gap-2">
                 <h3 className="font-semibold">Uitslag Rit</h3>
-                <div className="flex flex-col gap-2 p-4 bg-surface-100 rounded-lg shadow-md font-semibold text-xl h-full overflow-auto">
+                <div
+                  style={container}
+                  className="flex flex-col h-full overflow-auto"
+                >
                   <DataTable
                     paginator
                     rows={5}
@@ -291,6 +341,7 @@ const index = () => {
                     sortField="ranking"
                     sortOrder={1}
                     emptyMessage="Geen resultaten gevonden"
+                    className=""
                   >
                     <Column field="ranking" header="Plaats" />
                     <Column field="name" header="Naam" />
@@ -309,7 +360,7 @@ const index = () => {
               <div className="flex w-full gap-5">
                 <div className="flex flex-col flex-1 gap-2">
                   <h3 className="font-semibold">Afstand</h3>
-                  <div className="flex flex-col justify-center gap-2 p-4 bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                  <div style={container} className="font-semibold text-xl">
                     {activeRace?.distance} km
                     <span className="text-sm font-normal">
                       {activeRace?.distance !== undefined &&
@@ -348,7 +399,10 @@ const index = () => {
               <div className="py-[10px]"></div>
               <div className="flex flex-col flex-1 gap-2">
                 <h3 className="font-semibold">Uitslag Race</h3>
-                <div className="flex flex-col gap-2 p-4 bg-surface-100 rounded-lg shadow-md font-semibold text-xl h-full overflow-auto">
+                <div
+                  style={container}
+                  className="flex flex-col h-full overflow-auto"
+                >
                   <DataTable
                     paginator
                     rows={5}

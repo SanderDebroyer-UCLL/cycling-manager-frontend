@@ -7,6 +7,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import Image from 'next/image';
 import Link from 'next/link';
+import { container } from '@/const/containerStyle';
 
 export default function Overview() {
   // Sort users by score descending and get top 3
@@ -108,7 +109,7 @@ export default function Overview() {
         <div className="flex flex-col gap-4 w-full flex-3/4">
           <h2 className="text-xl font-semibold">Huidig klassement</h2>
           <div className="overflow-hidden rounded-lg">
-            <div className="overflow-auto max-h-80 shadow-md w-full flex-3/4">
+            <div style={container} className="overflow-auto max-h-80 w-full flex-3/4">
               <DataTable value={sortedUsers} tableStyle={{ width: '100%' }}>
                 <Column
                   header="Position"
