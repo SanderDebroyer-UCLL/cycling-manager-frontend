@@ -2,7 +2,7 @@ import { Button } from 'primereact/button';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { InputText } from 'primereact/inputtext';
-import { use, useEffect, useState } from 'react';
+import { ReactNode, use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { loginUserRequest, resetUserStatus } from '@/features/user/user.slice';
@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import { validateEmail } from '@/utils/email';
 import { selectCurrentUser } from '@/features/user/user.selector';
 import { showErrorToast, showSuccessToast } from '@/services/toast.service';
+import HomeLayout from '@/components/homeLayout';
 
 export default function Login() {
   const [email, setEmail] = useState<string>('');
@@ -130,3 +131,5 @@ export default function Login() {
     </>
   );
 }
+
+Login.getLayout = (page: ReactNode) => <HomeLayout>{page}</HomeLayout>;

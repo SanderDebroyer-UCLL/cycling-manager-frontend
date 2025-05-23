@@ -15,6 +15,7 @@ export interface Race {
   endDate: string;
   niveau: string;
   distance: string;
+  parcoursType: ParcoursType;
 }
 
 export interface Stage {
@@ -27,8 +28,16 @@ export interface Stage {
   distance: string;
   verticalMeters: string;
   results: StageResult[];
+  parcoursType: ParcoursType;
 }
 
+export enum ParcoursType {
+  FLAT = 'FLAT',
+  MOUNTAIN = 'MOUNTAIN',
+  HILLY = 'HILLY',
+  HILLY_HILL_FINISH = 'HILLY_HILL_FINISH',
+  MOUNTAIN_HILL_FINISH = 'MOUNTAIN_HILL_FINISH',
+}
 
 export interface StageResult {
   position: number;

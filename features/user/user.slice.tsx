@@ -2,10 +2,11 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { loginUser, registerUser } from '@/services/auth.service';
 import { Credentials } from '@/types/credentials';
 import { RegisterUserDetails, User } from '@/types/user';
+import { getLoggedInUser } from '@/services/user.service';
 
 interface UserState {
   data: User | null;
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  status: 'idle' | 'loading' | 'succeeded' | 'failed' | 'not-authenticated';
   error: string | null;
 }
 
@@ -20,7 +21,7 @@ export const loginUserRequest = createAsyncThunk(
   async (credentials: Credentials) => {
     const user = await loginUser(credentials);
     return user;
-  }
+  },
 );
 
 export const registerUserRequest = createAsyncThunk(
@@ -28,7 +29,15 @@ export const registerUserRequest = createAsyncThunk(
   async (userInfo: RegisterUserDetails) => {
     const user = await registerUser(userInfo);
     return user;
-  }
+  },
+);
+
+export const requestLoggedInUser = createAsyncThunk(
+  'user/getLoggedInUser',
+  async () => {
+    const user = await getLoggedInUser();
+    return user;
+  },
 );
 
 const userSlice = createSlice({
@@ -68,7 +77,7 @@ const userSlice = createSlice({
           state.status = 'succeeded';
           state.data = action.payload;
           state.error = null;
-        }
+        },
       )
       .addCase(loginUserRequest.rejected, (state, action) => {
         state.status = 'failed';
@@ -78,7 +87,6 @@ const userSlice = createSlice({
       .addCase(registerUserRequest.pending, (state) => {
         state.status = 'loading';
         state.error = null; // clear previous errors on new request
-
       })
       .addCase(
         registerUserRequest.fulfilled,
@@ -86,11 +94,27 @@ const userSlice = createSlice({
           state.status = 'succeeded';
           state.data = action.payload;
           state.error = null;
-        }
+        },
       )
       .addCase(registerUserRequest.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to register';
+      })
+      .addCase(requestLoggedInUser.pending, (state) => {
+        state.status = 'loading';
+        state.error = null; // clear previous errors on new request
+      })
+      .addCase(
+        requestLoggedInUser.fulfilled,
+        (state, action: PayloadAction<User>) => {
+          state.status = 'succeeded';
+          state.data = action.payload;
+          state.error = null;
+        },
+      )
+      .addCase(requestLoggedInUser.rejected, (state, action) => {
+        state.status = 'not-authenticated';
+        state.error = null;
       });
   },
 });

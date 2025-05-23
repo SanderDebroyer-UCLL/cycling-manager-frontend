@@ -6,13 +6,14 @@ import { User } from '@/types/user';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
-import { Stage } from '@/types/grandtour';
 import CompetitieLayout from '@/components/competitieLayout';
+import { container } from '@/const/containerStyle';
+import { ParcoursType, Stage } from '@/types/race';
 
 const LeaderboardWithSidebar = () => {
   // Sorteer gebruikers op score aflopend
   const sortedUsers = users.sort(
-    (a: User, b: User) => (b.score ?? 0) - (a.score ?? 0)
+    (a: User, b: User) => (b.score ?? 0) - (a.score ?? 0),
   );
 
   const stages: Stage[] = [
@@ -57,6 +58,7 @@ const LeaderboardWithSidebar = () => {
       arrival: '',
       startTime: '',
       verticalMeters: '',
+      parcoursType: ParcoursType.FLAT
     },
     {
       name: 'Etappe 2',
@@ -99,6 +101,7 @@ const LeaderboardWithSidebar = () => {
       arrival: '',
       startTime: '',
       verticalMeters: '',
+      parcoursType: ParcoursType.FLAT
     },
   ];
 
@@ -124,7 +127,7 @@ const LeaderboardWithSidebar = () => {
           <h2 className="text-xl font-semibold mb-4">
             {selectedStage.name} Resultaten
           </h2>
-          <div className="rounded-lg shadow-md bg-surface-100 overflow-auto w-full max-h-[80vh]">
+          <div style={container} className="overflow-auto w-full max-h-[80vh]">
             <DataTable
               value={selectedStage.results}
               tableStyle={{ width: '100%' }}

@@ -1,4 +1,5 @@
 import CompetitieLayout from '@/components/competitieLayout';
+import { container } from '@/const/containerStyle';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import { AppDispatch, RootState } from '@/store/store';
 import { Competition } from '@/types/competition';
@@ -10,7 +11,7 @@ import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Nullable } from 'primereact/ts-helpers';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { CSSProperties, ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Race, updateRaceData } from '@/features/race/race.slice';
 import { cookies } from 'next/headers';
@@ -23,11 +24,6 @@ const index = () => {
   const [visible, setVisible] = useState(false);
   const [updateRaceDataLoading, setUpdateRaceDataLoading] = useState(false);
   const documentStyle = getComputedStyle(document.documentElement);
-  const textColor = documentStyle.getPropertyValue('--text-color');
-  const textColorSecondary = documentStyle.getPropertyValue(
-    '--text-color-secondary',
-  );
-  const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
   const competition: Competition = useSelector(
     (state: any) => state.competition.data,
   );
@@ -155,6 +151,7 @@ const index = () => {
             : competition.name}
           <Button
             // rounded
+            outlined
             icon="pi pi-refresh"
             rounded
             className="max-w-48"
@@ -170,17 +167,18 @@ const index = () => {
         </h2>
       </div>
       <div className="flex gap-10 w-full">
-        <div className="flex flex-1/4 flex-col gap-2">
+        <div className="flex flex-1/4 flex-col gap-2 max-h-[500px]">
           <h3 className="font-semibold">Duur Competitie</h3>
-          <div className="p-3 flex justify-center rounded-lg shadow-md bg-surface-100">
-            <Calendar value={dates} inline selectionMode="range" />
-          </div>
+          <Calendar value={dates} inline selectionMode="range" />
         </div>
-        <div className="flex flex-row flex-3/4 gap-10 w-full">
+        <div className="flex flex-row flex-3/4 gap-10 w-full max-h-[500px]">
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-2">
               <h3 className="font-semibold">Totale afstand</h3>
-              <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+              <div
+                style={container}
+                className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl"
+              >
                 {totalDistance} km
                 {competition.races[0].stages.length > 0 ? (
                   <span className="text-sm font-normal">
@@ -196,7 +194,10 @@ const index = () => {
             </div>
             <div className="flex flex-col gap-2">
               <h3 className="font-semibold">Totaal hoogtemeters</h3>
-              <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+              <div
+                style={container}
+                className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl"
+              >
                 {totalElevation} m
                 <span className="text-sm font-normal">
                   Dat is {(totalElevation / 1.82).toFixed(0)} keer Niels
@@ -206,12 +207,17 @@ const index = () => {
           </div>
           <div className="flex flex-col gap-2">
             <h3 className="font-semibold">Ritten</h3>
-            <div className="bg-surface-100 rounded-lg shadow-md p-4 max-h-[365px] overflow-y-auto">
+            <div
+              style={container}
+              className="flex flex-col h-full overflow-auto"
+            >
               <DataTable
                 selectionMode="single"
                 selection={null}
                 onSelectionChange={(e) =>
-                  router.push(`/competities/${competitionId}/ritten`)
+                  router.push(
+                    `/competities/${competitionId}/ritten/${e.value.id}`,
+                  )
                 }
                 value={
                   competition.races[0].stages.length > 0

@@ -8,6 +8,8 @@ import { CalendarSearch } from 'lucide-react';
 import bannerImage from '@/public/images/banner_image.avif';
 import Image from 'next/image';
 import Link from 'next/link';
+import HomeLayout from '@/components/homeLayout';
+import { ReactNode } from 'react';
 
 export default function Home() {
   return (
@@ -21,8 +23,8 @@ export default function Home() {
             <p className="text-md">
               Race, manage je team, en leid ze tot de overwinning!
             </p>
-            <Link href={'/authentication/register'}>
-              <Button label="Get started" />
+            <Link href={'/authenticatie/register'}>
+              <Button label="Begin!" />
             </Link>
           </div>
           <div className="max-w-[50%]">
@@ -40,7 +42,7 @@ export default function Home() {
             </div>
             <h3 className="font-medium text-md"> Kies je race</h3>
             <p className="text-sm">
-            Selecteer renners, wijs rollen toe en vorm een winnende strategie.
+              Selecteer renners, wijs rollen toe en vorm een winnende strategie.
             </p>
           </div>
           <div className="bg-surface-50 h-full w-full flex flex-col rounded-lg shadow-md p-4 gap-2">
@@ -48,7 +50,7 @@ export default function Home() {
               <Swords size={48} className="stroke-blue-500" />
             </div>
             <h3 className="font-medium text-md">
-            Neem het op tegen je vrienden
+              Neem het op tegen je vrienden
             </h3>
             <p className="text-sm">Bewijs wie de beste manager is.</p>
           </div>
@@ -58,7 +60,7 @@ export default function Home() {
             </div>
             <h3 className="font-medium text-md">Bereik grootse dingen</h3>
             <p className="text-sm">
-             Versla je vrienden en klim naar de top van het klassement.
+              Versla je vrienden en klim naar de top van het klassement.
             </p>
           </div>
         </div>
@@ -66,3 +68,5 @@ export default function Home() {
     </>
   );
 }
+
+Home.getLayout = (page: ReactNode) => <HomeLayout>{page}</HomeLayout>;

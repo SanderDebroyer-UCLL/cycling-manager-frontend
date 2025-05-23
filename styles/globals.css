@@ -14,7 +14,7 @@
 @import 'tailwindcss/utilities' layer(utilities);
 
 .p-datepicker {
-  @apply bg-surface-100 border-none p-0;
+  @apply bg-surface-100 border-[1px] p-4 border-surface-500;
 }
 
 .p-toast {
@@ -37,6 +37,10 @@
   @apply bg-primary-500 rounded-full text-surface-50;
 }
 
+.p-datatable {
+  @apply bg-surface-100 rounded-lg;
+}
+
 .p-datatable-header {
   @apply bg-surface-100 border-none;
 }
@@ -51,6 +55,26 @@
 
 .p-paginator {
   @apply bg-surface-100 border-none;
+}
+
+.p-button:not(:disabled) {
+  @apply bg-primary-500 transition-all;
+}
+
+.p-button:not(:disabled):hover {
+  @apply bg-primary-600;
+}
+
+.p-button-secondary.p-button.p-button-outlined:not(:disabled) {
+  @apply border-[#64748b];
+}
+
+.p-button.p-button-outlined:not(:disabled) {
+  @apply bg-transparent border-primary-500;
+}
+
+.p-button.p-button-outlined:not(:disabled):hover {
+  @apply bg-surface-100;
 }
 
 @theme {

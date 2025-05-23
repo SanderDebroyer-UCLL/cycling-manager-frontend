@@ -1,21 +1,20 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { selectCurrentUser } from '@/features/user/user.selector';
+import React, { useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '@/features/user/user.slice';
 import { Menu } from 'primereact/menu';
 import { MenuItem } from 'primereact/menuitem';
 import Link from 'next/link';
 import router from 'next/router';
-import { AppDispatch } from '@/store/store';
+import { AppDispatch, RootState } from '@/store/store';
 import { User } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { Button } from 'primereact/button';
 
 const navbar = () => {
-  const user = useSelector(selectCurrentUser);
   const dispatch = useDispatch<AppDispatch>();
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
+  const user = useSelector((state: RootState) => state.user.data);
 
   const logoutHandler = () => {
     dispatch(setUser(null)); // Of een specifieke logout action als je die hebt
@@ -104,6 +103,3 @@ const navbar = () => {
 };
 
 export default navbar;
-function componentDidMount(arg0: () => void) {
-  throw new Error('Function not implemented.');
-}

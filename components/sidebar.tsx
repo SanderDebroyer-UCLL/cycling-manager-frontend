@@ -1,5 +1,5 @@
 import { grandTours } from '@/const/data';
-import React, { useEffect } from 'react';
+import React, { use, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Bike, Medal, SquareGanttChart, Users } from 'lucide-react';
 import { useRouter } from 'next/router';
@@ -7,12 +7,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import type { AppDispatch } from '@/store/store';
 import { Competition } from '@/types/competition';
+import { usePathname } from 'next/navigation';
+import path from 'path';
 
 const Sidebar = () => {
   const competition: Competition = useSelector(
     (state: any) => state.competition.data,
   );
+  const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
+  const isActive = (path: string) => pathname.includes(path);
+  const isNotActive = (paths: string[]) =>
+    paths.every((p) => !pathname.includes(p));
 
   const router = useRouter();
   const { competitionId } = router.query;
@@ -47,37 +53,37 @@ const Sidebar = () => {
       <div className="px-6 py-1 flex flex-col gap-4 uppercase text-md font-bold">
         Wedstrijd
       </div>
-      <div className="flex flex-col gap-2 pb-2">
+      <div className="flex flex-col pb-2">
         <Link
           href={`/competities/${competitionId}`}
-          className="flex gap-3 items-center hover:border-l-3 border-l-3 border-surface-100 hover:border-primary-500 px-6 py-1 hover:text-dark-500 hover:font-semibold"
+          className={` ${isNotActive(['ritten', 'mijn-team', 'klassement']) ? '!border-primary-500 !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface-100 hover:border-primary-500 px-6 hover:font-semibold py-2`}
         >
           <SquareGanttChart size={18} className="stroke-dark-700" />
           Overzicht
         </Link>
         <Link
           href={`/competities/${competitionId}/ritten`}
-          className="flex gap-3 items-center hover:border-l-3 border-l-3 border-surface-100 hover:border-primary-500 px-6 py-1 hover:text-dark-500 hover:font-semibold"
+          className={` ${isActive('ritten') ? '!border-primary-500 !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface-100 hover:border-primary-500 px-6 hover:font-semibold py-2`}
         >
           <Bike size={18} className="stroke-dark-700" />
           Ritten
         </Link>
       </div>
 
-      <div className="px-6 py-1 flex flex-col gap-4 uppercase text-md font-bold">
+      <div className="px-6 flex flex-col gap-4 uppercase text-md font-bold">
         Competitie
       </div>
-      <div className="flex flex-col gap-2 pb-2">
+      <div className="flex flex-col pb-2">
         <Link
           href={`/competities/${competitionId}/mijn-team`}
-          className="flex gap-3 items-center hover:border-l-3 border-l-3 border-surface-100 hover:border-primary-500 px-6 py-1 hover:text-dark-500 hover:font-semibold"
+          className={` ${isActive('mijn-team') ? '!border-primary-500 !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface-100 hover:border-primary-500 px-6 hover:font-semibold py-2`}
         >
           <Users size={18} className="stroke-dark-700" />
           Mijn team
         </Link>
         <Link
           href={`/competities/${competitionId}/klassement`}
-          className="flex gap-3 items-center hover:border-l-3 border-l-3 border-surface-100 hover:border-primary-500 px-6 py-1 hover:text-dark-500 hover:font-semibold"
+          className={` ${isActive('klassement') ? '!border-primary-500 !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface-100 hover:border-primary-500 px-6 hover:font-semibold py-2`}
         >
           <Medal size={18} className="stroke-dark-700" />
           Klassement
