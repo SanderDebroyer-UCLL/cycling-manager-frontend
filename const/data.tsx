@@ -8,8 +8,9 @@ import tdfIconDark from '@/public/images/tdf-icon-dark.png';
 import giroIconLight from '@/public/images/giro-icon.png';
 import giroIconDark from '@/public/images/giro-icon-dark.png';
 import vueltaIconLight from '@/public/images/vuelta-icon.png';
-import { GrandTour, Stage, StageResult } from '@/types/grandtour';
+import { GrandTour } from '@/types/grandtour';
 import { User } from '@/types/user';
+import { StageResult } from '@/types/race';
 
 export const grandTours: GrandTour[] = [
   {
@@ -59,7 +60,6 @@ export const users: User[] = [
     role: 'admin',
     score: 100,
     profilePicture: 'https://randomuser.me/api/portraits/men/1.jpg',
-    name: '',
   },
   {
     id: 2,
@@ -70,7 +70,6 @@ export const users: User[] = [
     role: 'user',
     score: 50,
     profilePicture: 'https://randomuser.me/api/portraits/women/2.jpg',
-    name: '',
   },
   {
     id: 3,
@@ -81,7 +80,6 @@ export const users: User[] = [
     role: 'user',
     score: 72,
     profilePicture: 'https://randomuser.me/api/portraits/women/3.jpg',
-    name: '',
   },
   {
     id: 4,
@@ -92,7 +90,6 @@ export const users: User[] = [
     role: 'user',
     score: 85,
     profilePicture: 'https://randomuser.me/api/portraits/men/4.jpg',
-    name: '',
   },
   {
     id: 5,
@@ -103,7 +100,6 @@ export const users: User[] = [
     role: 'admin',
     score: 92,
     profilePicture: 'https://randomuser.me/api/portraits/women/5.jpg',
-    name: '',
   },
   {
     id: 6,
@@ -114,7 +110,6 @@ export const users: User[] = [
     role: 'user',
     score: 60,
     profilePicture: 'https://randomuser.me/api/portraits/men/6.jpg',
-    name: '',
   },
   {
     id: 7,
@@ -125,7 +120,6 @@ export const users: User[] = [
     role: 'user',
     score: 77,
     profilePicture: 'https://randomuser.me/api/portraits/women/7.jpg',
-    name: '',
   },
   {
     id: 8,
@@ -136,7 +130,6 @@ export const users: User[] = [
     role: 'user',
     score: 88,
     profilePicture: 'https://randomuser.me/api/portraits/men/8.jpg',
-    name: '',
   },
   {
     id: 9,
@@ -147,7 +140,6 @@ export const users: User[] = [
     role: 'user',
     score: 66,
     profilePicture: 'https://randomuser.me/api/portraits/women/9.jpg',
-    name: '',
   },
   {
     id: 10,
@@ -158,9 +150,7 @@ export const users: User[] = [
     role: 'user',
     score: 59,
     profilePicture: 'https://randomuser.me/api/portraits/men/10.jpg',
-    name: '',
   },
-
 ];
 
 export const stageResults: StageResult[] = [
