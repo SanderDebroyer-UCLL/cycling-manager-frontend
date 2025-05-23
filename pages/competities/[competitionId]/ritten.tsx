@@ -12,7 +12,10 @@ import { AppDispatch } from '@/store/store';
 import { Competition } from '@/types/competition';
 import { ParcoursType, Race, Stage, StageResult } from '@/types/race';
 import { RaceResult } from '@/types/race-result';
-import { parcoursDescriptions, ParcoursTypeKeyMap } from '@/utils/parcours-key-map';
+import {
+  parcoursDescriptions,
+  ParcoursTypeKeyMap,
+} from '@/utils/parcours-key-map';
 import { useRouter } from 'next/router';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -327,7 +330,11 @@ const index = () => {
                       activeRace?.parcoursType as ParcoursType
                     ] ?? 'Niet beschikbaar'}
                     <span className="text-sm font-normal">
-                      Nog iets toevoegen
+                      {activeStage?.parcoursType
+                        ? parcoursDescriptions[
+                            activeRace?.parcoursType as ParcoursType
+                          ]
+                        : 'Geen parcoursinformatie'}
                     </span>
                   </div>
                 </div>
