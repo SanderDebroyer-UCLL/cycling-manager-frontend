@@ -57,7 +57,8 @@ const userSlice = createSlice({
         state.data = {
           email: '',
           jwtToken: '',
-          name: '',
+          firstName: '',
+          lastName: '',
           password: '',
         };
       }
@@ -92,7 +93,7 @@ const userSlice = createSlice({
         registerUserRequest.fulfilled,
         (state, action: PayloadAction<User>) => {
           state.status = 'succeeded';
-          state.data = action.payload;
+          state.data = null;
           state.error = null;
         },
       )
