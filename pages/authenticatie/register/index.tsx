@@ -1,4 +1,3 @@
-import Navbar from '@/components/navbar';
 import { selectCurrentUser } from '@/features/user/user.selector';
 import {
   registerUserRequest,
@@ -13,7 +12,6 @@ import { InputIcon } from 'primereact/inputicon';
 import { InputText } from 'primereact/inputtext';
 import { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Toast } from 'primereact/toast';
 import { showErrorToast, showSuccessToast } from '@/services/toast.service';
 import HomeLayout from '@/components/homeLayout';
 
@@ -40,57 +38,51 @@ export default function Register() {
   const dispatch = useDispatch<AppDispatch>();
 
   const handleRegister = () => {
+    // Clear previous error messages
+    setFirstNameError('');
+    setLastNameError('');
     setEmailError('');
     setPasswordError('');
     setRepeatPasswordError('');
 
-    if (!name && !email && !password && !repeatPassword) {
-      setEmailError('Email is verplicht');
-      setPasswordError('Wachtwoord is verplicht');
-      setRepeatPasswordError('Herhalen van wachtwoord is verplicht');
-      if (!firstName && !lastName && !email && !password && !repeatPassword) {
-        setFirstNameError('Voornaam is verplicht');
-        setLastNameError('Achternaam is verplicht');
-        setEmailError('Email is verplicht');
-        setPasswordError('Wachtwoord is verplicht');
-        setRepeatPasswordError('herhalen van wachtwoord is verplicht');
-        return;
-      }
-      if (!firstName) {
-        setFirstNameError('Voornaam is verplicht');
-        return;
-      }
+    // Track whether there are any validation issues
+    let hasError = false;
 
-      if (!lastName) {
-        setLastNameError('Achternaam is verplicht');
-        return;
-      }
-
-      if (!email) {
-        setEmailError('Email  is verplicht');
-        return;
-      }
-
-      if (!password) {
-        setPasswordError('Wachtwoord is verplicht');
-        return;
-      }
-
-      if (!repeatPassword) {
-        setRepeatPasswordError('Herhalen van wachtwoord is verplicht');
-        return;
-      }
-
-      if (password !== repeatPassword) {
-        setPasswordError('Wachtwoorden komen niet overeen');
-        return;
-      }
-
-      if (validateEmail(email) === false) {
-        setEmailError('Ongeldig emailadres');
-        return;
-      }
+    // Validate each field individually
+    if (!firstName) {
+      setFirstNameError('Voornaam is verplicht');
+      hasError = true;
     }
+
+    if (!lastName) {
+      setLastNameError('Achternaam is verplicht');
+      hasError = true;
+    }
+
+    if (!email) {
+      setEmailError('Email is verplicht');
+      hasError = true;
+    } else if (!validateEmail(email)) {
+      setEmailError('Ongeldig emailadres');
+      hasError = true;
+    }
+
+    if (!password) {
+      setPasswordError('Wachtwoord is verplicht');
+      hasError = true;
+    }
+
+    if (!repeatPassword) {
+      setRepeatPasswordError('Herhalen van wachtwoord is verplicht');
+      hasError = true;
+    } else if (password && password !== repeatPassword) {
+      setRepeatPasswordError('Wachtwoorden komen niet overeen');
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    // All validations passed, proceed with dispatch
     dispatch(registerUserRequest({ firstName, lastName, email, password }));
   };
 
@@ -107,6 +99,7 @@ export default function Register() {
         summary: 'Registreren mislukt',
         detail: error || 'Er is iets misgegaan.',
       });
+      dispatch(resetUserStatus()); // reset status to avoid repeated error messages
     }
   }, [status, router]);
 

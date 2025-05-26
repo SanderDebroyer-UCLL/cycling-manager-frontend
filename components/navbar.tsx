@@ -94,7 +94,7 @@ const navbar = () => {
             <Button label="Login" severity="secondary" outlined />
           </Link>
           <Link href="/authenticatie/register">
-            <Button label="Register" />
+            <Button label="Registeer" />
           </Link>
         </div>
       )}

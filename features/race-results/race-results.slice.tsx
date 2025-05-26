@@ -1,7 +1,9 @@
 // src/features/user/userSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RaceResult } from '@/types/race-result';
-import { getRaceResultsByRaceId } from '@/services/results.service';
+import {
+  getRaceResultsByRaceId,
+} from '@/services/results.service';
 
 interface RaceResultsState {
   data: RaceResult[];

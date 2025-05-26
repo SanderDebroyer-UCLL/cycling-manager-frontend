@@ -1,15 +1,22 @@
 // src/features/user/userSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { getResultsByStageId } from '@/services/results.service';
+import {
+  getGCStageResult,
+  getResultsByStageId,
+} from '@/services/results.service';
 import { StageResult } from '@/types/race';
 
 interface StageResultsState {
-  data: StageResult[];
+  etappeResult?: StageResult[];
+  gcResult?: StageResult[];
+  youthResult?: StageResult[];
+  pointsResult?: StageResult[];
+
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
 const initialStageResultsState: StageResultsState = {
-  data: [],
+  etappeResult: [],
   status: 'idle',
 };
 
@@ -17,6 +24,14 @@ export const fetchStageResultsByStageId = createAsyncThunk(
   'stage-results/fetchResults',
   async (stageId: string) => {
     const results = await getResultsByStageId(stageId);
+    return results;
+  },
+);
+
+export const fetchGCStageResult = createAsyncThunk(
+  'race-results/fetchGCStageResult',
+  async (stageId: string) => {
+    const results = await getGCStageResult(stageId);
     return results;
   },
 );
@@ -38,10 +53,23 @@ const resultsSlice = createSlice({
         fetchStageResultsByStageId.fulfilled,
         (state, action: PayloadAction<StageResult[]>) => {
           state.status = 'succeeded';
-          state.data = action.payload;
+          state.etappeResult = action.payload;
         },
       )
       .addCase(fetchStageResultsByStageId.rejected, (state) => {
+        state.status = 'failed';
+      })
+      .addCase(fetchGCStageResult.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(
+        fetchGCStageResult.fulfilled,
+        (state, action: PayloadAction<StageResult[]>) => {
+          state.status = 'succeeded';
+          state.gcResult = action.payload;
+        },
+      )
+      .addCase(fetchGCStageResult.rejected, (state) => {
         state.status = 'failed';
       });
   },

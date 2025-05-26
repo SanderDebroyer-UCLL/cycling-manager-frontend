@@ -6,6 +6,7 @@ import { requestLoggedInUser, setUser } from '@/features/user/user.slice';
 import { AppDispatch, RootState } from '@/store/store';
 import { usePathname } from 'next/navigation';
 import router from 'next/router';
+import Head from 'next/head';
 
 type LayoutProps = {
   children: ReactNode;
@@ -66,6 +67,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <>
+      <Head>
+        <title>Cycling Manager</title>
+        <meta
+          name="description"
+          content="Cycling Manager - beheer jouw team en win de competitie"
+        />
+      </Head>
       <Navbar />
       <main>{children}</main>
     </>

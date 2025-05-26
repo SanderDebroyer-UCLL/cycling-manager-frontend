@@ -6,6 +6,7 @@ import {
   resetRaceResultsStatus,
 } from '@/features/race-results/race-results.slice';
 import {
+  fetchGCStageResult,
   fetchStageResultsByStageId,
   resetStageResultsStatus,
 } from '@/features/stage-results/stage-results.slice';
@@ -17,18 +18,12 @@ import {
   parcoursDescriptions,
   ParcoursTypeKeyMap,
 } from '@/utils/parcours-key-map';
-import { Calendar, Flag, ListOrdered } from 'lucide-react';
+import { Calendar, Flag } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import React, {
-  CSSProperties,
-  ReactNode,
-  use,
-  useEffect,
-  useState,
-} from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 const index = () => {
@@ -38,7 +33,11 @@ const index = () => {
   const [activeStage, setActiveStage] = useState<Stage | null>(null);
   const [activeRace, setActiveRace] = useState<Race | null>(null);
   const [resultLoading, setResultLoading] = useState(false);
+  const [resultStatus, setResultStatus] = useState<ResultType>(ResultType.STAGE);
   const [stageResultsState, setStageResultsState] = useState<StageResult[]>([]);
+  const [stageGCResultsState, setStageGCResultsState] = useState<StageResult[]>(
+    [],
+  );
   const [raceResultsState, setRaceResultsState] = useState<RaceResult[]>([]);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -47,16 +46,19 @@ const index = () => {
     (state: any) => state.competition.data,
   );
   const stageResults: StageResult[] = useSelector(
-    (state: any) => state.results.data,
+    (state: any) => state.stageResults.etappeResult,
   );
   const raceResults: RaceResult[] = useSelector(
     (state: any) => state.raceResults.data,
   );
   const stageResultsStatus: string = useSelector(
-    (state: any) => state.results.status,
+    (state: any) => state.stageResults.status,
   );
   const raceResultsStatus: string = useSelector(
     (state: any) => state.raceResults.status,
+  );
+  const stageGCResults: StageResult[] = useSelector(
+    (state: any) => state.stageResults.gcResult,
   );
 
   useEffect(() => {
@@ -64,8 +66,20 @@ const index = () => {
   }, [stageResults]);
 
   useEffect(() => {
+    setStageGCResultsState(stageGCResults);
+    console.log('Stage GC Results:', stageGCResults);
+  }, [stageGCResults]);
+
+  useEffect(() => {
     setRaceResultsState(raceResults);
   }, [raceResults]);
+
+  useEffect(() => {
+    if (stageResultsStatus === 'idle' && activeStage?.id) {
+      dispatch(fetchStageResultsByStageId(activeStage.id));
+      dispatch(fetchGCStageResult(activeStage.id));
+    }
+  }, [dispatch, stageResultsStatus, activeStage?.id]);
 
   useEffect(() => {
     if (stageResultsStatus === 'idle' && activeStage?.id) {
@@ -110,6 +124,17 @@ const index = () => {
     if (race) {
       setActiveRace(race);
       setActiveStage(null);
+      return;
+    } else {
+      if (competition.races[0].stages.length > 0) {
+        router.replace(
+          `/competities/${competitionId}/ritten/${competition.races[0].stages[0].id}`,
+        );
+      } else {
+        router.replace(
+          `/competities/${competitionId}/ritten/${competition.races[0].id}`,
+        );
+      }
     }
   }, [competition, itemId]);
 
@@ -327,19 +352,36 @@ const index = () => {
                   style={container}
                   className="flex flex-col h-full overflow-auto"
                 >
+                  <div className="flex gap-4">
+                    <div className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg">
+                      Etappe
+                    </div>
+                    <div className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg">
+                      Algemeen klassement
+                    </div>
+                    <div className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg">
+                      Jongerenklassement
+                    </div>
+                    <div className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg">
+                      Puntenklassement
+                    </div>
+                    <div className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg">
+                      Bergklassement
+                    </div>
+                  </div>
                   <DataTable
                     paginator
                     rows={5}
                     loading={resultLoading}
                     value={stageResultsState}
                     dataKey="id"
-                    sortField="ranking"
+                    sortField="position"
                     sortOrder={1}
                     emptyMessage="Geen resultaten gevonden"
                     className=""
                   >
-                    <Column field="ranking" header="Plaats" />
-                    <Column field="name" header="Naam" />
+                    <Column field="position" header="Plaats" />
+                    <Column field="cyclistName" header="Naam" />
                     <Column field="time" header="Tijd" />
                   </DataTable>
                 </div>
@@ -409,7 +451,7 @@ const index = () => {
                     emptyMessage="Geen resultaten gevonden"
                   >
                     <Column field="position" header="Plaats" />
-                    <Column field="name" header="Naam" />
+                    <Column field="cyclistName" header="Naam" />
                     <Column field="time" header="Tijd" />
                   </DataTable>
                 </div>
@@ -427,3 +469,11 @@ index.getLayout = (page: ReactNode) => (
 );
 
 export default index;
+
+const enum ResultType {
+  STAGE = 'STAGE',
+  GC = 'GC',
+  YOUNG = 'YOUNG',
+  POINTS = 'POINTS',
+  MOUNTAIN = 'MOUNTAIN',
+}

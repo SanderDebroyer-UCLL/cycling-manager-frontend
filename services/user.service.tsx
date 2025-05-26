@@ -1,5 +1,5 @@
 export const getUsers = async () => {
-  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/users', {
+  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/users', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -15,7 +15,7 @@ export const getUsers = async () => {
 };
 
 export const getLoggedInUser = async () => {
-  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/auth/user', {
+  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/auth/user', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

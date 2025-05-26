@@ -2,7 +2,7 @@ import { Credentials } from '@/types/credentials';
 import { RegisterUserDetails } from '@/types/user';
 
 export const loginUser = async (Credentials: Credentials) => {
-  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/auth/login', {
+  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/auth/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -22,7 +22,7 @@ export const loginUser = async (Credentials: Credentials) => {
 
 export const registerUser = async (userInfo: RegisterUserDetails) => {
   const res = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + '/api/auth/register',
+    process.env.NEXT_PUBLIC_API_URL + '/auth/register',
     {
       method: 'POST',
       headers: {
