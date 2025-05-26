@@ -33,6 +33,7 @@ const index = () => {
   const [activeStage, setActiveStage] = useState<Stage | null>(null);
   const [activeRace, setActiveRace] = useState<Race | null>(null);
   const [resultLoading, setResultLoading] = useState(false);
+  const [resultStatus, setResultStatus] = useState<ResultType>(ResultType.STAGE);
   const [stageResultsState, setStageResultsState] = useState<StageResult[]>([]);
   const [stageGCResultsState, setStageGCResultsState] = useState<StageResult[]>(
     [],
@@ -374,13 +375,13 @@ const index = () => {
                     loading={resultLoading}
                     value={stageResultsState}
                     dataKey="id"
-                    sortField="ranking"
+                    sortField="position"
                     sortOrder={1}
                     emptyMessage="Geen resultaten gevonden"
                     className=""
                   >
-                    <Column field="ranking" header="Plaats" />
-                    <Column field="name" header="Naam" />
+                    <Column field="position" header="Plaats" />
+                    <Column field="cyclistName" header="Naam" />
                     <Column field="time" header="Tijd" />
                   </DataTable>
                 </div>
@@ -468,3 +469,11 @@ index.getLayout = (page: ReactNode) => (
 );
 
 export default index;
+
+const enum ResultType {
+  STAGE = 'STAGE',
+  GC = 'GC',
+  YOUNG = 'YOUNG',
+  POINTS = 'POINTS',
+  MOUNTAIN = 'MOUNTAIN',
+}
