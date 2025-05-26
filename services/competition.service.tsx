@@ -1,17 +1,12 @@
-import { get } from 'http';
-
 export const createCompetition = async (competitionData: any) => {
-  const res = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + '/competitions/create-competition',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
-      },
-      body: JSON.stringify(competitionData),
-    }
-  );
+  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/competitions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
+    },
+    body: JSON.stringify(competitionData),
+  });
 
   if (!res.ok) {
     throw new Error('Failed to create competition');
@@ -45,7 +40,7 @@ export const getCompetition = async (competitionId: string) => {
         'Content-Type': 'application/json',
         authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
       },
-    }
+    },
   );
 
   if (!res.ok) {

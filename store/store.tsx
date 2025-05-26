@@ -19,7 +19,7 @@ const store = configureStore({
     competitions: competitionsReducer,
     userTeams: userTeamsReducer,
     cyclists: cyclistsReducer,
-    results: stageResultsReducer,
+    stageResults: stageResultsReducer,
     raceResults: raceResultsReducer,
   },
 });

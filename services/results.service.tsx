@@ -1,6 +1,27 @@
 export const getResultsByStageId = async (stageId: string) => {
   const res = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + '/stages/result/' + stageId,
+    process.env.NEXT_PUBLIC_API_URL + '/stageResults/result/' + stageId,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
+      },
+    },
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch');
+  }
+
+  return data;
+};
+
+export const getGCStageResult = async (stageId: string) => {
+  const res = await fetch(
+    process.env.NEXT_PUBLIC_API_URL + '/stageResults/gc/' + stageId,
     {
       method: 'GET',
       headers: {
@@ -42,7 +63,7 @@ export const getRaceResultsByRaceId = async (raceId: string) => {
 
 export const ResultsService = {
   getResultsByStageId,
-  getRaceResultsByRaceId
+  getRaceResultsByRaceId,
 };
 
 export default ResultsService;
