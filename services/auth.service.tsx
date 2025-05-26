@@ -29,7 +29,7 @@ export const registerUser = async (userInfo: RegisterUserDetails) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(userInfo),
-    }
+    },
   );
 
   const data = await res.json();
@@ -39,7 +39,7 @@ export const registerUser = async (userInfo: RegisterUserDetails) => {
   }
 
   return data;
-}
+};
 
 const AuthService = {
   loginUser,

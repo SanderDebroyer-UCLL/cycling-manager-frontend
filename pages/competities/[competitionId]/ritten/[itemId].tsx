@@ -141,11 +141,6 @@ const index = () => {
     }
   }, [dispatch, competition, competitionId]);
 
-  useEffect(() => {
-    console.log('itemId', itemId);
-    console.log('activeStage', activeStage?.id);
-  });
-
   if (!competition) {
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-surface-100 z-9999">

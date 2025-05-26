@@ -31,6 +31,7 @@ const userTeamsSlice = createSlice({
         cyclistName: string;
         email: string;
         competitionId: string;
+        maxCyclists?: number;
       }>,
     ) => {
       const { cyclistName, email, competitionId } = action.payload;
@@ -40,7 +41,7 @@ const userTeamsSlice = createSlice({
       );
       if (team) {
         // Prevent duplicates
-        if (!team.cyclists.find((c) => c.name === cyclistName)) {
+        if (team.mainCyclists.length >= (action.payload.maxCyclists || 15)) {
           const cyclist: Cyclist = {
             name: cyclistName,
             id: '',
@@ -48,7 +49,17 @@ const userTeamsSlice = createSlice({
             age: 0,
             country: '',
           };
-          team.cyclists.push(cyclist);
+          team.reserveCyclists.push(cyclist);
+          return;
+        } else if (!team.mainCyclists.find((c) => c.name === cyclistName)) {
+          const cyclist: Cyclist = {
+            name: cyclistName,
+            id: '',
+            team: [],
+            age: 0,
+            country: '',
+          };
+          team.mainCyclists.push(cyclist);
         }
       }
     },

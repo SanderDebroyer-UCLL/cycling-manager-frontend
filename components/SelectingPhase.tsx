@@ -11,10 +11,11 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { ConfirmPopup } from 'primereact/confirmpopup';
 import { DataTable, DataTableFilterMeta } from 'primereact/datatable';
+import { Dialog } from 'primereact/dialog';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { InputText } from 'primereact/inputtext';
-import React, { ChangeEvent, FC, useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 
 interface SelectingPhaseProps {
   competition: Competition;
@@ -27,6 +28,8 @@ interface SelectingPhaseProps {
   countryBodyTemplate: (rowData: any) => React.ReactNode;
   stompClientRef: React.RefObject<any>;
   container: React.CSSProperties;
+  mainTeamPopupVisible: boolean;
+  setMainTeamPopupVisible: (visible: boolean) => void;
 }
 
 const SelectingPhase: React.FC<SelectingPhaseProps> = ({
@@ -40,6 +43,8 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
   countryBodyTemplate,
   stompClientRef,
   container,
+  mainTeamPopupVisible,
+  setMainTeamPopupVisible,
 }) => {
   const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
   const [filters, setFilters] = useState<DataTableFilterMeta>({
@@ -81,6 +86,17 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
 
   return (
     <div className="flex flex-col gap-12 w-full">
+      <Dialog
+        header="Je hebt je hoofdteam compleet"
+        visible={mainTeamPopupVisible}
+        style={{ width: '400px' }}
+        onHide={() => {
+          if (!mainTeamPopupVisible) return;
+          setMainTeamPopupVisible(false);
+        }}
+      >
+        <p className="m-0">Vanaf nu kies je je reserverenners.</p>
+      </Dialog>
       <div className="flex flex-col gap-6">
         <h2 className=" text-xl font-bold">Stel je team samen</h2>
       </div>
@@ -92,15 +108,23 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
           rows={5}
           selectionMode="single"
           onSelectionChange={(e) => {
+            const userTeam = userTeams.find(
+              (userTeam) =>
+                userTeam.user.email.trim() === email?.trim() &&
+                userTeam.competitionId === competition.id,
+            );
             const isUserTurn = competition.competitionPicks.find(
               (competitionPick: CompetitionPick) =>
-                competitionPick.userId ===
-                  userTeams.find((userTeam) => userTeam.user.email === email)
-                    ?.user.id &&
+                competitionPick.userId === userTeam?.user.id &&
                 competitionPick.pickOrder === competition.currentPick,
             );
 
-            if (isUserTurn) {
+            const teamNotFull =
+              (userTeam?.mainCyclists.length || 0) +
+                (userTeam?.reserveCyclists.length || 0) <
+              competition.maxMainCyclists + competition.maxReserveCyclists;
+
+            if (isUserTurn && teamNotFull) {
               setSelectedCyclist(e.value);
               setConfirmTarget(e.originalEvent.currentTarget); // Required for confirmPopup positioning
             }
@@ -109,7 +133,7 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
           filters={filters}
           loading={loading}
           globalFilterFields={['name', 'country', 'team']}
-          emptyMessage="No customers found."
+          emptyMessage="Geen renners gevonden."
           value={cyclistsState}
           tableStyle={{ width: '100%' }}
         >
@@ -147,10 +171,21 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
                   {userTeam.user.email === email ? 'Mijn Team' : userTeam.name}
                 </h2>
                 <div className="flex flex-col gap-2 w-full overflow-y-auto max-h-[350px] text-nowrap text-ellipsis">
-                  {userTeam.cyclists.map((cyclist: Cyclist, index) => (
+                  {userTeam.mainCyclists.map((cyclist: Cyclist, index) => (
                     <div
                       key={cyclist.name}
                       className="flex items-center border-b-1 last:border-b-0 border-surface-400 mx-2 py-2"
+                    >
+                      <span className="mr-2">{index + 1}.</span>
+                      <span className="overflow-hidden text-ellipsis whitespace-nowrap block w-full">
+                        {cyclist.name}
+                      </span>
+                    </div>
+                  ))}
+                  {userTeam.reserveCyclists.map((cyclist: Cyclist, index) => (
+                    <div
+                      key={cyclist.name}
+                      className="flex items-center border-b-1 last:border-b-0 border-surface-400 mx-2 py-2 text-surface-900"
                     >
                       <span className="mr-2">{index + 1}.</span>
                       <span className="overflow-hidden text-ellipsis whitespace-nowrap block w-full">
@@ -187,7 +222,11 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
             .filter(
               (userTeam: UserTeam) => userTeam.competitionId == competition.id,
             )
-            .some((userTeam) => userTeam.cyclists.length < 20)}
+            .some(
+              (userTeam) =>
+                userTeam.mainCyclists.length + userTeam.reserveCyclists.length <
+                competition.maxMainCyclists + competition.maxReserveCyclists,
+            )}
           onClick={() =>
             stompClientRef.current?.publish({
               destination: '/app/status',

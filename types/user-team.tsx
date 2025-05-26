@@ -6,6 +6,7 @@ export interface UserTeam {
   id: string;
   name: string;
   competitionId: string;
-  cyclists: Cyclist[];
+  mainCyclists: Cyclist[];
+  reserveCyclists: Cyclist[];
   user: User;
 }

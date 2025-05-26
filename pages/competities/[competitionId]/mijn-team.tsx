@@ -4,6 +4,8 @@ import {
   updateCompetition,
   updateCompetitionPick,
   updateCompetitionStatus,
+  updateCyclistCount,
+  updateReserveCyclistCount,
 } from '@/features/competition/competition.slice';
 import { fetchCyclists } from '@/features/cyclists/cyclists.slice';
 import {
@@ -20,13 +22,7 @@ import { Cyclist } from '@/types/cyclist';
 import { UserTeam } from '@/types/user-team';
 import { useRouter } from 'next/router';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import React, {
-  CSSProperties,
-  ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { ReactNode, use, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { countryAbbreviationMap } from '@/utils/country-abbreviation-map-lowercase';
 import SockJS from 'sockjs-client';
@@ -46,6 +42,10 @@ const index = () => {
   const [cyclistsState, setCyclistsState] = useState<Cyclist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedCyclist, setSelectedCyclist] = useState<Cyclist | null>(null);
+  const [reserveCyclistCount, setReserveCyclistCount] = useState<number>(0);
+  const [cyclistCount, setCyclistCount] = useState<number>(0);
+  const [mainTeamPopupVisible, setMainTeamPopupVisible] =
+    useState<boolean>(false);
   const [confirmTarget, setConfirmTarget] = useState<Element | null>(null);
   const usersStatus = useSelector((state: RootState) => state.users.status);
   const userTeamsStatus = useSelector(
@@ -76,15 +76,31 @@ const index = () => {
   useEffect(() => {
     if (cyclistsStatus === 'succeeded' && cyclists) {
       const filteredCyclists = cyclists.filter((cyclist) => {
-        return !userTeams.some((userTeam: UserTeam) =>
-          userTeam.cyclists.some(
-            (teamCyclist) => teamCyclist.name.trim() === cyclist.name.trim(),
-          ),
+        return !userTeams.some(
+          (userTeam: UserTeam) =>
+            userTeam.mainCyclists.some(
+              (teamCyclist) => teamCyclist.name.trim() === cyclist.name.trim(),
+            ) ||
+            userTeam.reserveCyclists?.some(
+              (reserveCyclist) =>
+                reserveCyclist.name.trim() === cyclist.name.trim(),
+            ),
         );
       });
       setCyclistsState(filteredCyclists);
     }
   }, [cyclists, userTeams, cyclistsStatus]);
+
+  useEffect(() => {
+    if (
+      competition &&
+      competition.maxMainCyclists &&
+      competition.maxReserveCyclists
+    ) {
+      setCyclistCount(competition.maxMainCyclists);
+      setReserveCyclistCount(competition.maxReserveCyclists);
+    }
+  }, [competition]);
 
   useEffect(() => {
     if (usersStatus === 'succeeded' && competition) {
@@ -150,12 +166,14 @@ const index = () => {
             email: string;
             currentPick: number;
             competitionId: string;
+            maxCyclists: number;
           } = JSON.parse(message.body);
 
           if (!competitionRef.current) {
             return;
           }
           pick.competitionId = competitionRef.current.id;
+          pick.maxCyclists = competitionRef.current.maxMainCyclists;
           dispatch(updateCompetitionPick(pick.currentPick));
           dispatch(updateUserTeamCyclists(pick));
         });
@@ -185,6 +203,16 @@ const index = () => {
 
           dispatch(updateCompetitionStatus(competitionStatus));
         });
+        stompClient.subscribe('/topic/count', (message) => {
+          const parsed = JSON.parse(message.body);
+
+          if (!competitionRef.current) {
+            return;
+          }
+
+          dispatch(updateCyclistCount(parsed.maxMainCyclists));
+          dispatch(updateReserveCyclistCount(parsed.maxReserveCyclists));
+        });
       },
     });
 
@@ -197,6 +225,19 @@ const index = () => {
   }, []);
 
   useEffect(() => {
+    if (
+      userTeams.some(
+        (team: UserTeam) =>
+          team.mainCyclists.length !== competition.maxMainCyclists,
+      )
+    ) {
+      setMainTeamPopupVisible(false);
+    } else {
+      setMainTeamPopupVisible(true);
+    }
+  }, []);
+
+  useEffect(() => {
     if (selectedCyclist && confirmTarget) {
       confirmPopup({
         target: confirmTarget as HTMLElement,
@@ -204,6 +245,9 @@ const index = () => {
         icon: 'pi pi-exclamation-triangle',
         defaultFocus: 'accept',
         accept: () => {
+          if (stompClientRef.current === null) {
+            return;
+          }
           stompClientRef.current?.publish({
             destination: '/app/pick',
             body: JSON.stringify({
@@ -223,8 +267,57 @@ const index = () => {
     }
   }, [selectedCyclist, confirmTarget]);
 
+  const handleReserveCyclistCount = (count: number) => {
+    setReserveCyclistCount(count);
+    const client = stompClientRef.current;
+
+    if (!client || !client.connected) {
+      console.warn('STOMP client not connected yet.');
+      return;
+    }
+    if (stompClientRef.current === null) {
+      return;
+    }
+    stompClientRef.current?.publish({
+      destination: '/app/count',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        maxMainCyclists: cyclistCount,
+        maxReserveCyclists: count,
+        competitionId: competition.id,
+      }),
+    });
+  };
+
+  const handleCyclistCount = (count: number) => {
+    setCyclistCount(count);
+    const client = stompClientRef.current;
+
+    if (!client || !client.connected) {
+      console.warn('STOMP client not connected yet.');
+      return;
+    }
+
+    client.publish({
+      destination: '/app/count',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        maxMainCyclists: count,
+        maxReserveCyclists: reserveCyclistCount,
+        competitionId: competition.id,
+      }),
+    });
+  };
+
   const handleUsersChange = (users: User[]) => {
     setUsersState(users);
+    if (stompClientRef.current === null) {
+      return;
+    }
     stompClientRef.current?.publish({
       destination: '/app/order',
       headers: {
@@ -286,6 +379,10 @@ const index = () => {
     return (
       <>
         <SortingPhase
+          reserveCyclistCount={reserveCyclistCount}
+          cyclistCount={cyclistCount}
+          handleReserveCyclistCount={handleReserveCyclistCount}
+          handleCyclistCount={handleCyclistCount}
           competition={competition}
           usersState={usersState}
           handleUsersChange={handleUsersChange}
@@ -300,6 +397,8 @@ const index = () => {
     return (
       <>
         <SelectingPhase
+          setMainTeamPopupVisible={setMainTeamPopupVisible}
+          mainTeamPopupVisible={mainTeamPopupVisible}
           competition={competition}
           email={email}
           loading={loading}

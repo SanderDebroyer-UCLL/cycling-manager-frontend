@@ -70,7 +70,21 @@ const competitionSlice = createSlice({
         return;
       }
       state.data.currentPick = currentPick;
-    }
+    },
+    updateCyclistCount(state, action: PayloadAction<number>) {
+      const maxMainCyclists = action.payload;
+      if (!state.data) {
+        return;
+      }
+      state.data.maxMainCyclists = maxMainCyclists;
+    },
+    updateReserveCyclistCount(state, action: PayloadAction<number>) {
+      const maxReserveCyclists = action.payload;
+      if (!state.data) {
+        return;
+      }
+      state.data.maxReserveCyclists = maxReserveCyclists;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -108,5 +122,7 @@ export const {
   updateCompetition,
   updateCompetitionStatus,
   updateCompetitionPick,
+  updateCyclistCount,
+  updateReserveCyclistCount,
 } = competitionSlice.actions;
 export default competitionSlice.reducer;

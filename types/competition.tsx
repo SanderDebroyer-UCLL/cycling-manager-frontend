@@ -14,6 +14,8 @@ export interface Competition {
   users: User[];
   competitionStatus: CompetitionStatus;
   competitionPicks: CompetitionPick[];
+  maxMainCyclists: number;
+  maxReserveCyclists: number;
   currentPick: number;
 }
 

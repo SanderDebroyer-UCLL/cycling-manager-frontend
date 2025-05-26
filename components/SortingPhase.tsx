@@ -3,6 +3,7 @@ import { OrderList } from 'primereact/orderlist';
 import { Button } from 'primereact/button';
 import { CompetitionStatus } from '@/types/competition';
 import { User } from '@/types/user';
+import { InputNumber } from 'primereact/inputnumber';
 
 interface SortingPhaseProps {
   competition: {
@@ -13,6 +14,10 @@ interface SortingPhaseProps {
   handleUsersChange: (users: User[]) => void;
   stompClientRef: React.RefObject<any>;
   itemTemplate: (user: User, index: number) => React.ReactNode;
+  handleReserveCyclistCount: (count: number) => void;
+  handleCyclistCount: (count: number) => void;
+  reserveCyclistCount: number;
+  cyclistCount: number;
 }
 
 const SortingPhase: React.FC<SortingPhaseProps> = ({
@@ -21,6 +26,10 @@ const SortingPhase: React.FC<SortingPhaseProps> = ({
   handleUsersChange,
   stompClientRef,
   itemTemplate,
+  handleReserveCyclistCount,
+  handleCyclistCount,
+  reserveCyclistCount,
+  cyclistCount,
 }) => {
   if (competition.competitionStatus !== CompetitionStatus.SORTING) return null;
 
@@ -32,21 +41,48 @@ const SortingPhase: React.FC<SortingPhaseProps> = ({
             Bepaal de volgorde van het kiezen van de renners
           </h2>
         </div>
-        <div className="flex w-[400px]">
-          <OrderList
-            dataKey="id"
-            value={usersState}
-            onChange={(e) => handleUsersChange(e.value)}
-            itemTemplate={(user) =>
-              itemTemplate(
-                user,
-                usersState.findIndex((u) => u.id === user.id),
-              )
-            }
-            header="Deelnemers"
-            dragdrop
-          ></OrderList>
+        <div className="flex flex-row gap-10">
+          <div className="flex w-[400px]">
+            <OrderList
+              dataKey="id"
+              value={usersState}
+              onChange={(e) => handleUsersChange(e.value)}
+              itemTemplate={(user) =>
+                itemTemplate(
+                  user,
+                  usersState.findIndex((u) => u.id === user.id),
+                )
+              }
+              header="Deelnemers"
+              dragdrop
+            ></OrderList>
+          </div>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <p>Aantal renners per deelnemer</p>
+              <InputNumber
+                min={1}
+                max={50}
+                value={cyclistCount}
+                onValueChange={(e) =>
+                  handleCyclistCount(e.value == null ? 0 : e.value)
+                }
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <p>Aantal reserve renners per deelnemer</p>
+              <InputNumber
+                min={0}
+                max={50}
+                value={reserveCyclistCount}
+                onValueChange={(e) =>
+                  handleReserveCyclistCount(e.value == null ? 0 : e.value)
+                }
+              />
+            </div>
+          </div>
         </div>
+
         <div className="flex justify-between">
           <div></div>
           <Button

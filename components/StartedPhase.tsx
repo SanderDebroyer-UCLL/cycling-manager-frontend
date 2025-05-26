@@ -35,7 +35,7 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
                   (team) =>
                     team.competitionId === competition.id &&
                     team.user.email === email,
-                )?.cyclists
+                )?.mainCyclists
               }
             >
               <Column header="Naam" field="name" />
@@ -53,7 +53,7 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
                   (team) =>
                     team.competitionId === competition.id &&
                     team.user.email === email,
-                )?.cyclists
+                )?.reserveCyclists
               }
             >
               <Column header="Naam" field="name" />

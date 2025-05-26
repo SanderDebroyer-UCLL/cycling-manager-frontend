@@ -158,7 +158,7 @@ const Index = () => {
       <div className="p-10 flex flex-col gap-8">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold">Actieve competities</h2>
-          <Button label="Creëer Competite" onClick={() => setVisible(true)} />
+          <Button label="Creëer Competitie" onClick={() => setVisible(true)} />
         </div>
         <div
           style={container}
@@ -185,7 +185,7 @@ const Index = () => {
       </div>
 
       <Dialog
-        header="Creëer Competite"
+        header="Creëer Competitie"
         visible={visible}
         onHide={() => {
           if (!visible) return;
@@ -307,7 +307,7 @@ const Index = () => {
               outlined
             />
             <Button
-              label="Creëer Competite"
+              label="Creëer Competitie"
               loading={competitionloading}
               onClick={handleCreateCompetition}
             />

@@ -11,10 +11,9 @@ import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Nullable } from 'primereact/ts-helpers';
-import React, { CSSProperties, ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Race, updateRaceData } from '@/features/race/race.slice';
-import { cookies } from 'next/headers';
 
 const index = () => {
   const router = useRouter();
