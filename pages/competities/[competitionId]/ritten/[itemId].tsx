@@ -123,6 +123,17 @@ const index = () => {
     if (race) {
       setActiveRace(race);
       setActiveStage(null);
+      return;
+    } else {
+      if (competition.races[0].stages.length > 0) {
+        router.replace(
+          `/competities/${competitionId}/ritten/${competition.races[0].stages[0].id}`,
+        );
+      } else {
+        router.replace(
+          `/competities/${competitionId}/ritten/${competition.races[0].id}`,
+        );
+      }
     }
   }, [competition, itemId]);
 
@@ -439,7 +450,7 @@ const index = () => {
                     emptyMessage="Geen resultaten gevonden"
                   >
                     <Column field="position" header="Plaats" />
-                    <Column field="name" header="Naam" />
+                    <Column field="cyclistName" header="Naam" />
                     <Column field="time" header="Tijd" />
                   </DataTable>
                 </div>

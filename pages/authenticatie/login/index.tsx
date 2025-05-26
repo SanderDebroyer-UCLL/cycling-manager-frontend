@@ -71,6 +71,7 @@ export default function Login() {
         summary: 'Login mislukt',
         detail: error || 'Er is iets misgegaan.',
       });
+      dispatch(resetUserStatus()); // reset status to avoid repeated error messages
     }
   }, [status, router]);
 

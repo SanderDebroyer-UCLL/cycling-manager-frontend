@@ -170,6 +170,7 @@ const Index = () => {
             tableStyle={{ width: '100%' }}
             sortField="name"
             sortOrder={1}
+            emptyMessage="Geen competities gevonden"
           >
             <Column header="Naam" field="name" />
 
