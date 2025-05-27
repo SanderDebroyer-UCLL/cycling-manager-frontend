@@ -1,8 +1,13 @@
-import { ResultType } from "@/const/resultType";
-
-export const getResultsByStageIdByType = async (stageId: string, resultType: ResultType) => {
+export const getStagePointsForStage = async (
+  competitionId: string,
+  stageId: string,
+) => {
   const res = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + '/stageResults/' + stageId + '?type=' + resultType,
+    process.env.NEXT_PUBLIC_API_URL +
+      '/stagePoints/' +
+      competitionId +
+      '?stageId=' +
+      stageId,
     {
       method: 'GET',
       headers: {
@@ -21,9 +26,16 @@ export const getResultsByStageIdByType = async (stageId: string, resultType: Res
   return data;
 };
 
-export const getRaceResultsByRaceId = async (raceId: string) => {
+export const getStagePointsForAllStages = async (
+  competitionId: string,
+  userId: string,
+) => {
   const res = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + '/raceResults/race/' + raceId,
+    process.env.NEXT_PUBLIC_API_URL +
+      '/stagePoints/all/' +
+      competitionId +
+      '?userId=' +
+      userId,
     {
       method: 'GET',
       headers: {
@@ -42,9 +54,8 @@ export const getRaceResultsByRaceId = async (raceId: string) => {
   return data;
 };
 
-export const ResultsService = {
-  getResultsByStageIdByType,
-  getRaceResultsByRaceId,
+export const StagePointsService = {
+  getStagePointsForStage,
 };
 
-export default ResultsService;
+export default StagePointsService;
