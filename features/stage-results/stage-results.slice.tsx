@@ -1,16 +1,15 @@
 // src/features/user/userSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import {
-  getGCStageResult,
-  getResultsByStageId,
-} from '@/services/results.service';
+import { getResultsByStageIdByType } from '@/services/results.service';
 import { StageResult } from '@/types/race';
+import { ResultType } from '@/const/resultType';
 
 interface StageResultsState {
   etappeResult?: StageResult[];
   gcResult?: StageResult[];
   youthResult?: StageResult[];
   pointsResult?: StageResult[];
+  mountainResult?: StageResult[];
 
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
@@ -20,18 +19,11 @@ const initialStageResultsState: StageResultsState = {
   status: 'idle',
 };
 
-export const fetchStageResultsByStageId = createAsyncThunk(
+export const fetchResultsByStageIdByType = createAsyncThunk(
   'stage-results/fetchResults',
-  async (stageId: string) => {
-    const results = await getResultsByStageId(stageId);
-    return results;
-  },
-);
-
-export const fetchGCStageResult = createAsyncThunk(
-  'race-results/fetchGCStageResult',
-  async (stageId: string) => {
-    const results = await getGCStageResult(stageId);
+  async (params: { stageId: string; resultType: ResultType }) => {
+    const { stageId, resultType } = params;
+    const results = await getResultsByStageIdByType(stageId, resultType);
     return results;
   },
 );
@@ -46,30 +38,40 @@ const resultsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchStageResultsByStageId.pending, (state) => {
+      .addCase(fetchResultsByStageIdByType.pending, (state) => {
         state.status = 'loading';
       })
       .addCase(
-        fetchStageResultsByStageId.fulfilled,
+        fetchResultsByStageIdByType.fulfilled,
         (state, action: PayloadAction<StageResult[]>) => {
           state.status = 'succeeded';
-          state.etappeResult = action.payload;
+
+          if (action.payload.length === 0) {
+            return;
+          }
+
+          const resultType = action.payload[0].scrapeResultType;
+
+          switch (resultType) {
+            case ResultType.STAGE:
+              state.etappeResult = action.payload;
+              break;
+            case ResultType.GC:
+              state.gcResult = action.payload;
+              break;
+            case ResultType.YOUNG:
+              state.youthResult = action.payload;
+              break;
+            case ResultType.POINTS:
+              state.pointsResult = action.payload;
+              break;
+            case ResultType.MOUNTAIN:
+              state.mountainResult = action.payload;
+              break;
+          }
         },
       )
-      .addCase(fetchStageResultsByStageId.rejected, (state) => {
-        state.status = 'failed';
-      })
-      .addCase(fetchGCStageResult.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(
-        fetchGCStageResult.fulfilled,
-        (state, action: PayloadAction<StageResult[]>) => {
-          state.status = 'succeeded';
-          state.gcResult = action.payload;
-        },
-      )
-      .addCase(fetchGCStageResult.rejected, (state) => {
+      .addCase(fetchResultsByStageIdByType.rejected, (state) => {
         state.status = 'failed';
       });
   },

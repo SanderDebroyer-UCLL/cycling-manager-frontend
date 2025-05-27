@@ -34,6 +34,7 @@ import SelectingPhase from '@/components/SelectingPhase';
 import SortingPhase from '@/components/SortingPhase';
 import { container } from '@/const/containerStyle';
 import StartedPhase from '@/components/StartedPhase';
+import { fetchStagePointsForAllStages } from '@/features/stage-points/stage-points.slice';
 
 const index = () => {
   const router = useRouter();
@@ -54,9 +55,14 @@ const index = () => {
   const cyclistsStatus = useSelector(
     (state: RootState) => state.cyclists.status,
   );
+  const stagePointsStatus = useSelector(
+    (state: RootState) => state.stagePoints.status,
+  );
+  const stagePoints = useSelector((state: RootState) => state.stagePoints.stagePointsPerCyclist);
   const cyclists: Cyclist[] = useSelector(
     (state: RootState) => state.cyclists.data,
   );
+  const user: User | null = useSelector((state: RootState) => state.user.data);
   const users: User[] = useSelector((state: RootState) => state.users.data);
   const userTeams: UserTeam[] = useSelector(
     (state: any) => state.userTeams.data,
@@ -72,6 +78,20 @@ const index = () => {
   useEffect(() => {
     competitionRef.current = competition;
   }, [competition]);
+
+  useEffect(() => {
+    if (stagePoints.length === 0 || stagePointsStatus === 'idle') {
+      if (!user || !user.id || !competition || !competition.id) {
+        return;
+      }
+      dispatch(
+        fetchStagePointsForAllStages({
+          competitionId: competition.id,
+          userId: user.id.toString(),
+        }),
+      );
+    }
+  }, [dispatch, stagePoints, stagePointsStatus, user, competition]);
 
   useEffect(() => {
     if (cyclistsStatus === 'succeeded' && cyclists) {
@@ -226,14 +246,15 @@ const index = () => {
 
   useEffect(() => {
     if (
-      userTeams.some(
+      competition &&
+      userTeams.every(
         (team: UserTeam) =>
-          team.mainCyclists.length !== competition.maxMainCyclists,
+          team.mainCyclists.length === competition.maxMainCyclists,
       )
     ) {
-      setMainTeamPopupVisible(false);
-    } else {
       setMainTeamPopupVisible(true);
+    } else {
+      setMainTeamPopupVisible(false);
     }
   }, []);
 
@@ -419,6 +440,7 @@ const index = () => {
       <>
         <StartedPhase
           userTeams={userTeams}
+          stagePoints={stagePoints}
           email={email}
           competition={competition}
         />
