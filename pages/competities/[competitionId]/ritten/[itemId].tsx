@@ -1,13 +1,13 @@
 import CompetitieLayout from '@/components/competitieLayout';
 import { container } from '@/const/containerStyle';
+import { ResultType } from '@/const/resultType';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import {
   fetchRaceResultsByRaceId,
   resetRaceResultsStatus,
 } from '@/features/race-results/race-results.slice';
 import {
-  fetchGCStageResult,
-  fetchStageResultsByStageId,
+  fetchResultsByStageIdByType,
   resetStageResultsStatus,
 } from '@/features/stage-results/stage-results.slice';
 import { AppDispatch } from '@/store/store';
@@ -33,7 +33,9 @@ const index = () => {
   const [activeStage, setActiveStage] = useState<Stage | null>(null);
   const [activeRace, setActiveRace] = useState<Race | null>(null);
   const [resultLoading, setResultLoading] = useState(false);
-  const [resultStatus, setResultStatus] = useState<ResultType>(ResultType.STAGE);
+  const [resultStatus, setResultStatus] = useState<ResultType>(
+    ResultType.STAGE,
+  );
   const [stageResultsState, setStageResultsState] = useState<StageResult[]>([]);
   const [stageGCResultsState, setStageGCResultsState] = useState<StageResult[]>(
     [],
@@ -76,14 +78,13 @@ const index = () => {
 
   useEffect(() => {
     if (stageResultsStatus === 'idle' && activeStage?.id) {
-      dispatch(fetchStageResultsByStageId(activeStage.id));
-      dispatch(fetchGCStageResult(activeStage.id));
-    }
-  }, [dispatch, stageResultsStatus, activeStage?.id]);
-
-  useEffect(() => {
-    if (stageResultsStatus === 'idle' && activeStage?.id) {
-      dispatch(fetchStageResultsByStageId(activeStage.id));
+      dispatch(
+        fetchResultsByStageIdByType({
+          stageId: activeStage.id,
+          resultType: ResultType.STAGE,
+        }),
+      );
+      dispatch(fetchResultsByStageIdByType({stageId: activeStage.id, resultType:  ResultType.GC}));
     }
   }, [dispatch, stageResultsStatus, activeStage?.id]);
 
@@ -353,19 +354,34 @@ const index = () => {
                   className="flex flex-col h-full overflow-auto"
                 >
                   <div className="flex gap-4">
-                    <div className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg">
+                    <div
+                      onClick={() => setResultStatus(ResultType.STAGE)}
+                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
+                    >
                       Etappe
                     </div>
-                    <div className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg">
+                    <div
+                      onClick={() => setResultStatus(ResultType.GC)}
+                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
+                    >
                       Algemeen klassement
                     </div>
-                    <div className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg">
+                    <div
+                      onClick={() => setResultStatus(ResultType.YOUNG)}
+                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
+                    >
                       Jongerenklassement
                     </div>
-                    <div className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg">
+                    <div
+                      onClick={() => setResultStatus(ResultType.POINTS)}
+                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
+                    >
                       Puntenklassement
                     </div>
-                    <div className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg">
+                    <div
+                      onClick={() => setResultStatus(ResultType.MOUNTAIN)}
+                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
+                    >
                       Bergklassement
                     </div>
                   </div>
@@ -373,7 +389,13 @@ const index = () => {
                     paginator
                     rows={5}
                     loading={resultLoading}
-                    value={stageResultsState}
+                    value={
+                      resultStatus === ResultType.STAGE
+                        ? stageResultsState
+                        : resultStatus === ResultType.GC
+                          ? stageGCResultsState
+                          : []
+                    }
                     dataKey="id"
                     sortField="position"
                     sortOrder={1}
@@ -382,7 +404,13 @@ const index = () => {
                   >
                     <Column field="position" header="Plaats" />
                     <Column field="cyclistName" header="Naam" />
-                    <Column field="time" header="Tijd" />
+                    {resultStatus === ResultType.STAGE ? (
+                      <Column field="time" header="Tijd" />
+                    ) : resultStatus === ResultType.GC ? (
+                      <Column field="time" header="Tijd" />
+                    ) : (
+                      []
+                    )}
                   </DataTable>
                 </div>
               </div>
@@ -469,11 +497,3 @@ index.getLayout = (page: ReactNode) => (
 );
 
 export default index;
-
-const enum ResultType {
-  STAGE = 'STAGE',
-  GC = 'GC',
-  YOUNG = 'YOUNG',
-  POINTS = 'POINTS',
-  MOUNTAIN = 'MOUNTAIN',
-}

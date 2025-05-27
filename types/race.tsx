@@ -1,11 +1,4 @@
-export interface Race2 {
-  age: number;
-  ranking: number;
-  id: number;
-  team_id: number;
-  country: string;
-  name: string;
-}
+import { ResultType } from '@/const/resultType';
 
 export interface Race {
   id: string;
@@ -44,4 +37,6 @@ export interface StageResult {
   rider: string;
   team: string;
   timeGap: string;
+  resultType: ResultType;
+  scrapeResultType: ResultType;
 }
