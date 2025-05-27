@@ -7,6 +7,10 @@ import {
   resetRaceResultsStatus,
 } from '@/features/race-results/race-results.slice';
 import {
+  fetchStagePointsForStage,
+  resetStagePointsStatus,
+} from '@/features/stage-points/stage-points.slice';
+import {
   fetchResultsByStageIdByType,
   resetStageResultsStatus,
 } from '@/features/stage-results/stage-results.slice';
@@ -14,6 +18,7 @@ import { AppDispatch } from '@/store/store';
 import { Competition } from '@/types/competition';
 import { ParcoursType, Race, Stage, StageResult } from '@/types/race';
 import { RaceResult } from '@/types/race-result';
+import { StagePoints } from '@/types/stage-points';
 import {
   parcoursDescriptions,
   ParcoursTypeKeyMap,
@@ -23,7 +28,7 @@ import { useRouter } from 'next/router';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 const index = () => {
@@ -59,8 +64,14 @@ const index = () => {
   const raceResultsStatus: string = useSelector(
     (state: any) => state.raceResults.status,
   );
+  const stagePointsStatus: string = useSelector(
+    (state: any) => state.stagePoints.status,
+  );
   const stageGCResults: StageResult[] = useSelector(
     (state: any) => state.stageResults.gcResult,
+  );
+  const stagePoints: StagePoints[] = useSelector(
+    (state: any) => state.stagePoints.stagePoints,
   );
 
   useEffect(() => {
@@ -69,12 +80,22 @@ const index = () => {
 
   useEffect(() => {
     setStageGCResultsState(stageGCResults);
-    console.log('Stage GC Results:', stageGCResults);
   }, [stageGCResults]);
 
   useEffect(() => {
     setRaceResultsState(raceResults);
   }, [raceResults]);
+
+  useEffect(() => {
+    if (stagePointsStatus === 'idle' && activeStage?.id) {
+      dispatch(
+        fetchStagePointsForStage({
+          competitionId: competition.id,
+          stageId: activeStage.id,
+        }),
+      );
+    }
+  }, [dispatch, stagePointsStatus, activeStage?.id]);
 
   useEffect(() => {
     if (stageResultsStatus === 'idle' && activeStage?.id) {
@@ -84,7 +105,12 @@ const index = () => {
           resultType: ResultType.STAGE,
         }),
       );
-      dispatch(fetchResultsByStageIdByType({stageId: activeStage.id, resultType:  ResultType.GC}));
+      dispatch(
+        fetchResultsByStageIdByType({
+          stageId: activeStage.id,
+          resultType: ResultType.GC,
+        }),
+      );
     }
   }, [dispatch, stageResultsStatus, activeStage?.id]);
 
@@ -139,10 +165,21 @@ const index = () => {
     }
   }, [competition, itemId]);
 
+  useEffect(() => {
+    if (
+      competition &&
+      competitionId &&
+      competition.id.toString().trim() !== competitionId.toString().trim()
+    ) {
+      dispatch(fetchCompetitionById(competitionId.toString()));
+    }
+  }, [dispatch, competition, competitionId]);
+
   const onSelectStage = (stage: Stage) => {
     setActiveStage(stage);
     setActiveRace(null);
     dispatch(resetStageResultsStatus());
+    dispatch(resetStagePointsStatus());
     router.push(`/competities/${competitionId}/ritten/${stage.id}`, undefined, {
       shallow: true,
     });
@@ -156,16 +193,6 @@ const index = () => {
       shallow: true,
     });
   };
-
-  useEffect(() => {
-    if (
-      competition &&
-      competitionId &&
-      competition.id.toString().trim() !== competitionId.toString().trim()
-    ) {
-      dispatch(fetchCompetitionById(competitionId.toString()));
-    }
-  }, [dispatch, competition, competitionId]);
 
   if (!competition) {
     return (
@@ -262,7 +289,7 @@ const index = () => {
         </div>
 
         {competition.races[0].stages.length > 0 ? (
-          <div className="flex gap-10 w-full h-[525px]">
+          <div className="flex gap-10 w-full ">
             <div className="flex flex-1/2 flex-col gap-5">
               <h3 className="font-semibold">Overzicht {activeStage?.name}</h3>
               <div></div>
@@ -341,8 +368,24 @@ const index = () => {
                 </div>
               </div>
               <div></div>
-              <div style={container} className="h-full">
-                Punten verdiend per speler
+              <div className="flex flex-col flex-1 gap-2">
+                <h3 className="font-semibold">Punten verdiend per deelnemer</h3>
+                <div
+                  style={container}
+                  className="flex flex-col h-full overflow-auto"
+                >
+                  <DataTable
+                    value={stagePoints}
+                    dataKey="userId"
+                    sortField="position"
+                    sortOrder={1}
+                    emptyMessage="Geen resultaten gevonden"
+                    className=""
+                  >
+                    <Column field="fullName" header="Deelnemer" />
+                    <Column field="points" header="Punten" />
+                  </DataTable>
+                </div>
               </div>
             </div>
             <div className="flex flex-col flex-1/2 gap-10 w-full">
@@ -417,7 +460,7 @@ const index = () => {
             </div>
           </div>
         ) : (
-          <div className="flex gap-10 w-full h-[525px]">
+          <div className="flex gap-10 w-full">
             <div className="flex flex-1/2 flex-col gap-5">
               <h3 className="font-semibold">Overzicht {activeRace?.name}</h3>
               <div></div>
@@ -456,8 +499,40 @@ const index = () => {
                 </div>
               </div>
               <div></div>
-              <div style={container} className="h-full">
-                Punten verdiend per speler
+              <div className="flex flex-col flex-1 gap-2">
+                <h3 className="font-semibold">Uitslag Rit</h3>
+                <div
+                  style={container}
+                  className="flex flex-col h-full overflow-auto"
+                >
+                  <DataTable
+                    paginator
+                    rows={5}
+                    loading={resultLoading}
+                    value={
+                      resultStatus === ResultType.STAGE
+                        ? stageResultsState
+                        : resultStatus === ResultType.GC
+                          ? stageGCResultsState
+                          : []
+                    }
+                    dataKey="id"
+                    sortField="position"
+                    sortOrder={1}
+                    emptyMessage="Geen resultaten gevonden"
+                    className=""
+                  >
+                    <Column field="position" header="Plaats" />
+                    <Column field="cyclistName" header="Naam" />
+                    {resultStatus === ResultType.STAGE ? (
+                      <Column field="time" header="Tijd" />
+                    ) : resultStatus === ResultType.GC ? (
+                      <Column field="time" header="Tijd" />
+                    ) : (
+                      []
+                    )}
+                  </DataTable>
+                </div>
               </div>
             </div>
             <div className="flex flex-col flex-1/2 gap-10 w-full">
