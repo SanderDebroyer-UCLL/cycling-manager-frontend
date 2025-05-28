@@ -22,7 +22,7 @@ import { Cyclist } from '@/types/cyclist';
 import { UserTeam } from '@/types/user-team';
 import { useRouter } from 'next/router';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import React, { ReactNode, use, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { countryAbbreviationMap } from '@/utils/country-abbreviation-map-lowercase';
 import SockJS from 'sockjs-client';
@@ -58,7 +58,9 @@ const index = () => {
   const stagePointsStatus = useSelector(
     (state: RootState) => state.stagePoints.status,
   );
-  const stagePoints = useSelector((state: RootState) => state.stagePoints.stagePointsPerCyclist);
+  const stagePoints = useSelector(
+    (state: RootState) => state.stagePoints.stagePointsPerCyclist,
+  );
   const cyclists: Cyclist[] = useSelector(
     (state: RootState) => state.cyclists.data,
   );
@@ -175,7 +177,7 @@ const index = () => {
   }, [dispatch, competition, competitionId]);
 
   useEffect(() => {
-    const socket = new SockJS('http://localhost:8080/ws');
+    const socket = new SockJS(process.env.NEXT_PUBLIC_API_URL + '/ws');
     const stompClient = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
