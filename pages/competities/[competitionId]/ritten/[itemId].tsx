@@ -87,7 +87,10 @@ const index = () => {
   }, [raceResults]);
 
   useEffect(() => {
-    if (stagePointsStatus === 'idle' && activeStage?.id) {
+    if (
+      (stagePoints.length === 0 && activeStage?.id) ||
+      (stagePointsStatus === 'idle' && activeStage?.id)
+    ) {
       dispatch(
         fetchStagePointsForStage({
           competitionId: competition.id,

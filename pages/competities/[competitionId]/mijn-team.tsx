@@ -29,7 +29,7 @@ import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import { User } from '@/types/user';
 import { fetchUsers, resetUsersStatus } from '@/features/users/users.slice';
-import { confirmPopup, ConfirmPopup } from 'primereact/confirmpopup';
+import { confirmPopup } from 'primereact/confirmpopup';
 import SelectingPhase from '@/components/SelectingPhase';
 import SortingPhase from '@/components/SortingPhase';
 import { container } from '@/const/containerStyle';
