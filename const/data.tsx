@@ -11,6 +11,7 @@ import vueltaIconLight from '@/public/images/vuelta-icon.png';
 import { GrandTour } from '@/types/grandtour';
 import { User } from '@/types/user';
 import { StageResult } from '@/types/race';
+import { ResultType } from './resultType';
 
 export const grandTours: GrandTour[] = [
   {
@@ -159,59 +160,79 @@ export const stageResults: StageResult[] = [
     rider: 'PEDERSEN Mads',
     team: 'Lidl - Trek',
     timeGap: '0:00',
+    resultType: ResultType.STAGE,
+    scrapeResultType: ResultType.STAGE,
   },
   {
     position: 2,
     rider: 'ROGLIČ Primož',
     team: 'Red Bull - BORA - hansgrohe',
     timeGap: '0:17',
+    resultType: ResultType.STAGE,
+    scrapeResultType: ResultType.STAGE,
   },
   {
     position: 3,
     rider: 'VACEK Mathias',
     team: 'Lidl - Trek',
     timeGap: '0:24',
+    resultType: ResultType.STAGE,
+    scrapeResultType: ResultType.STAGE,
   },
   {
     position: 4,
     rider: 'MCNULTY Brandon',
     team: 'UAE Team Emirates - XRG',
     timeGap: '0:31',
+    resultType: ResultType.STAGE,
+    scrapeResultType: ResultType.STAGE,
   },
   {
     position: 5,
     rider: 'DEL TORO Isaac',
     team: 'UAE Team Emirates - XRG',
     timeGap: '0:32',
+    resultType: ResultType.STAGE,
+    scrapeResultType: ResultType.STAGE,
   },
   {
     position: 6,
     rider: 'AYUSO Juan',
     team: 'UAE Team Emirates - XRG',
     timeGap: '0:35',
+    resultType: ResultType.STAGE,
+    scrapeResultType: ResultType.STAGE,
   },
   {
     position: 7,
     rider: 'POOLE Max',
     team: 'Team Picnic PostNL',
     timeGap: '0:43',
+    resultType: ResultType.STAGE,
+    scrapeResultType: ResultType.STAGE,
   },
   {
     position: 8,
     rider: 'TIBERI Antonio',
     team: 'Bahrain - Victorious',
     timeGap: '0:44',
+    resultType: ResultType.STAGE,
+    scrapeResultType: ResultType.STAGE,
   },
   {
     position: 9,
     rider: 'STORER Michael',
     team: 'Tudor Pro Cycling Team',
     timeGap: '0:46',
+    resultType: ResultType.STAGE,
+    scrapeResultType: ResultType.STAGE,
   },
   {
     position: 10,
     rider: 'PELLIZZARI Giulio',
     team: 'Red Bull - BORA - hansgrohe',
     timeGap: '0:50',
+    resultType: ResultType.STAGE,
+    scrapeResultType: ResultType.STAGE,
   },
 ];
