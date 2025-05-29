@@ -8,4 +8,5 @@ export interface StagePointsPerCyclist {
   points: number;
   cyclistName: string;
   userId: string;
+  isCyclistActive: boolean;
 }

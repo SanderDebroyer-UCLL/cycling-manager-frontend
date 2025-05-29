@@ -162,7 +162,7 @@ const Index = () => {
         </div>
         <div
           style={container}
-          className="overflow-hidden overflow-y-auto rounded-lg max-h-[75vh]"
+          className="overflow-hidden overflow-y-auto rounded-xl max-h-[75vh]"
         >
           <DataTable
             value={competitions}

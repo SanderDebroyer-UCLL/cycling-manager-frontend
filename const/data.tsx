@@ -35,20 +35,6 @@ export const grandTours: GrandTour[] = [
     iconLight: vueltaIconLight,
     iconDark: vueltaIconLight,
   },
-  {
-    name: 'Vuelta a España',
-    image: vueltaBanner,
-    href: '/competities/vuelta-a-espana',
-    iconLight: vueltaIconLight,
-    iconDark: vueltaIconLight,
-  },
-  {
-    name: 'Vuelta a España',
-    image: vueltaBanner,
-    href: '/competities/vuelta-a-espana',
-    iconLight: vueltaIconLight,
-    iconDark: vueltaIconLight,
-  },
 ];
 
 export const users: User[] = [

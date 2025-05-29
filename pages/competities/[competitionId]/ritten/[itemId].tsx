@@ -1,4 +1,6 @@
+import Chip from '@/components/chip';
 import CompetitieLayout from '@/components/competitieLayout';
+import SelectableCard from '@/components/SelectableCard';
 import { container } from '@/const/containerStyle';
 import { ResultType } from '@/const/resultType';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
@@ -23,12 +25,12 @@ import {
   parcoursDescriptions,
   ParcoursTypeKeyMap,
 } from '@/utils/parcours-key-map';
-import { Calendar, Flag } from 'lucide-react';
+import { FlagIcon, Mountain, Star, Trophy, UserIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import React, { ReactNode, use, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 const index = () => {
@@ -199,7 +201,7 @@ const index = () => {
 
   if (!competition) {
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-surface-100 z-9999">
+      <div className="fixed inset-0 flex justify-center items-center bg-surface z-9999">
         <ProgressSpinner
           style={{ width: '100px', height: '100px' }}
           strokeWidth="8"
@@ -222,72 +224,42 @@ const index = () => {
           </h2>
         </div>
 
-        <div className="flex gap-10 w-full overflow-x-auto">
+        <div className="flex gap-8 w-full overflow-x-auto">
           {competition.races[0].stages.length > 0
-            ? competition.races[0].stages.map((stage, index) => (
-                <div
-                  onClick={() => {
-                    onSelectStage(stage);
-                    dispatch(resetStageResultsStatus()); // reset before fetch effect can run
-                  }}
-                  key={stage.id}
-                  style={container}
-                  className={`cursor-pointer shrink-0 w-72 mb-4 rounded-lg p-4 border transition-all ${
-                    stage.id.toString() === itemId
-                      ? '!bg-primary-100 !border-primary-500 !text-primary-900'
-                      : ''
-                  }`}
-                >
-                  <p className="font-semibold text-lg flex items-center gap-2">
-                    Stage {index + 1}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Flag className="w-4 h-4 shrink-0" />
-                    <span className="truncate overflow-hidden whitespace-nowrap">
-                      {stage.name.split('|')[1]}
-                    </span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    {(() => {
-                      const [day, month] = stage.date.split('/').map(Number);
-                      const year = new Date(
-                        competition.races[0].startDate,
-                      ).getFullYear();
-                      const fullDate = new Date(year, month - 1, day); // Month is 0-based in JS
-                      return fullDate.toLocaleDateString('nl');
-                    })()}
-                  </p>
-                </div>
-              ))
+            ? competition.races[0].stages.map((stage, index) => {
+                const [day, month] = stage.date.split('/').map(Number);
+                const year = new Date(
+                  competition.races[0].startDate,
+                ).getFullYear();
+                const fullDate = new Date(year, month - 1, day);
+                const dateStr = fullDate.toLocaleDateString('nl');
+
+                return (
+                  <SelectableCard
+                    key={stage.id}
+                    title={`Stage ${index + 1}`}
+                    subtitle={stage.name.split('|')[1]}
+                    date={dateStr}
+                    selected={stage.id.toString() === itemId}
+                    onClick={() => {
+                      onSelectStage(stage);
+                      dispatch(resetStageResultsStatus());
+                    }}
+                  />
+                );
+              })
             : competition.races.map((race, index) => (
-                <div
+                <SelectableCard
+                  key={race.id}
+                  title={`Race ${index + 1}`}
+                  subtitle={race.name}
+                  date={new Date(race.startDate).toLocaleDateString('nl')}
+                  selected={race.id.toString() === itemId}
                   onClick={() => {
                     onSelectRace(race);
                     dispatch(resetRaceResultsStatus());
                   }}
-                  key={race.id}
-                  style={container}
-                  className={`cursor-pointer shrink-0 w-72 mb-4 rounded-lg p-4 border transition-all ${
-                    race.id.toString() === itemId
-                      ? '!bg-primary-100 !border-primary-500 !text-primary-900'
-                      : ''
-                  }`}
-                >
-                  <p className="font-semibold text-lg flex items-center gap-2">
-                    Race {index + 1}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Flag className="w-4 h-4" />
-                    <span className="truncate overflow-hidden whitespace-nowrap">
-                      {race.name}
-                    </span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    {new Date(race.startDate).toLocaleDateString('nl')}
-                  </p>
-                </div>
+                />
               ))}
         </div>
 
@@ -400,36 +372,36 @@ const index = () => {
                   className="flex flex-col h-full overflow-auto"
                 >
                   <div className="flex gap-4">
-                    <div
+                    <Chip
+                      label="Etappe"
+                      Icon={FlagIcon}
+                      active={resultStatus === ResultType.STAGE}
                       onClick={() => setResultStatus(ResultType.STAGE)}
-                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
-                    >
-                      Etappe
-                    </div>
-                    <div
+                    />
+                    <Chip
+                      label="GC"
+                      Icon={Trophy}
+                      active={resultStatus === ResultType.GC}
                       onClick={() => setResultStatus(ResultType.GC)}
-                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
-                    >
-                      Algemeen klassement
-                    </div>
-                    <div
+                    />
+                    <Chip
+                      label="Youth"
+                      Icon={UserIcon}
+                      active={resultStatus === ResultType.YOUNG}
                       onClick={() => setResultStatus(ResultType.YOUNG)}
-                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
-                    >
-                      Jongerenklassement
-                    </div>
-                    <div
+                    />
+                    <Chip
+                      label="Points"
+                      Icon={Star}
+                      active={resultStatus === ResultType.POINTS}
                       onClick={() => setResultStatus(ResultType.POINTS)}
-                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
-                    >
-                      Puntenklassement
-                    </div>
-                    <div
+                    />
+                    <Chip
+                      label="Mountain"
+                      Icon={Mountain}
+                      active={resultStatus === ResultType.MOUNTAIN}
                       onClick={() => setResultStatus(ResultType.MOUNTAIN)}
-                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
-                    >
-                      Bergklassement
-                    </div>
+                    />
                   </div>
                   <DataTable
                     paginator
@@ -465,7 +437,9 @@ const index = () => {
         ) : (
           <div className="flex gap-10 w-full">
             <div className="flex flex-1/2 flex-col gap-5">
-              <h3 className="font-semibold">Overzicht {activeRace?.name}</h3>
+              <h3 className="font-semibold text-lg">
+                Overzicht {activeRace?.name}
+              </h3>
               <div></div>
 
               <div className="flex w-full gap-5">
@@ -487,7 +461,7 @@ const index = () => {
                 </div>
                 <div className="flex flex-col flex-1 gap-2">
                   <h3 className="font-semibold">Type Rit</h3>
-                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface rounded-xl shadow-md font-semibold text-xl">
                     {ParcoursTypeKeyMap[
                       activeRace?.parcoursType as ParcoursType
                     ] ?? 'Niet beschikbaar'}

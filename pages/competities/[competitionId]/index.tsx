@@ -9,11 +9,11 @@ import { Calendar } from 'primereact/calendar';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
-import { ProgressSpinner } from 'primereact/progressspinner';
 import { Nullable } from 'primereact/ts-helpers';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Race, updateRaceData } from '@/features/race/race.slice';
+import LoadingOverlay from '@/components/LoadingOverlay';
 
 const index = () => {
   const router = useRouter();
@@ -22,7 +22,6 @@ const index = () => {
   const [totalElevation, setTotalElevation] = useState(0);
   const [visible, setVisible] = useState(false);
   const [updateRaceDataLoading, setUpdateRaceDataLoading] = useState(false);
-  const documentStyle = getComputedStyle(document.documentElement);
   const competition: Competition = useSelector(
     (state: any) => state.competition.data,
   );
@@ -98,16 +97,7 @@ const index = () => {
   }, [dispatch, competition]);
 
   if (!competition) {
-    return (
-      <div className="fixed inset-0 flex justify-center items-center bg-surface-100 z-9999">
-        <ProgressSpinner
-          style={{ width: '100px', height: '100px' }}
-          strokeWidth="8"
-          className="stroke-primary-500"
-          animationDuration=".5s"
-        />
-      </div>
-    );
+    return <LoadingOverlay />;
   }
 
   return (
@@ -176,7 +166,7 @@ const index = () => {
               <h3 className="font-semibold">Totale afstand</h3>
               <div
                 style={container}
-                className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl"
+                className="flex flex-col justify-center gap-2 p-4  bg-surface rounded-xl font-semibold text-xl"
               >
                 {totalDistance} km
                 {competition.races[0].stages.length > 0 ? (
@@ -195,7 +185,7 @@ const index = () => {
               <h3 className="font-semibold">Totaal hoogtemeters</h3>
               <div
                 style={container}
-                className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl"
+                className="flex flex-col justify-center gap-2 p-4  bg-surface rounded-xl font-semibold text-xl"
               >
                 {totalElevation} m
                 <span className="text-sm font-normal">

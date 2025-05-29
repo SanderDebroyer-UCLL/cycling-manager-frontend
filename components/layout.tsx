@@ -1,12 +1,12 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import Navbar from './navbar';
-import { ProgressSpinner } from 'primereact/progressspinner';
 import { useDispatch, useSelector } from 'react-redux';
 import { requestLoggedInUser, setUser } from '@/features/user/user.slice';
 import { AppDispatch, RootState } from '@/store/store';
 import { usePathname } from 'next/navigation';
 import router from 'next/router';
 import Head from 'next/head';
+import LoadingOverlay from './LoadingOverlay';
 
 type LayoutProps = {
   children: ReactNode;
@@ -53,16 +53,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   if (loading || !user) {
-    return (
-      <div className="fixed inset-0 flex justify-center items-center bg-surface-100 z-9999">
-        <ProgressSpinner
-          style={{ width: '100px', height: '100px' }}
-          strokeWidth="8"
-          className="stroke-primary-500"
-          animationDuration=".5s"
-        />{' '}
-      </div>
-    );
+    return <LoadingOverlay />;
   }
 
   return (

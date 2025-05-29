@@ -1,0 +1,283 @@
+@import 'tailwindcss';
+
+@custom-variant yellow (&:where(.yellow, .yellow *));
+@custom-variant pink (&:where(.pink, .pink *));
+@custom-variant blue (&:where(.blue, .blue *));
+@custom-variant red (&:where(.red, .red *));
+
+@layer theme, base, primereact, utilities;
+
+@import 'primereact/resources/themes/mira/theme.css';
+
+@import 'tailwindcss/theme' layer(theme);
+@import 'tailwindcss/preflight' layer(base);
+@import 'tailwindcss/utilities' layer(utilities);
+
+.p-datepicker {
+  @apply bg-surface border-[1px] p-4 border-surface-bright0;
+}
+
+.p-toast {
+  @apply !top-[80px];
+}
+
+.p-datepicker-header {
+  @apply bg-surface rounded-xl p-2;
+}
+
+.p-datepicker span {
+  @apply !h-7 !w-7;
+}
+
+.p-datepicker-header button {
+  @apply text-black;
+}
+
+.p-datepicker table td > span.p-highlight {
+  @apply bg-primary-500 rounded-full text-surface-bright;
+}
+
+.p-datatable {
+  @apply bg-surface-bright rounded-xl;
+}
+
+.p-datatable-header {
+  @apply bg-surface-bright border-none;
+}
+
+.p-datatable-thead th {
+  @apply bg-surface-bright border-none;
+}
+
+.p-datatable-tbody tr {
+  @apply bg-surface-bright border-none;
+}
+
+.p-paginator {
+  @apply bg-surface-bright border-none;
+}
+
+.p-button:not(:disabled) {
+  @apply bg-primary-500 border-primary-500 transition-all;
+}
+
+.p-button:not(:disabled):hover {
+  @apply bg-primary-600 hover:border-primary-600;
+}
+
+.p-button.p-button-text {
+  @apply bg-transparent;
+}
+
+.p-button.p-button-text:hover {
+  @apply bg-surface-bright;
+}
+
+.p-button-secondary.p-button.p-button-outlined:not(:disabled) {
+  @apply border-[#64748b];
+}
+
+.p-button.p-button-outlined:not(:disabled) {
+  @apply bg-transparent border-primary-500;
+}
+
+.p-button.p-button-outlined:not(:disabled):hover {
+  @apply bg-surface-bright;
+}
+
+@theme {
+  --font-inter: var(--font-inter);
+  --font-manrope: var(--font-manrope);
+  --font-anton: var(--font-anton);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Primary Color Scale - Sky Blue */
+  --color-primary-50: #e2f3ff; /* primary-95 */
+  --color-primary-100: #c2e8ff; /* primary-90 / primaryContainer */
+  --color-primary-200: #8ecff2; /* primary-80 / inversePrimary */
+  --color-primary-300: #5cb5e0; /* primary-70 */
+  --color-primary-400: #3d9ac4; /* primary-60 */
+  --color-primary-500: #196584; /* primary base light theme */
+  --color-primary-600: #1280a9; /* primary-50 */
+  --color-primary-700: #006688; /* primary-40 */
+  --color-primary-800: #004d67; /* primary-30 / onPrimaryContainer */
+  --color-primary-900: #003548; /* primary-20 / onPrimary dark */
+
+  /* Surface Color Scale - Neutral */
+  --color-surface-bright: #ffffff; /* neutral-100 / surfaceContainerLowest */
+  --color-surface: #f6fafe;
+  --color-surface: #fcfcfe; /* neutral-99 */
+  --color-surface-200: #f9f9fb; /* neutral-98 */
+  --color-surface-300: #f0f1f2; /* neutral-95 / surfaceDim light medium contrast */
+  --color-surface-400: #e2e2e4; /* neutral-90 */
+  --color-surface-bright0: #c6c6c8; /* neutral-80 */
+  --color-surface-600: #aaabad; /* neutral-70 */
+  --color-surface-700: #8f9193; /* neutral-60 */
+  --color-surface-800: #757779; /* neutral-50 */
+  --color-surface-900: #5d5e60; /* neutral-40 */
+
+  /* Dark Color Scale - Custom Dark Palette */
+  --color-dark-50: #e5e9eb; /* Custom dark-50 */
+  --color-dark-100: #cad3d8; /* Custom dark-100 */
+  --color-dark-200: #96a6b1; /* Custom dark-200 */
+  --color-dark-300: #647987; /* Custom dark-300 */
+  --color-dark-400: #3d4a52; /* Custom dark-400 */
+  --color-dark-500: #171c1f; /* Custom dark-500 / onSurface light / onBackground light */
+  --color-dark-600: #111517; /* Custom dark-600 */
+  --color-dark-700: #0d1012; /* Custom dark-700 */
+  --color-dark-800: #090b0c; /* Custom dark-800 */
+  --color-dark-900: #040506; /* Custom dark-900 */
+  --color-dark-950: #020303; /* Custom dark-950 */
+
+  /* Secondary Color Scale - Blue Grey */
+  --color-secondary-50: #fbfcff; /* secondary-99 */
+  --color-secondary-100: #f5faff; /* secondary-98 */
+  --color-secondary-200: #e2f3ff; /* secondary-95 */
+  --color-secondary-300: #d3e5f1; /* secondary-90 / secondaryContainer */
+  --color-secondary-400: #b7c9d5; /* secondary-80 / secondaryFixedDim */
+  --color-secondary-500: #9caeb9; /* secondary-70 */
+  --color-secondary-600: #82939e; /* secondary-60 */
+  --color-secondary-700: #687984; /* secondary-50 */
+  --color-secondary-800: #50616b; /* secondary-40 / secondary light */
+  --color-secondary-900: #384953; /* secondary-30 / onSecondaryContainer */
+
+  /* Tertiary Color Scale - Yellow Green */
+  --color-tertiary-50: #fffbff; /* tertiary-99 */
+  --color-tertiary-100: #fffade; /* tertiary-98 */
+  --color-tertiary-200: #fcf494; /* tertiary-95 */
+  --color-tertiary-300: #ede687; /* tertiary-90 / tertiaryContainer */
+  --color-tertiary-400: #d0ca6e; /* tertiary-80 / tertiaryFixedDim */
+  --color-tertiary-500: #b4ae56; /* tertiary-70 */
+  --color-tertiary-600: #99933f; /* tertiary-60 */
+  --color-tertiary-700: #7f7927; /* tertiary-50 */
+  --color-tertiary-800: #65600e; /* tertiary-40 */
+  --color-tertiary-900: #4c4800; /* tertiary-30 / onTertiaryContainer / tertiary light */
+
+  /* Error/Red Color Scale */
+  --color-red-50: #ffdad6; /* errorContainer light */
+  --color-red-100: #ffb4ab; /* error dark */
+  --color-red-200: #cf2c27; /* errorContainer medium contrast */
+  --color-red-300: #ba1a1a; /* error light */
+  --color-red-400: #93000a; /* onErrorContainer light / errorContainer dark */
+  --color-red-500: #740006; /* error medium contrast */
+  --color-red-600: #690005; /* onError dark */
+  --color-red-700: #600004; /* error high contrast */
+  --color-red-800: #540003; /* onError medium contrast dark */
+  --color-red-900: #93000a; /* errorContainer dark */
+
+  /* Extended Custom Colors */
+  --color-green-50: #f0fff0; /* Light tint of custom green */
+  --color-green-100: #e6ffe6; /* Lighter tint */
+  --color-green-200: #ccffcc; /* Light */
+  --color-green-300: #b3ffb3; /* Soft */
+  --color-green-400: #9ae189; /* Custom Color 1 base */
+  --color-green-500: #80d070; /* Slightly darker */
+  --color-green-600: #66bf56; /* Darker */
+  --color-green-700: #4cae3c; /* Deep */
+  --color-green-800: #339d22; /* Deeper */
+  --color-green-900: #1a8c08; /* Deepest */
+
+  --color-purple-50: #f5f3ff; /* Light tint of custom purple */
+  --color-purple-100: #ebe7ff; /* Lighter tint */
+  --color-purple-200: #d7cfff; /* Light */
+  --color-purple-300: #c3b7ff; /* Soft */
+  --color-purple-400: #af9fff; /* Mid */
+  --color-purple-500: #9b87ff; /* Lighter base */
+  --color-purple-600: #876fff; /* Base variant */
+  --color-purple-700: #645cc9; /* Custom Color 2 base */
+  --color-purple-800: #5048b5; /* Darker */
+  --color-purple-900: #3c34a1; /* Deepest */
+
+  --color-accent-red-50: #ffe6ea; /* Light tint of custom red */
+  --color-accent-red-100: #ffccd5; /* Lighter tint */
+  --color-accent-red-200: #ffb3c0; /* Light */
+  --color-accent-red-300: #ff99ab; /* Soft */
+  --color-accent-red-400: #ff8096; /* Mid */
+  --color-accent-red-500: #ff6681; /* Lighter base */
+  --color-accent-red-600: #f54d6c; /* Base variant */
+  --color-accent-red-700: #db2d4c; /* Custom Color 3 base */
+  --color-accent-red-800: #c11937; /* Darker */
+  --color-accent-red-900: #a70522; /* Deepest */
+
+  /* Outline Colors - Direct from MD3 */
+  --color-outline: #71787d; /* outline light theme */
+  --color-outline-variant: #c0c7cd; /* outlineVariant light theme */
+  --color-outline-dark: #8a9297; /* outline dark theme */
+  --color-outline-variant-dark: #40484d; /* outlineVariant dark theme */
+
+  /* Additional Semantic Colors */
+  --color-on-primary: #ffffff; /* onPrimary light */
+  --color-on-secondary: #ffffff; /* onSecondary light */
+  --color-on-tertiary: #ffffff; /* onTertiary light */
+  --color-on-surface: #171c1f; /* onSurface light */
+  --color-on-background: #171c1f; /* onBackground light */
+  --color-on-error: #ffffff; /* onError light */
+  --color-surface-variant: #dce3e9; /* surfaceVariant light */
+  --color-on-surface-variant: #40484d; /* onSurfaceVariant light */
+  --color-inverse-surface: #2c3134; /* inverseSurface light */
+  --color-inverse-on-surface: #edf1f5; /* inverseOnSurface light */
+  --color-surface-tint: #196584; /* surfaceTint light */
+  --color-scrim: #000000; /* scrim light/dark */
+  --color-shadow: #000000; /* shadow light/dark */
+}
+
+.yellow {
+  --color-yellow-50: #fffcf0; /* Base */
+  --color-yellow-100: #fff7cc; /* Lighter */
+  --color-yellow-200: #fff199; /* Light */
+  --color-yellow-300: #ffe75e; /* Normal */
+  --color-yellow-400: #ffdd2a; /* Darker */
+  --color-yellow-500: #ffd700; /* Dark */
+  --color-yellow-600: #e6c100; /* Darker */
+  --color-yellow-700: #c4a700; /* Deeper */
+  --color-yellow-800: #9e8800; /* Deepest */
+  --color-yellow-900: #6f5e00; /* Darkest */
+}
+
+.pink {
+  --color-pink-50: #fff5f9; /* Base */
+  --color-pink-100: #ffe3ed; /* Lighter */
+  --color-pink-200: #ffc1d6; /* Light */
+  --color-pink-300: #ff9abb; /* Normal */
+  --color-pink-400: #ff729f; /* Darker */
+  --color-pink-500: #ff286e; /* Dark */
+  --color-pink-600: #e02164; /* Darker */
+  --color-pink-700: #bf1d58; /* Deeper */
+  --color-pink-800: #991748; /* Deepest */
+  --color-pink-900: #701132; /* Darkest */
+}
+
+.blue {
+  --color-blue-50: #eff6ff; /* Very light */
+  --color-blue-100: #dbeafe; /* Extra light */
+  --color-blue-200: #bfdbfe; /* Light */
+  --color-blue-300: #93c5fd; /* Soft blue */
+  --color-blue-400: #60a5fa; /* Mid-light */
+  --color-blue-500: #2563eb; /* Base */
+  --color-blue-600: #1d4ed8; /* Stronger */
+  --color-blue-700: #1e40af; /* Dark */
+  --color-blue-800: #1e3a8a; /* Darker */
+  --color-blue-900: #172554; /* Deepest */
+}
+
+.red {
+  --color-red-50: #ffe5e7; /* very light pinkish red */
+  --color-red-100: #fbbfc4; /* soft light red */
+  --color-red-200: #f58a94; /* lighter red */
+  --color-red-300: #ef4a5a; /* soft red */
+  --color-red-400: #e61f34; /* vibrant red */
+  --color-red-500: #e30613; /* base: La Vuelta red */
+  --color-red-600: #cb0511; /* slightly darker */
+  --color-red-700: #b10410; /* deep red */
+  --color-red-800: #8e030d; /* darker red */
+  --color-red-900: #6c020a; /* very dark red */
+}
+
+.p-treeselect-panel {
+  width: 100% !important;
+  max-width: 402px !important;
+  box-sizing: border-box;
+}

@@ -4,9 +4,9 @@ import Sidebar from '@/components/sidebar';
 import { AppDispatch, RootState } from '@/store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { requestLoggedInUser, setUser } from '@/features/user/user.slice';
-import { ProgressSpinner } from 'primereact/progressspinner';
 import { usePathname } from 'next/navigation';
 import router from 'next/router';
+import LoadingOverlay from './LoadingOverlay';
 
 type CustomLayoutProps = {
   children: ReactNode;
@@ -49,22 +49,13 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   };
 
   if (loading || !user) {
-    return (
-      <div className="fixed inset-0 flex justify-center items-center bg-surface-100 z-9999">
-        <ProgressSpinner
-          style={{ width: '100px', height: '100px' }}
-          strokeWidth="8"
-          className="stroke-primary-500"
-          animationDuration=".5s"
-        />{' '}
-      </div>
-    );
+    return <LoadingOverlay />;
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="flex h-screen w-full">
       <Sidebar />
-      <div className="max-w-[calc(100vw-350px)] w-full flex flex-col gap-12 py-12 px-8">
+      <div className="max-w-[calc(100vw-320px)] w-full flex flex-col gap-12 py-12 px-8 bg-surface-container-lowest overflow-y-auto max-h-screen rounded-tl-lg rounded-bl-lg">
         {children}
       </div>
     </div>

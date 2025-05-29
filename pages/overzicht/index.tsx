@@ -38,11 +38,11 @@ export default function Overview() {
     <main className="max-w-[80vw] mx-auto p-20 text-dark-700 class flex flex-col gap-12">
       <div className="flex flex-col gap-4">
         <h2 className="text-xl font-semibold">Actieve Competities</h2>
-        <div className="rounded-lg overflow-hidden">
-          <div className="w-full h-70 bg-surface-100 flex items-center justify-between gap-4 shadow-md overflow-x-auto p-8">
+        <div className="rounded-xl overflow-hidden">
+          <div className="w-full h-70 bg-surface flex items-center justify-between gap-4 shadow-md overflow-x-auto p-8">
             {grandTours.map((tour: GrandTour) => (
               <div
-                className="relative rounded-lg shadow-md overflow-hidden h-full w-full min-w-75"
+                className="relative rounded-xl shadow-md overflow-hidden h-full w-full min-w-75"
                 key={tour.name}
               >
                 <Link href={`${tour.href}`} key={tour.name}>
@@ -72,7 +72,7 @@ export default function Overview() {
       <div className="flex flex-row gap-4">
         <div className="flex flex-col gap-4 w-full flex-1/4">
           <h2 className="text-xl font-semibold">Klassement</h2>
-          <div className="w-fit h-80 bg-surface-100 flex flex-col justify-center gap-6 rounded-lg shadow-md overflow-hidden p-8">
+          <div className="w-fit h-80 bg-surface flex flex-col justify-center gap-6 rounded-xl shadow-md overflow-hidden p-8">
             <div className="flex flex-row gap-6 items-end justify-between">
               {topThreeUsers.map((user: User, index) => (
                 <div className="flex flex-col items-center gap-1" key={user.id}>
@@ -93,7 +93,7 @@ export default function Overview() {
                           : 'h-14 bg-blue-300'
                     }`}
                   >
-                    <p className="bg-surface-100 rounded-full p-4  h-6 w-6 flex items-center justify-center">
+                    <p className="bg-surface rounded-full p-4  h-6 w-6 flex items-center justify-center">
                       {index == 1 ? 1 : index == 0 ? 2 : 3}
                     </p>
                   </div>
@@ -102,14 +102,18 @@ export default function Overview() {
             </div>
             <p className="text-center">
               {sortedUsers[0].firstName} staat op de eerste plaats{' '}
-              {sortedUsers[0].score ?? 0 - (sortedUsers[1].score ?? 0)} punten voor op {sortedUsers[1].firstName}
+              {sortedUsers[0].score ?? 0 - (sortedUsers[1].score ?? 0)} punten
+              voor op {sortedUsers[1].firstName}
             </p>
           </div>
         </div>
         <div className="flex flex-col gap-4 w-full flex-3/4">
           <h2 className="text-xl font-semibold">Huidig klassement</h2>
-          <div className="overflow-hidden rounded-lg">
-            <div style={container} className="overflow-auto max-h-80 w-full flex-3/4">
+          <div className="overflow-hidden rounded-xl">
+            <div
+              style={container}
+              className="overflow-auto max-h-80 w-full flex-3/4"
+            >
               <DataTable value={sortedUsers} tableStyle={{ width: '100%' }}>
                 <Column
                   header="Position"

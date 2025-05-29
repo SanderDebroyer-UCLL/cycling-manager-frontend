@@ -2,6 +2,7 @@ import { getAllUserTeams } from '@/services/user-team.service';
 import { Cyclist } from '@/types/cyclist';
 import { UserTeam } from '@/types/user-team';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { stat } from 'fs';
 
 interface UserTeamsState {
   data: UserTeam[];
@@ -32,22 +33,25 @@ const userTeamsSlice = createSlice({
         email: string;
         competitionId: string;
         maxCyclists?: number;
+        pointsScored?: number;
       }>,
     ) => {
-      const { cyclistName, email, competitionId } = action.payload;
+      const { cyclistName, email, competitionId, maxCyclists, pointsScored } =
+        action.payload;
       const team = state.data.find(
         (team) =>
           team.user.email === email && team.competitionId === competitionId,
       );
       if (team) {
         // Prevent duplicates
-        if (team.mainCyclists.length >= (action.payload.maxCyclists || 15)) {
+        if (team.mainCyclists.length >= (maxCyclists || 15)) {
           const cyclist: Cyclist = {
             name: cyclistName,
             id: '',
             team: [],
             age: 0,
             country: '',
+            pointsScored,
           };
           team.reserveCyclists.push(cyclist);
           return;
@@ -62,6 +66,31 @@ const userTeamsSlice = createSlice({
           team.mainCyclists.push(cyclist);
         }
       }
+    },
+    removeCyclistFromUserTeamCylists: (
+      state,
+      action: PayloadAction<{
+        cyclistName: string;
+        email: string;
+        competitionId: string;
+      }>,
+    ) => {
+      const { cyclistName, email, competitionId } = action.payload;
+      const team = state.data.find(
+        (team) =>
+          team.user.email === email && team.competitionId === competitionId,
+      );
+      if (team) {
+        team.reserveCyclists = team.reserveCyclists.filter(
+          (cyclist) => cyclist.name !== cyclistName,
+        );
+      }
+    },
+    setUserTeams: (state, action: PayloadAction<UserTeam[]>) => {
+      if (!action.payload) {
+        return;
+      }
+      state.data = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -82,5 +111,9 @@ const userTeamsSlice = createSlice({
   },
 });
 
-export const { updateUserTeamCyclists } = userTeamsSlice.actions;
+export const {
+  updateUserTeamCyclists,
+  removeCyclistFromUserTeamCylists,
+  setUserTeams,
+} = userTeamsSlice.actions;
 export default userTeamsSlice.reducer;

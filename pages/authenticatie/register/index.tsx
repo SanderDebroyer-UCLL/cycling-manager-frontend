@@ -114,7 +114,7 @@ export default function Register() {
   return (
     <>
       <main className="flex items-center justify-center max-w-[70vw] mx-auto p-20 text-dark-700">
-        <div className="bg-surface-100 flex flex-col justify-center gap-4 px-16 py-20  rounded-lg">
+        <div className="bg-surface flex flex-col justify-center gap-4 px-16 py-20  rounded-xl">
           <h2 className="font-semibold text-lg">Registreer</h2>
           <p>Vul uw gegevens in a.u.b.</p>
           <div>

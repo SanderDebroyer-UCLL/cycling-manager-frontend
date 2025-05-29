@@ -43,6 +43,21 @@ const Slice = createSlice({
     resetStagePointsStatus(state) {
       state.status = 'idle';
     },
+    updateStagePointsPerCyclist(
+      state,
+      action: PayloadAction<StagePointsPerCyclist[]>,
+    ) {
+      if (!action.payload) {
+        return;
+      }
+      state.stagePointsPerCyclist = action.payload;
+    },
+    setStagePointsPerCyclist(state, action: PayloadAction<StagePointsPerCyclist[]>) {
+      if (!action.payload) {
+        return;
+      }
+      state.stagePointsPerCyclist = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -75,6 +90,10 @@ const Slice = createSlice({
   },
 });
 
-export const { resetStagePointsStatus } = Slice.actions;
+export const {
+  resetStagePointsStatus,
+  updateStagePointsPerCyclist,
+  setStagePointsPerCyclist,
+} = Slice.actions;
 
 export default Slice.reducer;

@@ -6,4 +6,5 @@ export interface Cyclist {
   team: Team[];
   age: number;
   country: string;
+  pointsScored?: number;
 }

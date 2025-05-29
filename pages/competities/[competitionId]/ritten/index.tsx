@@ -1,4 +1,5 @@
 import CompetitieLayout from '@/components/competitieLayout';
+import LoadingOverlay from '@/components/LoadingOverlay';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import { AppDispatch } from '@/store/store';
 import { useRouter } from 'next/router';
@@ -40,16 +41,7 @@ export default function RittenIndex() {
     }
   }, [competition, competitionId, router]);
 
-  return (
-    <div className="fixed inset-0 flex justify-center items-center bg-surface-100 z-9999">
-      <ProgressSpinner
-        style={{ width: '100px', height: '100px' }}
-        strokeWidth="8"
-        className="stroke-primary-500"
-        animationDuration=".5s"
-      />
-    </div>
-  );
+  return <LoadingOverlay />;
 }
 
 RittenIndex.getLayout = (page: ReactNode) => (

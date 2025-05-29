@@ -48,7 +48,7 @@ const navbar = () => {
   ];
 
   return (
-    <div className="flex items-center justify-between text-dark-700 h-16 border-b-1 border-surface-500 backdrop-blur-md px-20">
+    <div className="flex items-center justify-between text-dark-700 h-16 border-b-1 border-outline backdrop-blur-md px-20">
       {user ? (
         <div className="flex gap-12 items-center font-bold">
           <Link href="/" className="text-dark-700 text-2xl italic font-anton ">

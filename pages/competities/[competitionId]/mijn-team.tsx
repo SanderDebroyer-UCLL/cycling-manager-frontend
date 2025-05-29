@@ -10,6 +10,8 @@ import {
 import { fetchCyclists } from '@/features/cyclists/cyclists.slice';
 import {
   fetchUserTeam,
+  removeCyclistFromUserTeamCylists,
+  setUserTeams,
   updateUserTeamCyclists,
 } from '@/features/user-teams/user-teams.slice';
 import { AppDispatch, RootState } from '@/store/store';
@@ -21,7 +23,6 @@ import {
 import { Cyclist } from '@/types/cyclist';
 import { UserTeam } from '@/types/user-team';
 import { useRouter } from 'next/router';
-import { ProgressSpinner } from 'primereact/progressspinner';
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { countryAbbreviationMap } from '@/utils/country-abbreviation-map-lowercase';
@@ -34,7 +35,15 @@ import SelectingPhase from '@/components/SelectingPhase';
 import SortingPhase from '@/components/SortingPhase';
 import { container } from '@/const/containerStyle';
 import StartedPhase from '@/components/StartedPhase';
-import { fetchStagePointsForAllStages } from '@/features/stage-points/stage-points.slice';
+import {
+  fetchStagePointsForAllStages,
+  setStagePointsPerCyclist,
+  updateStagePointsPerCyclist,
+} from '@/features/stage-points/stage-points.slice';
+import { UserPlus, UserX } from 'lucide-react';
+import { StagePointsPerCyclist } from '@/types/stage-points';
+import { Button } from 'primereact/button';
+import LoadingOverlay from '@/components/LoadingOverlay';
 
 const index = () => {
   const router = useRouter();
@@ -48,6 +57,13 @@ const index = () => {
   const [mainTeamPopupVisible, setMainTeamPopupVisible] =
     useState<boolean>(false);
   const [confirmTarget, setConfirmTarget] = useState<Element | null>(null);
+  const [initialStagePoints, setInitialStagePoints] = useState<
+    StagePointsPerCyclist[] | null
+  >(null);
+  const [initialUserTeams, setInitialUserTeams] = useState<UserTeam[] | null>(
+    null,
+  );
+  const [teamChanged, setTeamChanged] = useState<boolean>(false);
   const usersStatus = useSelector((state: RootState) => state.users.status);
   const userTeamsStatus = useSelector(
     (state: RootState) => state.userTeams.status,
@@ -80,6 +96,16 @@ const index = () => {
   useEffect(() => {
     competitionRef.current = competition;
   }, [competition]);
+
+  useEffect(() => {
+    // Only set once, when data is first fetched and initial copy is not set yet
+    if (stagePoints && stagePoints.length > 0 && !initialStagePoints) {
+      setInitialStagePoints(stagePoints);
+    }
+    if (userTeams && userTeams.length > 0 && !initialUserTeams) {
+      setInitialUserTeams(userTeams);
+    }
+  }, [stagePoints, initialStagePoints, userTeams, initialUserTeams]);
 
   useEffect(() => {
     if (stagePoints.length === 0 || stagePointsStatus === 'idle') {
@@ -247,6 +273,12 @@ const index = () => {
   }, []);
 
   useEffect(() => {
+    const isEqual =
+      JSON.stringify(initialStagePoints) === JSON.stringify(stagePoints);
+    setTeamChanged(!isEqual);
+  }, [initialStagePoints, stagePoints]);
+
+  useEffect(() => {
     if (
       competition &&
       userTeams.every(
@@ -358,6 +390,56 @@ const index = () => {
     });
   };
 
+  const handleDeactivateMain = (
+    stagePointsPerCyclist: StagePointsPerCyclist,
+  ) => {
+    const filteredStagePoints = stagePoints.filter(
+      (stagePoint) =>
+        stagePoint.cyclistName.trim() !=
+        stagePointsPerCyclist.cyclistName.trim(),
+    );
+    if (!email || !competition.id || !competition.maxMainCyclists) {
+      return;
+    }
+    dispatch(updateStagePointsPerCyclist(filteredStagePoints));
+    dispatch(
+      updateUserTeamCyclists({
+        cyclistName: stagePointsPerCyclist.cyclistName,
+        email: email,
+        competitionId: competition.id,
+        maxCyclists: competition.maxMainCyclists,
+        pointsScored: stagePointsPerCyclist.points,
+      }),
+    );
+  };
+
+  const handleActivateReserve = (name: string) => {
+    const newStagePoints: StagePointsPerCyclist[] = [
+      ...stagePoints,
+      {
+        cyclistName: name,
+        points: 0,
+        isCyclistActive: false,
+        userId: '0',
+      },
+    ];
+    if (!email || !competition.id) {
+      return;
+    }
+    dispatch(updateStagePointsPerCyclist(newStagePoints));
+    dispatch(
+      removeCyclistFromUserTeamCylists({
+        cyclistName: name,
+        email: email,
+        competitionId: competition.id,
+      }),
+    );
+  };
+
+  const handleDeactivateSubmit = () => {
+    // dispatch()
+  };
+
   const itemTemplate = (user: User, index: number) => {
     return (
       <div className="flex flex-wrap p-2 align-items-center gap-3">
@@ -385,17 +467,59 @@ const index = () => {
     );
   };
 
-  if (!competition || userTeams === null || userTeams.length === 0) {
-    return (
-      <div className="fixed inset-0 flex justify-center items-center bg-surface-100 z-9999">
-        <ProgressSpinner
-          style={{ width: '100px', height: '100px' }}
-          strokeWidth="8"
-          className="stroke-primary-500"
-          animationDuration=".5s"
-        />
-      </div>
+  const handleResetChanges = () => {
+    dispatch(setStagePointsPerCyclist(initialStagePoints || []));
+    console.log(initialUserTeams);
+    dispatch(setUserTeams(initialUserTeams || []));
+  };
+
+  const cyclistDeactivateTemplate = (rowData: StagePointsPerCyclist) => {
+    if (!rowData.isCyclistActive) {
+      return (
+        <>
+          <Button
+            label="Deactiveer"
+            severity="danger"
+            icon={() => <UserX size={16} className="mr-2 stroke-[2.5]" />}
+            raised
+            onClick={() => handleDeactivateMain(rowData)}
+          />
+        </>
+      );
+    } else {
+      return <div></div>;
+    }
+  };
+
+  const activateCyclistTemplate = (rowData: Cyclist) => {
+    const userTeam = userTeams.find((team) =>
+      team.reserveCyclists.some((cyclist) => cyclist.name === rowData.name),
     );
+    if (
+      (userTeam?.reserveCyclists?.length ?? 0) >
+        competition.maxReserveCyclists &&
+      !initialStagePoints?.find(
+        (stagePoint) => stagePoint.cyclistName.trim() === rowData.name.trim(),
+      )
+    ) {
+      return (
+        <>
+          <Button
+            label="Activeer"
+            size="small"
+            icon={() => <UserPlus size={16} className="mr-2 stroke-[2.5]" />}
+            raised
+            onClick={() => handleActivateReserve(rowData.name)}
+          />
+        </>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
+  if (!competition || userTeams === null || userTeams.length === 0) {
+    return <LoadingOverlay />;
   }
 
   if (competition.competitionStatus === CompetitionStatus.SORTING) {
@@ -441,6 +565,10 @@ const index = () => {
     return (
       <>
         <StartedPhase
+          cyclistDeactivateTemplate={cyclistDeactivateTemplate}
+          resetChanges={() => handleResetChanges()}
+          activateCyclistTemplate={activateCyclistTemplate}
+          teamChanged={teamChanged}
           userTeams={userTeams}
           stagePoints={stagePoints}
           email={email}
