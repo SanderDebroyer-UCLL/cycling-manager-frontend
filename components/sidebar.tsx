@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import type { AppDispatch } from '@/store/store';
-import { Competition, CompetitionDTO } from '@/types/competition';
+import { CompetitionDTO } from '@/types/competition';
 import { usePathname } from 'next/navigation';
 import LoadingOverlay from './LoadingOverlay';
 
@@ -39,7 +39,11 @@ const Sidebar = () => {
     !competition ||
     competition.id?.toString() !== competitionId?.toString()
   ) {
-    return <LoadingOverlay />;
+    return (
+      <>
+        <LoadingOverlay />
+      </>
+    );
   }
 
   return (

@@ -12,7 +12,9 @@ export default function RittenIndex() {
   const { competitionId } = router.query;
   const dispatch = useDispatch<AppDispatch>();
 
-  const competition = useSelector((state: any) => state.competition.data);
+  const competition = useSelector(
+    (state: any) => state.competition.competitionDTO,
+  );
 
   useEffect(() => {
     if (
