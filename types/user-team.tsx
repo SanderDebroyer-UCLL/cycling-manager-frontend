@@ -3,9 +3,9 @@ import { Cyclist } from './cyclist';
 import { User } from './user';
 
 export interface UserTeam {
-  id: string;
+  id: number;
   name: string;
-  competitionId: string;
+  competitionId: number;
   mainCyclists: Cyclist[];
   reserveCyclists: Cyclist[];
   user: User;

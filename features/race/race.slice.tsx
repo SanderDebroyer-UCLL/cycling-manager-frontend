@@ -4,7 +4,7 @@ import { getAllRaces, reloadRaceData } from '@/services/race.service';
 
 // Define Race type based on your API response
 export interface Race {
-  id: string;
+  id: number;
   name: string;
   // add more fields as needed
 }

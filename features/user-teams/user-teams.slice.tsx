@@ -1,4 +1,7 @@
-import { getAllUserTeams } from '@/services/user-team.service';
+import {
+  getAllUserTeams,
+  updateUserTeamMainCyclists,
+} from '@/services/user-team.service';
 import { Cyclist } from '@/types/cyclist';
 import { UserTeam } from '@/types/user-team';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
@@ -22,6 +25,22 @@ export const fetchUserTeam = createAsyncThunk(
   },
 );
 
+export const postUpdateUserTeamMainCyclists = createAsyncThunk(
+  'userTeam/updateUserTeamMainCyclists',
+  async (params: {
+    mainCyclistIds: number[];
+    reserveCyclistIds: number[];
+    userTeamId: number;
+  }) => {
+    const data = await updateUserTeamMainCyclists(
+      params.mainCyclistIds,
+      params.reserveCyclistIds,
+      params.userTeamId,
+    );
+    return data;
+  },
+);
+
 const userTeamsSlice = createSlice({
   name: 'userTeams',
   initialState,
@@ -31,7 +50,7 @@ const userTeamsSlice = createSlice({
       action: PayloadAction<{
         cyclistName: string;
         email: string;
-        competitionId: string;
+        competitionId: number;
         maxCyclists?: number;
         pointsScored?: number;
       }>,
@@ -47,7 +66,7 @@ const userTeamsSlice = createSlice({
         if (team.mainCyclists.length >= (maxCyclists || 15)) {
           const cyclist: Cyclist = {
             name: cyclistName,
-            id: '',
+            id: 0,
             team: [],
             age: 0,
             country: '',
@@ -58,7 +77,7 @@ const userTeamsSlice = createSlice({
         } else if (!team.mainCyclists.find((c) => c.name === cyclistName)) {
           const cyclist: Cyclist = {
             name: cyclistName,
-            id: '',
+            id: 0,
             team: [],
             age: 0,
             country: '',
@@ -72,7 +91,7 @@ const userTeamsSlice = createSlice({
       action: PayloadAction<{
         cyclistName: string;
         email: string;
-        competitionId: string;
+        competitionId: number;
       }>,
     ) => {
       const { cyclistName, email, competitionId } = action.payload;

@@ -176,7 +176,13 @@ const index = () => {
       competitionId &&
       competition.id.toString().trim() !== competitionId.toString().trim()
     ) {
-      dispatch(fetchCompetitionById(competitionId.toString()));
+      dispatch(
+        fetchCompetitionById(
+          Number(
+            Array.isArray(competitionId) ? competitionId[0] : competitionId,
+          ),
+        ),
+      );
     }
   }, [dispatch, competition, competitionId]);
 

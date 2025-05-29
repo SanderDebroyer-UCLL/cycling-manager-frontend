@@ -15,7 +15,7 @@ const initialRaceResultsState: RaceResultsState = {
 
 export const fetchRaceResultsByRaceId = createAsyncThunk(
   'race-results/fetchRaceResults',
-  async (raceId: string) => {
+  async (raceId: number) => {
     const results = await getRaceResultsByRaceId(raceId);
     return results;
   },

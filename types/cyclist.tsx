@@ -1,7 +1,7 @@
 import { Team } from './team';
 
 export interface Cyclist {
-  id: string;
+  id: number;
   name: string;
   team: Team[];
   age: number;

@@ -1,7 +1,7 @@
 import { ResultType } from '@/const/resultType';
 
 export interface Race {
-  id: string;
+  id: number;
   name: string;
   stages: Stage[];
   startDate: string;
@@ -12,7 +12,7 @@ export interface Race {
 }
 
 export interface Stage {
-  id: string;
+  id: number;
   name: string;
   departure: string;
   arrival: string;

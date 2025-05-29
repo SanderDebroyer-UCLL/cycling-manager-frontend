@@ -20,7 +20,7 @@ const initialStagePointsState: StagePointsState = {
 
 export const fetchStagePointsForStage = createAsyncThunk(
   'stagePointss/fetchStagePoints',
-  async (params: { competitionId: string; stageId: string }) => {
+  async (params: { competitionId: number; stageId: number }) => {
     const { competitionId, stageId } = params;
     const stagePoints = await getStagePointsForStage(competitionId, stageId);
     return stagePoints;
@@ -29,7 +29,7 @@ export const fetchStagePointsForStage = createAsyncThunk(
 
 export const fetchStagePointsForAllStages = createAsyncThunk(
   'stagePoints/fetchStagePointsForAllStages',
-  async (params: { competitionId: string; userId: string }) => {
+  async (params: { competitionId: number; userId: number }) => {
     const { competitionId, userId } = params;
     const stagePoints = await getStagePointsForAllStages(competitionId, userId);
     return stagePoints;
@@ -52,7 +52,10 @@ const Slice = createSlice({
       }
       state.stagePointsPerCyclist = action.payload;
     },
-    setStagePointsPerCyclist(state, action: PayloadAction<StagePointsPerCyclist[]>) {
+    setStagePointsPerCyclist(
+      state,
+      action: PayloadAction<StagePointsPerCyclist[]>,
+    ) {
       if (!action.payload) {
         return;
       }

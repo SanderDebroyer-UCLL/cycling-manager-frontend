@@ -4,7 +4,7 @@ import { Cyclist } from '@/types/cyclist';
 
 // Define Cyclists type based on your API response
 export interface Cyclists {
-  id: string;
+  id: number;
   name: string;
   // add more fields as needed
 }
@@ -19,10 +19,13 @@ const initialState: CyclistsState = {
   status: 'idle',
 };
 
-export const fetchCyclists = createAsyncThunk('cyclists/fetchCyclists', async () => {
-  const data = await getAllCyclistss();
-  return data as Cyclist[];
-});
+export const fetchCyclists = createAsyncThunk(
+  'cyclists/fetchCyclists',
+  async () => {
+    const data = await getAllCyclistss();
+    return data as Cyclist[];
+  },
+);
 
 const cyclistsSlice = createSlice({
   name: 'cyclists',
@@ -33,10 +36,13 @@ const cyclistsSlice = createSlice({
       .addCase(fetchCyclists.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(fetchCyclists.fulfilled, (state, action: PayloadAction<Cyclist[]>) => {
-        state.status = 'succeeded';
-        state.data = action.payload;
-      })
+      .addCase(
+        fetchCyclists.fulfilled,
+        (state, action: PayloadAction<Cyclist[]>) => {
+          state.status = 'succeeded';
+          state.data = action.payload;
+        },
+      )
       .addCase(fetchCyclists.rejected, (state) => {
         state.status = 'failed';
       });

@@ -19,6 +19,7 @@ interface StartedPhaseProps {
   activateCyclistTemplate: (rowData: Cyclist) => React.ReactNode;
   teamChanged: boolean;
   resetChanges: () => void;
+  handleSubmitTeamChanges: () => void;
 }
 
 const StartedPhase: React.FC<StartedPhaseProps> = ({
@@ -30,6 +31,7 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
   activateCyclistTemplate,
   teamChanged,
   resetChanges,
+  handleSubmitTeamChanges,
 }) => {
   return (
     <div className="flex flex-col gap-12 w-full">
@@ -72,7 +74,10 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
         {teamChanged && (
           <>
             <Button label="Annuleer" raised onClick={() => resetChanges()} />
-            <Button label="Update team" />
+            <Button
+              label="Update team"
+              onClick={() => handleSubmitTeamChanges()}
+            />
           </>
         )}
       </div>

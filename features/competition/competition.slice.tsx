@@ -31,7 +31,7 @@ export const createCompetitionRequest = createAsyncThunk(
 
 export const fetchCompetitionById = createAsyncThunk(
   'competition/fetchCompetition',
-  async (competitionId: string) => {
+  async (competitionId: number) => {
     const competition = await getCompetition(competitionId);
     return competition;
   },
@@ -48,7 +48,7 @@ const competitionSlice = createSlice({
       state,
       action: PayloadAction<{
         competitionPicks: CompetitionPick[];
-        competitionId: string;
+        competitionId: number;
       }>,
     ) {
       const { competitionPicks } = action.payload;

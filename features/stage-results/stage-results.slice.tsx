@@ -21,7 +21,7 @@ const initialStageResultsState: StageResultsState = {
 
 export const fetchResultsByStageIdByType = createAsyncThunk(
   'stage-results/fetchResults',
-  async (params: { stageId: string; resultType: ResultType }) => {
+  async (params: { stageId: number; resultType: ResultType }) => {
     const { stageId, resultType } = params;
     const results = await getResultsByStageIdByType(stageId, resultType);
     return results;

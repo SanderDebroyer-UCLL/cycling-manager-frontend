@@ -10,6 +10,7 @@ import {
 import { fetchCyclists } from '@/features/cyclists/cyclists.slice';
 import {
   fetchUserTeam,
+  postUpdateUserTeamMainCyclists,
   removeCyclistFromUserTeamCylists,
   setUserTeams,
   updateUserTeamCyclists,
@@ -115,7 +116,7 @@ const index = () => {
       dispatch(
         fetchStagePointsForAllStages({
           competitionId: competition.id,
-          userId: user.id.toString(),
+          userId: user.id,
         }),
       );
     }
@@ -196,9 +197,12 @@ const index = () => {
       (!competition && competitionId) ||
       (competition &&
         competitionId &&
-        competition.id.toString().trim() !== competitionId.toString().trim())
+        competition.id !==
+          Number(
+            Array.isArray(competitionId) ? competitionId[0] : competitionId,
+          ))
     ) {
-      dispatch(fetchCompetitionById(competitionId.toString()));
+      dispatch(fetchCompetitionById(competition.id));
     }
   }, [dispatch, competition, competitionId]);
 
@@ -213,7 +217,7 @@ const index = () => {
             cyclistName: string;
             email: string;
             currentPick: number;
-            competitionId: string;
+            competitionId: number;
             maxCyclists: number;
           } = JSON.parse(message.body);
 
@@ -228,7 +232,7 @@ const index = () => {
         stompClient.subscribe('/topic/order', (message) => {
           const order: {
             competitionPicks: CompetitionPick[];
-            competitionId: string;
+            competitionId: number;
           } = JSON.parse(message.body);
 
           if (!competitionRef.current) {
@@ -418,9 +422,10 @@ const index = () => {
       ...stagePoints,
       {
         cyclistName: name,
+        cyclistId: 0,
         points: 0,
         isCyclistActive: false,
-        userId: '0',
+        userId: 0,
       },
     ];
     if (!email || !competition.id) {
@@ -436,8 +441,27 @@ const index = () => {
     );
   };
 
-  const handleDeactivateSubmit = () => {
-    // dispatch()
+  const handleSubmitTeamChanges = () => {
+    const mainCyclistIds = stagePoints.map(
+      (stagePoint) => stagePoint.cyclistId,
+    );
+    const userTeam = userTeams.find(
+      (team) =>
+        team.user.email === email && team.competitionId === competition.id,
+    );
+    if (!userTeam) {
+      return;
+    }
+    const reserveCyclistIds =
+      userTeam.reserveCyclists.map((cyclist) => cyclist.id) || [];
+
+    dispatch(
+      postUpdateUserTeamMainCyclists({
+        mainCyclistIds,
+        reserveCyclistIds,
+        userTeamId: userTeam.id,
+      }),
+    );
   };
 
   const itemTemplate = (user: User, index: number) => {
@@ -565,6 +589,7 @@ const index = () => {
     return (
       <>
         <StartedPhase
+          handleSubmitTeamChanges={handleSubmitTeamChanges}
           cyclistDeactivateTemplate={cyclistDeactivateTemplate}
           resetChanges={() => handleResetChanges()}
           activateCyclistTemplate={activateCyclistTemplate}

@@ -29,7 +29,7 @@ const LeaderboardWithSidebar = () => {
           team: 'Lidl - Trek',
           timeGap: '0:00',
           resultType: ResultType.STAGE,
-          scrapeResultType: ResultType.STAGE
+          scrapeResultType: ResultType.STAGE,
         },
         {
           position: 2,
@@ -37,7 +37,7 @@ const LeaderboardWithSidebar = () => {
           team: 'Red Bull - BORA - hansgrohe',
           timeGap: '0:17',
           resultType: ResultType.STAGE,
-          scrapeResultType: ResultType.STAGE
+          scrapeResultType: ResultType.STAGE,
         },
         {
           position: 3,
@@ -45,7 +45,7 @@ const LeaderboardWithSidebar = () => {
           team: 'Lidl - Trek',
           timeGap: '0:24',
           resultType: ResultType.STAGE,
-          scrapeResultType: ResultType.STAGE
+          scrapeResultType: ResultType.STAGE,
         },
         {
           position: 4,
@@ -53,7 +53,7 @@ const LeaderboardWithSidebar = () => {
           team: 'UAE Team Emirates - XRG',
           timeGap: '0:31',
           resultType: ResultType.STAGE,
-          scrapeResultType: ResultType.STAGE
+          scrapeResultType: ResultType.STAGE,
         },
         {
           position: 5,
@@ -61,15 +61,15 @@ const LeaderboardWithSidebar = () => {
           team: 'UAE Team Emirates - XRG',
           timeGap: '0:32',
           resultType: ResultType.STAGE,
-          scrapeResultType: ResultType.STAGE
+          scrapeResultType: ResultType.STAGE,
         },
       ],
-      id: '',
+      id: 1,
       departure: '',
       arrival: '',
       startTime: '',
       verticalMeters: '',
-      parcoursType: ParcoursType.FLAT
+      parcoursType: ParcoursType.FLAT,
     },
     {
       name: 'Etappe 2',
@@ -82,7 +82,7 @@ const LeaderboardWithSidebar = () => {
           team: 'UAE Team Emirates - XRG',
           timeGap: '0:35',
           resultType: ResultType.STAGE,
-          scrapeResultType: ResultType.STAGE
+          scrapeResultType: ResultType.STAGE,
         },
         {
           position: 7,
@@ -90,7 +90,7 @@ const LeaderboardWithSidebar = () => {
           team: 'Team Picnic PostNL',
           timeGap: '0:43',
           resultType: ResultType.STAGE,
-          scrapeResultType: ResultType.STAGE
+          scrapeResultType: ResultType.STAGE,
         },
         {
           position: 8,
@@ -98,7 +98,7 @@ const LeaderboardWithSidebar = () => {
           team: 'Bahrain - Victorious',
           timeGap: '0:44',
           resultType: ResultType.STAGE,
-          scrapeResultType: ResultType.STAGE
+          scrapeResultType: ResultType.STAGE,
         },
         {
           position: 9,
@@ -106,7 +106,7 @@ const LeaderboardWithSidebar = () => {
           team: 'Tudor Pro Cycling Team',
           timeGap: '0:46',
           resultType: ResultType.STAGE,
-          scrapeResultType: ResultType.STAGE
+          scrapeResultType: ResultType.STAGE,
         },
         {
           position: 10,
@@ -114,15 +114,15 @@ const LeaderboardWithSidebar = () => {
           team: 'Red Bull - BORA - hansgrohe',
           timeGap: '0:50',
           resultType: ResultType.STAGE,
-          scrapeResultType: ResultType.STAGE
+          scrapeResultType: ResultType.STAGE,
         },
       ],
-      id: '',
+      id: 1,
       departure: '',
       arrival: '',
       startTime: '',
       verticalMeters: '',
-      parcoursType: ParcoursType.FLAT
+      parcoursType: ParcoursType.FLAT,
     },
   ];
 

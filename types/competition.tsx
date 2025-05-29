@@ -8,7 +8,7 @@ export interface CreateCompetitionDetails {
 }
 
 export interface Competition {
-  id: string;
+  id: number;
   name: string;
   races: Race[];
   users: User[];
@@ -20,7 +20,7 @@ export interface Competition {
 }
 
 export interface CompetitionPick {
-  id: string;
+  id: number;
   userId: number;
   pickOrder: number;
 }

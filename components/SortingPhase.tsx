@@ -7,7 +7,7 @@ import { InputNumber } from 'primereact/inputnumber';
 
 interface SortingPhaseProps {
   competition: {
-    id: string;
+    id: number;
     competitionStatus: CompetitionStatus;
   };
   usersState: User[];
