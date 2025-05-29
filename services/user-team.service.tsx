@@ -27,7 +27,7 @@ export const updateUserTeamMainCyclists = async (
         'Content-Type': 'application/json',
         authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
       },
-      body: JSON.stringify(mainCyclistIds, reserveCyclistIds),
+      body: JSON.stringify({ mainCyclistIds, reserveCyclistIds }),
     },
   );
 

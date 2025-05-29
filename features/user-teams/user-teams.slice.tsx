@@ -49,14 +49,21 @@ const userTeamsSlice = createSlice({
       state,
       action: PayloadAction<{
         cyclistName: string;
+        cyclistId: number;
         email: string;
         competitionId: number;
         maxCyclists?: number;
         pointsScored?: number;
       }>,
     ) => {
-      const { cyclistName, email, competitionId, maxCyclists, pointsScored } =
-        action.payload;
+      const {
+        cyclistName,
+        cyclistId,
+        email,
+        competitionId,
+        maxCyclists,
+        pointsScored,
+      } = action.payload;
       const team = state.data.find(
         (team) =>
           team.user.email === email && team.competitionId === competitionId,
@@ -66,7 +73,7 @@ const userTeamsSlice = createSlice({
         if (team.mainCyclists.length >= (maxCyclists || 15)) {
           const cyclist: Cyclist = {
             name: cyclistName,
-            id: 0,
+            id: cyclistId,
             team: [],
             age: 0,
             country: '',

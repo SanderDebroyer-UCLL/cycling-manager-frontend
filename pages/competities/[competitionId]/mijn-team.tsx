@@ -11,7 +11,6 @@ import { fetchCyclists } from '@/features/cyclists/cyclists.slice';
 import {
   fetchUserTeam,
   postUpdateUserTeamMainCyclists,
-  removeCyclistFromUserTeamCylists,
   setUserTeams,
   updateUserTeamCyclists,
 } from '@/features/user-teams/user-teams.slice';
@@ -39,10 +38,13 @@ import StartedPhase from '@/components/StartedPhase';
 import {
   fetchStagePointsForAllStages,
   setStagePointsPerCyclist,
-  updateStagePointsPerCyclist,
+  updateMainReserveStagePointsCyclist,
 } from '@/features/stage-points/stage-points.slice';
 import { UserPlus, UserX } from 'lucide-react';
-import { StagePointsPerCyclist } from '@/types/stage-points';
+import {
+  MainReserveStagePointsCyclist,
+  StagePointsPerCyclist,
+} from '@/types/stage-points';
 import { Button } from 'primereact/button';
 import LoadingOverlay from '@/components/LoadingOverlay';
 
@@ -58,12 +60,8 @@ const index = () => {
   const [mainTeamPopupVisible, setMainTeamPopupVisible] =
     useState<boolean>(false);
   const [confirmTarget, setConfirmTarget] = useState<Element | null>(null);
-  const [initialStagePoints, setInitialStagePoints] = useState<
-    StagePointsPerCyclist[] | null
-  >(null);
-  const [initialUserTeams, setInitialUserTeams] = useState<UserTeam[] | null>(
-    null,
-  );
+  const [initialStagePoints, setInitialStagePoints] =
+    useState<MainReserveStagePointsCyclist | null>(null);
   const [teamChanged, setTeamChanged] = useState<boolean>(false);
   const usersStatus = useSelector((state: RootState) => state.users.status);
   const userTeamsStatus = useSelector(
@@ -75,8 +73,8 @@ const index = () => {
   const stagePointsStatus = useSelector(
     (state: RootState) => state.stagePoints.status,
   );
-  const stagePoints = useSelector(
-    (state: RootState) => state.stagePoints.stagePointsPerCyclist,
+  const mainReserveStagePointsCyclist = useSelector(
+    (state: RootState) => state.stagePoints.mainReserveStagePointsCyclist,
   );
   const cyclists: Cyclist[] = useSelector(
     (state: RootState) => state.cyclists.data,
@@ -100,16 +98,20 @@ const index = () => {
 
   useEffect(() => {
     // Only set once, when data is first fetched and initial copy is not set yet
-    if (stagePoints && stagePoints.length > 0 && !initialStagePoints) {
-      setInitialStagePoints(stagePoints);
+    if (
+      mainReserveStagePointsCyclist &&
+      mainReserveStagePointsCyclist !== null &&
+      !initialStagePoints
+    ) {
+      setInitialStagePoints(mainReserveStagePointsCyclist);
     }
-    if (userTeams && userTeams.length > 0 && !initialUserTeams) {
-      setInitialUserTeams(userTeams);
-    }
-  }, [stagePoints, initialStagePoints, userTeams, initialUserTeams]);
+  }, [mainReserveStagePointsCyclist, initialStagePoints]);
 
   useEffect(() => {
-    if (stagePoints.length === 0 || stagePointsStatus === 'idle') {
+    if (
+      mainReserveStagePointsCyclist === null ||
+      stagePointsStatus === 'idle'
+    ) {
       if (!user || !user.id || !competition || !competition.id) {
         return;
       }
@@ -120,7 +122,13 @@ const index = () => {
         }),
       );
     }
-  }, [dispatch, stagePoints, stagePointsStatus, user, competition]);
+  }, [
+    dispatch,
+    mainReserveStagePointsCyclist,
+    stagePointsStatus,
+    user,
+    competition,
+  ]);
 
   useEffect(() => {
     if (cyclistsStatus === 'succeeded' && cyclists) {
@@ -202,7 +210,13 @@ const index = () => {
             Array.isArray(competitionId) ? competitionId[0] : competitionId,
           ))
     ) {
-      dispatch(fetchCompetitionById(competition.id));
+      dispatch(
+        fetchCompetitionById(
+          Number(
+            Array.isArray(competitionId) ? competitionId[0] : competitionId,
+          ),
+        ),
+      );
     }
   }, [dispatch, competition, competitionId]);
 
@@ -215,6 +229,7 @@ const index = () => {
         stompClient.subscribe('/topic/picks', (message) => {
           const pick: {
             cyclistName: string;
+            cyclistId: number;
             email: string;
             currentPick: number;
             competitionId: number;
@@ -278,9 +293,10 @@ const index = () => {
 
   useEffect(() => {
     const isEqual =
-      JSON.stringify(initialStagePoints) === JSON.stringify(stagePoints);
+      JSON.stringify(initialStagePoints) ===
+      JSON.stringify(mainReserveStagePointsCyclist);
     setTeamChanged(!isEqual);
-  }, [initialStagePoints, stagePoints]);
+  }, [initialStagePoints, mainReserveStagePointsCyclist]);
 
   useEffect(() => {
     if (
@@ -397,53 +413,71 @@ const index = () => {
   const handleDeactivateMain = (
     stagePointsPerCyclist: StagePointsPerCyclist,
   ) => {
-    const filteredStagePoints = stagePoints.filter(
-      (stagePoint) =>
-        stagePoint.cyclistName.trim() !=
-        stagePointsPerCyclist.cyclistName.trim(),
-    );
-    if (!email || !competition.id || !competition.maxMainCyclists) {
+    if (!mainReserveStagePointsCyclist) {
       return;
     }
-    dispatch(updateStagePointsPerCyclist(filteredStagePoints));
+
+    const { cyclistId, cyclistName } = stagePointsPerCyclist;
+
+    const updatedMainReserveStagePointsCyclist: MainReserveStagePointsCyclist =
+      {
+        mainCyclists: mainReserveStagePointsCyclist.mainCyclists.filter(
+          (cyclist) => cyclist.cyclistId !== cyclistId,
+        ),
+        reserveCyclists: [
+          ...mainReserveStagePointsCyclist.reserveCyclists,
+          {
+            cyclistName,
+            cyclistId,
+            points: 0,
+            isCyclistActive: false,
+            userId: 0,
+          },
+        ],
+      };
+
     dispatch(
-      updateUserTeamCyclists({
-        cyclistName: stagePointsPerCyclist.cyclistName,
-        email: email,
-        competitionId: competition.id,
-        maxCyclists: competition.maxMainCyclists,
-        pointsScored: stagePointsPerCyclist.points,
-      }),
+      updateMainReserveStagePointsCyclist(updatedMainReserveStagePointsCyclist),
     );
   };
 
-  const handleActivateReserve = (name: string) => {
-    const newStagePoints: StagePointsPerCyclist[] = [
-      ...stagePoints,
-      {
-        cyclistName: name,
-        cyclistId: 0,
-        points: 0,
-        isCyclistActive: false,
-        userId: 0,
-      },
-    ];
-    if (!email || !competition.id) {
+  const handleActivateReserve = (
+    stagePointsPerCyclist: StagePointsPerCyclist,
+  ) => {
+    if (!mainReserveStagePointsCyclist) {
       return;
     }
-    dispatch(updateStagePointsPerCyclist(newStagePoints));
+
+    const { cyclistId, cyclistName } = stagePointsPerCyclist;
+
+    const updatedMainReserveStagePointsCyclist: MainReserveStagePointsCyclist =
+      {
+        mainCyclists: [
+          ...mainReserveStagePointsCyclist.mainCyclists,
+          {
+            cyclistName,
+            cyclistId,
+            points: 0,
+            isCyclistActive: true,
+            userId: 0,
+          },
+        ],
+        reserveCyclists: mainReserveStagePointsCyclist.reserveCyclists.filter(
+          (cyclist) => cyclist.cyclistId !== cyclistId,
+        ),
+      };
+
     dispatch(
-      removeCyclistFromUserTeamCylists({
-        cyclistName: name,
-        email: email,
-        competitionId: competition.id,
-      }),
+      updateMainReserveStagePointsCyclist(updatedMainReserveStagePointsCyclist),
     );
   };
 
   const handleSubmitTeamChanges = () => {
-    const mainCyclistIds = stagePoints.map(
-      (stagePoint) => stagePoint.cyclistId,
+    if (!mainReserveStagePointsCyclist) {
+      return;
+    }
+    const mainCyclistIds = mainReserveStagePointsCyclist?.mainCyclists.map(
+      (stagePoint: StagePointsPerCyclist) => stagePoint.cyclistId,
     );
     const userTeam = userTeams.find(
       (team) =>
@@ -453,7 +487,9 @@ const index = () => {
       return;
     }
     const reserveCyclistIds =
-      userTeam.reserveCyclists.map((cyclist) => cyclist.id) || [];
+      mainReserveStagePointsCyclist?.reserveCyclists.map(
+        (stagePoint: StagePointsPerCyclist) => stagePoint.cyclistId,
+      );
 
     dispatch(
       postUpdateUserTeamMainCyclists({
@@ -492,9 +528,10 @@ const index = () => {
   };
 
   const handleResetChanges = () => {
-    dispatch(setStagePointsPerCyclist(initialStagePoints || []));
-    console.log(initialUserTeams);
-    dispatch(setUserTeams(initialUserTeams || []));
+    if (!initialStagePoints) {
+      return;
+    }
+    dispatch(updateMainReserveStagePointsCyclist(initialStagePoints));
   };
 
   const cyclistDeactivateTemplate = (rowData: StagePointsPerCyclist) => {
@@ -515,16 +552,14 @@ const index = () => {
     }
   };
 
-  const activateCyclistTemplate = (rowData: Cyclist) => {
-    const userTeam = userTeams.find((team) =>
-      team.reserveCyclists.some((cyclist) => cyclist.name === rowData.name),
-    );
+  const activateCyclistTemplate = (rowData: StagePointsPerCyclist) => {
+    if (!mainReserveStagePointsCyclist) {
+      return;
+    }
     if (
-      (userTeam?.reserveCyclists?.length ?? 0) >
+      mainReserveStagePointsCyclist?.reserveCyclists.length >
         competition.maxReserveCyclists &&
-      !initialStagePoints?.find(
-        (stagePoint) => stagePoint.cyclistName.trim() === rowData.name.trim(),
-      )
+      rowData.isCyclistActive === true
     ) {
       return (
         <>
@@ -533,7 +568,7 @@ const index = () => {
             size="small"
             icon={() => <UserPlus size={16} className="mr-2 stroke-[2.5]" />}
             raised
-            onClick={() => handleActivateReserve(rowData.name)}
+            onClick={() => handleActivateReserve(rowData)}
           />
         </>
       );
@@ -542,7 +577,12 @@ const index = () => {
     }
   };
 
-  if (!competition || userTeams === null || userTeams.length === 0) {
+  if (
+    !competition ||
+    userTeams === null ||
+    userTeams.length === 0 ||
+    (CompetitionStatus.STARTED && !mainReserveStagePointsCyclist)
+  ) {
     return <LoadingOverlay />;
   }
 
@@ -589,15 +629,13 @@ const index = () => {
     return (
       <>
         <StartedPhase
+          competition={competition}
           handleSubmitTeamChanges={handleSubmitTeamChanges}
           cyclistDeactivateTemplate={cyclistDeactivateTemplate}
           resetChanges={() => handleResetChanges()}
           activateCyclistTemplate={activateCyclistTemplate}
           teamChanged={teamChanged}
-          userTeams={userTeams}
-          stagePoints={stagePoints}
-          email={email}
-          competition={competition}
+          mainReserveStagePointsCyclist={mainReserveStagePointsCyclist}
         />
       </>
     );

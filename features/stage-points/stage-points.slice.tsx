@@ -4,17 +4,23 @@ import {
   getStagePointsForAllStages,
   getStagePointsForStage,
 } from '@/services/stage-points.service';
-import { StagePoints, StagePointsPerCyclist } from '@/types/stage-points';
+import {
+  MainReserveStagePointsCyclist,
+  StagePoints,
+  StagePointsPerCyclist,
+} from '@/types/stage-points';
 
 interface StagePointsState {
   stagePoints: StagePoints[];
   stagePointsPerCyclist: StagePointsPerCyclist[];
+  mainReserveStagePointsCyclist: MainReserveStagePointsCyclist | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
 const initialStagePointsState: StagePointsState = {
   stagePoints: [],
   stagePointsPerCyclist: [],
+  mainReserveStagePointsCyclist: null,
   status: 'idle',
 };
 
@@ -43,14 +49,14 @@ const Slice = createSlice({
     resetStagePointsStatus(state) {
       state.status = 'idle';
     },
-    updateStagePointsPerCyclist(
+    updateMainReserveStagePointsCyclist(
       state,
-      action: PayloadAction<StagePointsPerCyclist[]>,
+      action: PayloadAction<MainReserveStagePointsCyclist>,
     ) {
       if (!action.payload) {
         return;
       }
-      state.stagePointsPerCyclist = action.payload;
+      state.mainReserveStagePointsCyclist = action.payload;
     },
     setStagePointsPerCyclist(
       state,
@@ -82,9 +88,9 @@ const Slice = createSlice({
       })
       .addCase(
         fetchStagePointsForAllStages.fulfilled,
-        (state, action: PayloadAction<StagePointsPerCyclist[]>) => {
+        (state, action: PayloadAction<MainReserveStagePointsCyclist>) => {
           state.status = 'succeeded';
-          state.stagePointsPerCyclist = action.payload;
+          state.mainReserveStagePointsCyclist = action.payload;
         },
       )
       .addCase(fetchStagePointsForAllStages.rejected, (state) => {
@@ -95,7 +101,7 @@ const Slice = createSlice({
 
 export const {
   resetStagePointsStatus,
-  updateStagePointsPerCyclist,
+  updateMainReserveStagePointsCyclist,
   setStagePointsPerCyclist,
 } = Slice.actions;
 
