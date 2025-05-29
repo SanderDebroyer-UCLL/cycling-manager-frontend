@@ -43,7 +43,7 @@ export const fetchStagePointsForAllStages = createAsyncThunk(
 );
 
 const Slice = createSlice({
-  name: 'user',
+  name: 'stagePoints',
   initialState: initialStagePointsState,
   reducers: {
     resetStagePointsStatus(state) {

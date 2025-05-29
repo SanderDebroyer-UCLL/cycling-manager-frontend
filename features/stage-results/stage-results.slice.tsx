@@ -29,7 +29,7 @@ export const fetchResultsByStageIdByType = createAsyncThunk(
 );
 
 const resultsSlice = createSlice({
-  name: 'user',
+  name: 'stage-results',
   initialState: initialStageResultsState,
   reducers: {
     resetStageResultsStatus(state) {

@@ -1,4 +1,3 @@
-// components/CustomLayout.tsx
 import React, { ReactNode, useEffect, useState } from 'react';
 import Sidebar from '@/components/sidebar';
 import { AppDispatch, RootState } from '@/store/store';
@@ -16,7 +15,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(true);
 
-  const user = useSelector((state: RootState) => state.user.data);
+  const user = useSelector((state: RootState) => state.user.userDTO);
   const userStatus = useSelector((state: RootState) => state.user.status);
 
   const pathname = usePathname();
@@ -25,7 +24,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   useEffect(() => {
     const email = sessionStorage.getItem('email');
     const jwtToken = sessionStorage.getItem('jwtToken');
-    setLoading(false); // regardless, we stop loading after setting user or none
+    setLoading(false);
   }, [dispatch]);
 
   useEffect(() => {

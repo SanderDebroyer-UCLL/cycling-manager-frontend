@@ -22,7 +22,7 @@ export const fetchRaceResultsByRaceId = createAsyncThunk(
 );
 
 const resultsSlice = createSlice({
-  name: 'user',
+  name: 'race-results',
   initialState: initialRaceResultsState,
   reducers: {
     resetRaceResultsStatus(state) {

@@ -1,4 +1,3 @@
-import { selectCurrentUser } from '@/features/user/user.selector';
 import {
   registerUserRequest,
   resetUserStatus,
@@ -33,7 +32,7 @@ export default function Register() {
   const router = useRouter();
   const status = useSelector((state: RootState) => state.user.status);
   const error = useSelector((state: RootState) => state.user.error);
-  const user = useSelector(selectCurrentUser);
+  const user = useSelector((state: RootState) => state.user.userDTO);
 
   const dispatch = useDispatch<AppDispatch>();
 

@@ -10,6 +10,31 @@ export interface Race {
   distance: string;
   parcoursType: ParcoursType;
 }
+export interface RaceDTO {
+  id: number;
+  name: string;
+  niveau: string;
+  startDate: string;
+  endDate: string;
+  distance: number;
+  raceUrl: string;
+  competitionIds: number[];
+  stages: StageDTO[];
+  parcoursType: ParcoursType;
+}
+
+export interface StageDTO {
+  id: number;
+  name: string;
+  departure: string;
+  arrival: string;
+  date: string;
+  startTime?: string;
+  distance: number;
+  stageUrl: string;
+  verticalMeters: number;
+  parcoursType: ParcoursType;
+}
 
 export interface Stage {
   id: number;

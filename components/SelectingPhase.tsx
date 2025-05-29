@@ -1,5 +1,6 @@
 import {
   Competition,
+  CompetitionDTO,
   CompetitionPick,
   CompetitionStatus,
 } from '@/types/competition';
@@ -18,7 +19,7 @@ import { InputText } from 'primereact/inputtext';
 import React, { ChangeEvent, useState } from 'react';
 
 interface SelectingPhaseProps {
-  competition: Competition;
+  competition: CompetitionDTO;
   email: string | null;
   loading: boolean;
   cyclistsState: Cyclist[];

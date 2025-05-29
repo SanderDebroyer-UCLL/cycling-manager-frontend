@@ -17,8 +17,15 @@ import {
   resetStageResultsStatus,
 } from '@/features/stage-results/stage-results.slice';
 import { AppDispatch } from '@/store/store';
-import { Competition } from '@/types/competition';
-import { ParcoursType, Race, Stage, StageResult } from '@/types/race';
+import { Competition, CompetitionDTO } from '@/types/competition';
+import {
+  ParcoursType,
+  Race,
+  RaceDTO,
+  Stage,
+  StageDTO,
+  StageResult,
+} from '@/types/race';
 import { RaceResult } from '@/types/race-result';
 import { StagePoints } from '@/types/stage-points';
 import {
@@ -37,8 +44,8 @@ const index = () => {
   const router = useRouter();
   const { competitionId, itemId } = router.query;
 
-  const [activeStage, setActiveStage] = useState<Stage | null>(null);
-  const [activeRace, setActiveRace] = useState<Race | null>(null);
+  const [activeStage, setActiveStage] = useState<StageDTO | null>(null);
+  const [activeRace, setActiveRace] = useState<RaceDTO | null>(null);
   const [resultLoading, setResultLoading] = useState(false);
   const [resultStatus, setResultStatus] = useState<ResultType>(
     ResultType.STAGE,
@@ -51,8 +58,8 @@ const index = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const competition: Competition = useSelector(
-    (state: any) => state.competition.data,
+  const competition: CompetitionDTO | null = useSelector(
+    (state: any) => state.competition.competitionDTO,
   );
   const stageResults: StageResult[] = useSelector(
     (state: any) => state.stageResults.etappeResult,
@@ -93,9 +100,12 @@ const index = () => {
       (stagePoints.length === 0 && activeStage?.id) ||
       (stagePointsStatus === 'idle' && activeStage?.id)
     ) {
+      if (!competition) {
+        return;
+      }
       dispatch(
         fetchStagePointsForStage({
-          competitionId: competition.id,
+          competitionId: competition?.id,
           stageId: activeStage.id,
         }),
       );
@@ -186,7 +196,7 @@ const index = () => {
     }
   }, [dispatch, competition, competitionId]);
 
-  const onSelectStage = (stage: Stage) => {
+  const onSelectStage = (stage: StageDTO) => {
     setActiveStage(stage);
     setActiveRace(null);
     dispatch(resetStageResultsStatus());
@@ -196,7 +206,7 @@ const index = () => {
     });
   };
 
-  const onSelectRace = (race: Race) => {
+  const onSelectRace = (race: RaceDTO) => {
     setActiveRace(race);
     setActiveStage(null);
     dispatch(resetRaceResultsStatus());

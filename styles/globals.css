@@ -17,6 +17,22 @@ body {
   @apply text-on-surface;
 }
 
+.p-inputtext {
+  @apply rounded-xl font-semibold border-2;
+}
+
+.p-inputtext span {
+  @apply text-on-surface;
+}
+
+.p-inputtext:enabled {
+  @apply border-outline;
+}
+
+.p-inputtext:enabled:focus {
+  @apply border-outline shadow-[0_0_0_0.2rem_#d1e4ff];
+}
+
 .p-datepicker {
   @apply bg-surface-container border-none p-4 rounded-xl;
 }
@@ -70,15 +86,15 @@ body {
 }
 
 .p-button:not(:disabled) {
-  @apply bg-primary text-on-primary border border-primary;
+  @apply bg-primary text-on-primary border-2 border-primary;
 }
 
 .p-button:not(:disabled).p-button-secondary {
-  @apply bg-secondary text-on-secondary border border-secondary;
+  @apply bg-secondary text-on-secondary border-2 border-secondary;
 }
 
 .p-button:not(:disabled).p-button-danger {
-  @apply bg-error text-on-error border border-error;
+  @apply bg-error text-on-error border-2 border-error;
 }
 
 .p-button.p-button-outlined {
@@ -135,7 +151,7 @@ body {
 
 /* Primary Raised */
 .p-button.p-button-raised {
-  @apply bg-primary-container text-on-primary-container border border-transparent shadow-none;
+  @apply bg-primary-container text-on-primary-container border-2 border-transparent shadow-none;
 }
 .p-button.p-button-raised::before {
   @apply bg-on-primary-container;
@@ -143,7 +159,7 @@ body {
 
 /* Secondary Raised */
 .p-button.p-button-raised.p-button-secondary {
-  @apply bg-secondary-container text-on-secondary-container border border-transparent shadow-none;
+  @apply bg-secondary-container text-on-secondary-container border-2 border-transparent shadow-none;
 }
 .p-button.p-button-raised.p-button-secondary::before {
   @apply bg-on-secondary-container;
@@ -151,7 +167,7 @@ body {
 
 /* Danger/Error Raised */
 .p-button.p-button-raised.p-button-danger {
-  @apply bg-error-container text-on-error-container border border-transparent shadow-none;
+  @apply bg-error-container text-on-error-container border-2 border-transparent shadow-none;
 }
 .p-button.p-button-raised.p-button-danger::before {
   @apply bg-on-error-container;

@@ -13,7 +13,7 @@ type LayoutProps = {
 };
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const user = useSelector((state: RootState) => state.user.data);
+  const user = useSelector((state: RootState) => state.user.userDTO);
   const userStatus = useSelector((state: RootState) => state.user.status);
 
   const dispatch = useDispatch<AppDispatch>();

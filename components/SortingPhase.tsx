@@ -2,7 +2,7 @@ import React from 'react';
 import { OrderList } from 'primereact/orderlist';
 import { Button } from 'primereact/button';
 import { CompetitionStatus } from '@/types/competition';
-import { User } from '@/types/user';
+import { User, UserDTO } from '@/types/user';
 import { InputNumber } from 'primereact/inputnumber';
 
 interface SortingPhaseProps {
@@ -10,10 +10,10 @@ interface SortingPhaseProps {
     id: number;
     competitionStatus: CompetitionStatus;
   };
-  usersState: User[];
-  handleUsersChange: (users: User[]) => void;
+  usersState: UserDTO[];
+  handleUsersChange: (users: UserDTO[]) => void;
   stompClientRef: React.RefObject<any>;
-  itemTemplate: (user: User, index: number) => React.ReactNode;
+  itemTemplate: (user: UserDTO, index: number) => React.ReactNode;
   handleReserveCyclistCount: (count: number) => void;
   handleCyclistCount: (count: number) => void;
   reserveCyclistCount: number;

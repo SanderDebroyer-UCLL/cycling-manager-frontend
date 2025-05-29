@@ -96,7 +96,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     <PrimeReactProvider value={{ ripple: true }}>
       <Provider store={store}>
         <Toast ref={toastRef} />
-        <div className="bg-surface">
+        <div className="bg-surface-container-lowest">
           {getLayout(<Component {...pageProps} />)}
         </div>
       </Provider>

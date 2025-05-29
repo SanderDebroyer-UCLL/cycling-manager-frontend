@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { User } from '@/types/user';
+import { User, UserDTO } from '@/types/user';
 import { getUsers } from '@/services/user.service';
 
 interface UsersState {
-  data: User[];
+  data: UserDTO[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 const initialUsersState: UsersState = {
@@ -26,7 +26,7 @@ const usersSlice = createSlice({
     resetUsersStatus(state) {
       state.status = 'idle';
     },
-    setUsers(state, action: PayloadAction<User[]>) {
+    setUsers(state, action: PayloadAction<UserDTO[]>) {
       state.data = action.payload;
     },
   },
@@ -35,10 +35,13 @@ const usersSlice = createSlice({
       .addCase(fetchUsers.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(fetchUsers.fulfilled, (state, action: PayloadAction<User[]>) => {
-        state.status = 'succeeded';
-        state.data = action.payload;
-      })
+      .addCase(
+        fetchUsers.fulfilled,
+        (state, action: PayloadAction<UserDTO[]>) => {
+          state.status = 'succeeded';
+          state.data = action.payload;
+        },
+      )
       .addCase(fetchUsers.rejected, (state) => {
         state.status = 'failed';
       });

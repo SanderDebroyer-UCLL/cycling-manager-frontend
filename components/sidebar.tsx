@@ -5,13 +5,13 @@ import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import type { AppDispatch } from '@/store/store';
-import { Competition } from '@/types/competition';
+import { Competition, CompetitionDTO } from '@/types/competition';
 import { usePathname } from 'next/navigation';
 import LoadingOverlay from './LoadingOverlay';
 
 const Sidebar = () => {
-  const competition: Competition = useSelector(
-    (state: any) => state.competition.data,
+  const competition: CompetitionDTO | null = useSelector(
+    (state: any) => state.competition.competitionDTO,
   );
   const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();

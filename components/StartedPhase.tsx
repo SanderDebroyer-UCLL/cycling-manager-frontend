@@ -1,16 +1,13 @@
 import { container } from '@/const/containerStyle';
-import { Competition } from '@/types/competition';
-import { Cyclist } from '@/types/cyclist';
+import { Competition, CompetitionDTO } from '@/types/competition';
 import {
   MainReserveStagePointsCyclist,
-  StagePoints,
   StagePointsPerCyclist,
 } from '@/types/stage-points';
-import { UserTeam } from '@/types/user-team';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 interface StartedPhaseProps {
   mainReserveStagePointsCyclist: MainReserveStagePointsCyclist | null;
@@ -21,7 +18,7 @@ interface StartedPhaseProps {
   teamChanged: boolean;
   resetChanges: () => void;
   handleSubmitTeamChanges: () => void;
-  competition: Competition;
+  competition: CompetitionDTO;
 }
 
 const StartedPhase: React.FC<StartedPhaseProps> = ({

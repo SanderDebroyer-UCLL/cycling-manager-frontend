@@ -42,7 +42,7 @@ export const postUpdateUserTeamMainCyclists = createAsyncThunk(
 );
 
 const userTeamsSlice = createSlice({
-  name: 'userTeams',
+  name: 'userTeam',
   initialState,
   reducers: {
     updateUserTeamCyclists: (

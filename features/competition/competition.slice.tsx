@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import {
   Competition,
+  CompetitionDTO,
   CompetitionPick,
   CompetitionStatus,
   CreateCompetitionDetails,
@@ -12,12 +13,14 @@ import {
 } from '@/services/competition.service';
 
 interface CompetitionState {
-  data: Competition | null;
+  competition: Competition | null;
+  competitionDTO: CompetitionDTO | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
 const initialCompetitionState: CompetitionState = {
-  data: null,
+  competition: null,
+  competitionDTO: null,
   status: 'idle',
 };
 
@@ -38,7 +41,7 @@ export const fetchCompetitionById = createAsyncThunk(
 );
 
 const competitionSlice = createSlice({
-  name: 'user',
+  name: 'competition',
   initialState: initialCompetitionState,
   reducers: {
     resetCompetitionStatus(state) {
@@ -52,38 +55,38 @@ const competitionSlice = createSlice({
       }>,
     ) {
       const { competitionPicks } = action.payload;
-      if (!state.data) {
+      if (!state.competitionDTO) {
         return;
       }
-      state.data.competitionPicks = competitionPicks;
+      state.competitionDTO.competitionPicks = competitionPicks;
     },
     updateCompetitionStatus(state, action: PayloadAction<CompetitionStatus>) {
       const competitionStatus = action.payload;
-      if (!state.data) {
+      if (!state.competitionDTO) {
         return;
       }
-      state.data.competitionStatus = competitionStatus;
+      state.competitionDTO.competitionStatus = competitionStatus;
     },
     updateCompetitionPick(state, action: PayloadAction<number>) {
       const currentPick = action.payload;
-      if (!state.data) {
+      if (!state.competitionDTO) {
         return;
       }
-      state.data.currentPick = currentPick;
+      state.competitionDTO.currentPick = currentPick;
     },
     updateCyclistCount(state, action: PayloadAction<number>) {
       const maxMainCyclists = action.payload;
-      if (!state.data) {
+      if (!state.competitionDTO) {
         return;
       }
-      state.data.maxMainCyclists = maxMainCyclists;
+      state.competitionDTO.maxMainCyclists = maxMainCyclists;
     },
     updateReserveCyclistCount(state, action: PayloadAction<number>) {
       const maxReserveCyclists = action.payload;
-      if (!state.data) {
+      if (!state.competitionDTO) {
         return;
       }
-      state.data.maxReserveCyclists = maxReserveCyclists;
+      state.competitionDTO.maxReserveCyclists = maxReserveCyclists;
     },
   },
   extraReducers: (builder) => {
@@ -93,9 +96,9 @@ const competitionSlice = createSlice({
       })
       .addCase(
         createCompetitionRequest.fulfilled,
-        (state, action: PayloadAction<Competition>) => {
+        (state, action: PayloadAction<CompetitionDTO>) => {
           state.status = 'succeeded';
-          state.data = action.payload;
+          state.competitionDTO = action.payload;
         },
       )
       .addCase(createCompetitionRequest.rejected, (state) => {
@@ -106,9 +109,9 @@ const competitionSlice = createSlice({
       })
       .addCase(
         fetchCompetitionById.fulfilled,
-        (state, action: PayloadAction<Competition>) => {
+        (state, action: PayloadAction<CompetitionDTO>) => {
           state.status = 'succeeded';
-          state.data = action.payload;
+          state.competitionDTO = action.payload;
         },
       )
       .addCase(fetchCompetitionById.rejected, (state) => {

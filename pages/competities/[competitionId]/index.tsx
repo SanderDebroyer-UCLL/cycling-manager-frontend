@@ -2,7 +2,7 @@ import CompetitieLayout from '@/components/competitieLayout';
 import { container } from '@/const/containerStyle';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import { AppDispatch, RootState } from '@/store/store';
-import { Competition } from '@/types/competition';
+import { Competition, CompetitionDTO } from '@/types/competition';
 import { useRouter } from 'next/router';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
@@ -12,8 +12,9 @@ import { Dialog } from 'primereact/dialog';
 import { Nullable } from 'primereact/ts-helpers';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Race, updateRaceData } from '@/features/race/race.slice';
+import { updateRaceData } from '@/features/race/race.slice';
 import LoadingOverlay from '@/components/LoadingOverlay';
+import { Race, RaceDTO } from '@/types/race';
 
 const index = () => {
   const router = useRouter();
@@ -22,8 +23,8 @@ const index = () => {
   const [totalElevation, setTotalElevation] = useState(0);
   const [visible, setVisible] = useState(false);
   const [updateRaceDataLoading, setUpdateRaceDataLoading] = useState(false);
-  const competition: Competition = useSelector(
-    (state: any) => state.competition.data,
+  const competition: CompetitionDTO | null = useSelector(
+    (state: any) => state.competition.competitionDTO,
   );
   const raceStatus = useSelector((state: RootState) => state.race.status);
 
@@ -154,7 +155,7 @@ const index = () => {
             onClick={() =>
               competition.races[0].stages.length > 0
                 ? dispatch(updateRaceData(competition.races[0].name))
-                : competition.races.forEach((race: Race) =>
+                : competition.races.forEach((race: RaceDTO) =>
                     dispatch(updateRaceData(race.name)),
                   )
             }

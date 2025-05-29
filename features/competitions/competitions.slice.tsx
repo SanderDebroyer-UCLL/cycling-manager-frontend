@@ -19,10 +19,10 @@ export const fetchCompetitions = createAsyncThunk(
     const competitions = await getCompetitions();
     return competitions;
   },
-)
+);
 
 const competitionsSlice = createSlice({
-  name: 'user',
+  name: 'competitions',
   initialState: initialCompetitionsState,
   reducers: {
     resetCompetitionsStatus(state) {

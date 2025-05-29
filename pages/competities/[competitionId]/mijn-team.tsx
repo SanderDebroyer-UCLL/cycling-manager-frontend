@@ -11,12 +11,12 @@ import { fetchCyclists } from '@/features/cyclists/cyclists.slice';
 import {
   fetchUserTeam,
   postUpdateUserTeamMainCyclists,
-  setUserTeams,
   updateUserTeamCyclists,
 } from '@/features/user-teams/user-teams.slice';
 import { AppDispatch, RootState } from '@/store/store';
 import {
   Competition,
+  CompetitionDTO,
   CompetitionPick,
   CompetitionStatus,
 } from '@/types/competition';
@@ -28,7 +28,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { countryAbbreviationMap } from '@/utils/country-abbreviation-map-lowercase';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
-import { User } from '@/types/user';
+import { User, UserDTO } from '@/types/user';
 import { fetchUsers, resetUsersStatus } from '@/features/users/users.slice';
 import { confirmPopup } from 'primereact/confirmpopup';
 import SelectingPhase from '@/components/SelectingPhase';
@@ -37,7 +37,6 @@ import { container } from '@/const/containerStyle';
 import StartedPhase from '@/components/StartedPhase';
 import {
   fetchStagePointsForAllStages,
-  setStagePointsPerCyclist,
   updateMainReserveStagePointsCyclist,
 } from '@/features/stage-points/stage-points.slice';
 import { UserPlus, UserX } from 'lucide-react';
@@ -51,7 +50,7 @@ import LoadingOverlay from '@/components/LoadingOverlay';
 const index = () => {
   const router = useRouter();
   const { competitionId } = router.query;
-  const [usersState, setUsersState] = useState<User[]>([]);
+  const [usersState, setUsersState] = useState<UserDTO[]>([]);
   const [cyclistsState, setCyclistsState] = useState<Cyclist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedCyclist, setSelectedCyclist] = useState<Cyclist | null>(null);
@@ -79,20 +78,25 @@ const index = () => {
   const cyclists: Cyclist[] = useSelector(
     (state: RootState) => state.cyclists.data,
   );
-  const user: User | null = useSelector((state: RootState) => state.user.data);
-  const users: User[] = useSelector((state: RootState) => state.users.data);
+  const user: UserDTO | null = useSelector(
+    (state: RootState) => state.user.userDTO,
+  );
+  const users: UserDTO[] = useSelector((state: RootState) => state.users.data);
   const userTeams: UserTeam[] = useSelector(
     (state: any) => state.userTeams.data,
   );
-  const competition: Competition = useSelector(
-    (state: any) => state.competition.data,
+  const competition: CompetitionDTO | null = useSelector(
+    (state: any) => state.competition.competitionDTO,
   );
-  const competitionRef = useRef<Competition | null>(null);
+  const competitionRef = useRef<CompetitionDTO | null>(null);
   const stompClientRef = useRef<Client | null>(null);
   const email = sessionStorage.getItem('email');
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
+    if (!competition) {
+      return;
+    }
     competitionRef.current = competition;
   }, [competition]);
 
@@ -167,7 +171,7 @@ const index = () => {
         .map((pick: CompetitionPick) => {
           return users.find((user) => user.id === pick.userId) || null;
         })
-        .filter((user): user is User => user !== null);
+        .filter((user): user is UserDTO => user !== null);
 
       setUsersState(sortedUsers);
       resetUsersStatus();
@@ -320,7 +324,7 @@ const index = () => {
         icon: 'pi pi-exclamation-triangle',
         defaultFocus: 'accept',
         accept: () => {
-          if (stompClientRef.current === null) {
+          if (stompClientRef.current === null || !competition) {
             return;
           }
           stompClientRef.current?.publish({
@@ -350,7 +354,7 @@ const index = () => {
       console.warn('STOMP client not connected yet.');
       return;
     }
-    if (stompClientRef.current === null) {
+    if (stompClientRef.current === null || !competition) {
       return;
     }
     stompClientRef.current?.publish({
@@ -370,7 +374,7 @@ const index = () => {
     setCyclistCount(count);
     const client = stompClientRef.current;
 
-    if (!client || !client.connected) {
+    if (!client || !client.connected || !competition) {
       console.warn('STOMP client not connected yet.');
       return;
     }
@@ -388,9 +392,9 @@ const index = () => {
     });
   };
 
-  const handleUsersChange = (users: User[]) => {
+  const handleUsersChange = (users: UserDTO[]) => {
     setUsersState(users);
-    if (stompClientRef.current === null) {
+    if (stompClientRef.current === null || !competition) {
       return;
     }
     stompClientRef.current?.publish({
@@ -473,7 +477,7 @@ const index = () => {
   };
 
   const handleSubmitTeamChanges = () => {
-    if (!mainReserveStagePointsCyclist) {
+    if (!mainReserveStagePointsCyclist || !competition || !email) {
       return;
     }
     const mainCyclistIds = mainReserveStagePointsCyclist?.mainCyclists.map(
@@ -500,7 +504,7 @@ const index = () => {
     );
   };
 
-  const itemTemplate = (user: User, index: number) => {
+  const itemTemplate = (user: UserDTO, index: number) => {
     return (
       <div className="flex flex-wrap p-2 align-items-center gap-3">
         <span className="w-6 text-right font-bold text-primary-500">
@@ -553,7 +557,7 @@ const index = () => {
   };
 
   const activateCyclistTemplate = (rowData: StagePointsPerCyclist) => {
-    if (!mainReserveStagePointsCyclist) {
+    if (!mainReserveStagePointsCyclist || !competition) {
       return;
     }
     if (
