@@ -43,7 +43,7 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
             <DataTable value={stagePoints}>
               <Column header="Naam" field="cyclistName" />
               <Column header="Punten Verdiend" field="points" />
-              <Column body={cyclistDeactivateTemplate} header="Actief?" />
+              <Column body={cyclistDeactivateTemplate} header="Acties" />
             </DataTable>
           </div>
         </div>
@@ -63,7 +63,7 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
               <Column header="Naam" field="name" />
               <Column header="Team" field="team" />
               <Column header="Punten Verdiend" field="pointsScored" />
-              <Column body={activateCyclistTemplate} header="Activeren?" />
+              <Column body={activateCyclistTemplate} header="Activeer" />
             </DataTable>
           </div>
         </div>
