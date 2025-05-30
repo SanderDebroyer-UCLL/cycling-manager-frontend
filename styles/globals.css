@@ -17,6 +17,19 @@ body {
   @apply text-on-surface;
 }
 
+.p-tooltip {
+  filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3))
+    drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.15));
+}
+
+.p-tooltip.p-tooltip-right .p-tooltip-arrow {
+  @apply border-r-inverse-surface;
+}
+
+.p-tooltip-text {
+  @apply bg-inverse-surface border-r-inverse-surface text-inverse-on-surface text-xs px-2 py-1;
+}
+
 .p-inputtext {
   @apply rounded-xl font-semibold border-2;
 }
@@ -77,10 +90,6 @@ body {
   @apply bg-surface-container border-none;
 }
 
-.p-button {
-  @apply font-medium px-4 py-2 rounded-xl text-sm transition-colors duration-200;
-}
-
 .p-button:disabled {
   @apply opacity-50 cursor-not-allowed;
 }
@@ -112,8 +121,8 @@ body {
 /* Base button styles */
 .p-button {
   @apply bg-primary border-primary text-on-primary relative overflow-hidden font-semibold flex items-center justify-center select-none
-    px-4 py-2 rounded-xl transition-all
-    text-sm leading-normal;
+      px-4 py-2 rounded-xl transition-all
+      text-sm leading-normal;
 }
 
 /* Add pseudo-element ::before for hover effect */

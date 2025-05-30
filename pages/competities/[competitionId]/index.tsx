@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateRaceData } from '@/features/race/race.slice';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { Race, RaceDTO } from '@/types/race';
+import { RefreshCw } from 'lucide-react';
 
 const index = () => {
   const router = useRouter();
@@ -146,11 +147,14 @@ const index = () => {
             ? competition.races[0].name
             : competition.name}
           <Button
-            // rounded
-            outlined
-            icon="pi pi-refresh"
-            rounded
-            className="max-w-48"
+            raised
+            icon={() => (
+              <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
+            )}
+            tooltip="Haal de laatste data op"
+            tooltipOptions={{ showDelay: 500 }}
+            aria-label="Haal de laatste data op"
+            className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
             loading={updateRaceDataLoading}
             onClick={() =>
               competition.races[0].stages.length > 0
@@ -159,7 +163,7 @@ const index = () => {
                     dispatch(updateRaceData(race.name)),
                   )
             }
-          ></Button>
+          />
         </h2>
       </div>
       <div className="flex gap-10 w-full">
