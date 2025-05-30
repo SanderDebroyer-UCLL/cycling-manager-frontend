@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { getAllCyclistss } from '@/services/cyclists.service';
-import { Cyclist } from '@/types/cyclist';
+import { Cyclist, CyclistDTO } from '@/types/cyclist';
 
 // Define Cyclists type based on your API response
 export interface Cyclists {
@@ -10,7 +10,7 @@ export interface Cyclists {
 }
 
 interface CyclistsState {
-  data: Cyclist[];
+  data: CyclistDTO[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
@@ -23,7 +23,7 @@ export const fetchCyclists = createAsyncThunk(
   'cyclists/fetchCyclists',
   async () => {
     const data = await getAllCyclistss();
-    return data as Cyclist[];
+    return data as CyclistDTO[];
   },
 );
 
@@ -38,7 +38,7 @@ const cyclistsSlice = createSlice({
       })
       .addCase(
         fetchCyclists.fulfilled,
-        (state, action: PayloadAction<Cyclist[]>) => {
+        (state, action: PayloadAction<CyclistDTO[]>) => {
           state.status = 'succeeded';
           state.data = action.payload;
         },

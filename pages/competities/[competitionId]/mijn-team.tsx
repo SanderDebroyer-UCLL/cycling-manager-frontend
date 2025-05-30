@@ -15,13 +15,12 @@ import {
 } from '@/features/user-teams/user-teams.slice';
 import { AppDispatch, RootState } from '@/store/store';
 import {
-  Competition,
   CompetitionDTO,
   CompetitionPick,
   CompetitionStatus,
 } from '@/types/competition';
-import { Cyclist } from '@/types/cyclist';
-import { UserTeam } from '@/types/user-team';
+import { CyclistDTO } from '@/types/cyclist';
+import { UserTeamDTO } from '@/types/user-team';
 import { useRouter } from 'next/router';
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -39,7 +38,7 @@ import {
   fetchStagePointsForAllStages,
   updateMainReserveStagePointsCyclist,
 } from '@/features/stage-points/stage-points.slice';
-import { UserPlus, UserX } from 'lucide-react';
+import { Cylinder, UserPlus, UserX } from 'lucide-react';
 import {
   MainReserveStagePointsCyclist,
   StagePointsPerCyclist,
@@ -51,9 +50,11 @@ const index = () => {
   const router = useRouter();
   const { competitionId } = router.query;
   const [usersState, setUsersState] = useState<UserDTO[]>([]);
-  const [cyclistsState, setCyclistsState] = useState<Cyclist[]>([]);
+  const [cyclistsState, setCyclistsState] = useState<CyclistDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedCyclist, setSelectedCyclist] = useState<Cyclist | null>(null);
+  const [selectedCyclist, setSelectedCyclist] = useState<CyclistDTO | null>(
+    null,
+  );
   const [reserveCyclistCount, setReserveCyclistCount] = useState<number>(0);
   const [cyclistCount, setCyclistCount] = useState<number>(0);
   const [mainTeamPopupVisible, setMainTeamPopupVisible] =
@@ -75,14 +76,14 @@ const index = () => {
   const mainReserveStagePointsCyclist = useSelector(
     (state: RootState) => state.stagePoints.mainReserveStagePointsCyclist,
   );
-  const cyclists: Cyclist[] = useSelector(
+  const cyclists: CyclistDTO[] = useSelector(
     (state: RootState) => state.cyclists.data,
   );
   const user: UserDTO | null = useSelector(
     (state: RootState) => state.user.userDTO,
   );
   const users: UserDTO[] = useSelector((state: RootState) => state.users.data);
-  const userTeams: UserTeam[] = useSelector(
+  const userTeams: UserTeamDTO[] = useSelector(
     (state: any) => state.userTeams.data,
   );
   const competition: CompetitionDTO | null = useSelector(
@@ -135,16 +136,13 @@ const index = () => {
   ]);
 
   useEffect(() => {
-    if (cyclistsStatus === 'succeeded' && cyclists) {
+    if (cyclistsStatus === 'succeeded' && cyclists && userTeams.length > 0) {
       const filteredCyclists = cyclists.filter((cyclist) => {
-        return !userTeams.some(
-          (userTeam: UserTeam) =>
-            userTeam.mainCyclists.some(
+        return !userTeams.some((userTeam: UserTeamDTO) =>
+          userTeam.cyclistAssignments
+            .map((cyclist) => cyclist.cyclist)
+            .some(
               (teamCyclist) => teamCyclist.name.trim() === cyclist.name.trim(),
-            ) ||
-            userTeam.reserveCyclists?.some(
-              (reserveCyclist) =>
-                reserveCyclist.name.trim() === cyclist.name.trim(),
             ),
         );
       });
@@ -303,18 +301,20 @@ const index = () => {
   }, [initialStagePoints, mainReserveStagePointsCyclist]);
 
   useEffect(() => {
+    const mainCyclistsCount = userTeams.reduce(
+      (count: number, team: UserTeamDTO) =>
+        count + team.cyclistAssignments.length,
+      0,
+    );
     if (
       competition &&
-      userTeams.every(
-        (team: UserTeam) =>
-          team.mainCyclists.length === competition.maxMainCyclists,
-      )
+      mainCyclistsCount === competition.maxMainCyclists * userTeams.length
     ) {
       setMainTeamPopupVisible(true);
     } else {
       setMainTeamPopupVisible(false);
     }
-  }, []);
+  }, [userTeams, competition]);
 
   useEffect(() => {
     if (selectedCyclist && confirmTarget) {
@@ -518,7 +518,7 @@ const index = () => {
     );
   };
 
-  const countryBodyTemplate = (rowData: Cyclist) => {
+  const countryBodyTemplate = (rowData: CyclistDTO) => {
     return (
       <div className="flex align-items-center gap-2">
         <img
@@ -584,7 +584,6 @@ const index = () => {
   if (
     !competition ||
     userTeams === null ||
-    userTeams.length === 0 ||
     (CompetitionStatus.STARTED && !mainReserveStagePointsCyclist)
   ) {
     return <LoadingOverlay />;

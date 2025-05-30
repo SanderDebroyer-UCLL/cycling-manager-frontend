@@ -16,6 +16,7 @@ import { updateRaceData } from '@/features/race/race.slice';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { Race, RaceDTO } from '@/types/race';
 import { RefreshCw } from 'lucide-react';
+import { fetchCyclistsWithDNS } from '@/features/user-teams/user-teams.slice';
 
 const index = () => {
   const router = useRouter();
@@ -27,6 +28,13 @@ const index = () => {
   const competition: CompetitionDTO | null = useSelector(
     (state: any) => state.competition.competitionDTO,
   );
+  const cyclistWithDNS = useSelector(
+    (state: RootState) => state.userTeams.cyclistsWithDNS,
+  );
+  const userTeamsState = useSelector(
+    (state: RootState) => state.userTeams.status,
+  );
+
   const raceStatus = useSelector((state: RootState) => state.race.status);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -69,10 +77,24 @@ const index = () => {
   }, [raceStatus]);
 
   useEffect(() => {
+    if (cyclistWithDNS.length === 0 || userTeamsState === 'idle') {
+      if (!competitionId) return;
+      dispatch(
+        fetchCyclistsWithDNS(
+          Number(
+            Array.isArray(competitionId) ? competitionId[0] : competitionId,
+          ),
+        ),
+      );
+    }
+  }, [dispatch, competitionId]);
+
+  useEffect(() => {
     if (
       competition &&
       competitionId &&
-      competition.id.toString().trim() !== competitionId.toString().trim()
+      competition.id !==
+        Number(Array.isArray(competitionId) ? competitionId[0] : competitionId)
     ) {
       dispatch(
         fetchCompetitionById(
@@ -232,6 +254,13 @@ const index = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div style={container} className="flex flex-row gap-4 h-full w-full">
+        <DataTable value={cyclistWithDNS}>
+          <Column field="name" header="Naam" />
+          <Column field="team.name" header="Team" />
+          <Column field="dnsReason" header="Reden" />
+        </DataTable>
       </div>
     </div>
   );

@@ -41,8 +41,32 @@ export const updateUserTeamMainCyclists = async (
   return data;
 };
 
+export const getCyclistsWithDNS = async (competitionId: number) => {
+  const res = await fetch(
+    process.env.NEXT_PUBLIC_API_URL + '/user-teams/dns/' + competitionId,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
+      },
+    },
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    // throw the error message so it triggers rejected action
+    throw new Error(data.error || 'Er is iets misgegaan.');
+  }
+
+  return data;
+};
+
 const UserTeamService = {
   getAllUserTeams,
+  updateUserTeamMainCyclists,
+  getCyclistsWithDNS,
 };
 
 export default UserTeamService;

@@ -4,9 +4,8 @@ import {
   CompetitionPick,
   CompetitionStatus,
 } from '@/types/competition';
-import { Cyclist } from '@/types/cyclist';
-import { User } from '@/types/user';
-import { UserTeam } from '@/types/user-team';
+import { CyclistDTO } from '@/types/cyclist';
+import { CyclistRole, UserTeamDTO } from '@/types/user-team';
 import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
@@ -22,9 +21,9 @@ interface SelectingPhaseProps {
   competition: CompetitionDTO;
   email: string | null;
   loading: boolean;
-  cyclistsState: Cyclist[];
-  userTeams: UserTeam[];
-  setSelectedCyclist: (cyclist: Cyclist) => void;
+  cyclistsState: CyclistDTO[];
+  userTeams: UserTeamDTO[];
+  setSelectedCyclist: (cyclist: CyclistDTO) => void;
   setConfirmTarget: (target: EventTarget & Element) => void;
   countryBodyTemplate: (rowData: any) => React.ReactNode;
   stompClientRef: React.RefObject<any>;
@@ -121,8 +120,7 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
             );
 
             const teamNotFull =
-              (userTeam?.mainCyclists.length || 0) +
-                (userTeam?.reserveCyclists.length || 0) <
+              (userTeam?.cyclistAssignments.length || 0) <
               competition.maxMainCyclists + competition.maxReserveCyclists;
 
             if (isUserTurn && teamNotFull) {
@@ -152,9 +150,10 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
         {userTeams.length > 0 &&
           userTeams
             .filter(
-              (userTeam: UserTeam) => userTeam.competitionId === competition.id,
+              (userTeam: UserTeamDTO) =>
+                userTeam.competitionId === competition.id,
             )
-            .map((userTeam: UserTeam) => (
+            .map((userTeam: UserTeamDTO) => (
               <div
                 key={userTeam.id}
                 style={container}
@@ -172,28 +171,40 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
                   {userTeam.user.email === email ? 'Mijn Team' : userTeam.name}
                 </h2>
                 <div className="flex flex-col gap-2 w-full overflow-y-auto max-h-[350px] text-nowrap text-ellipsis">
-                  {userTeam.mainCyclists.map((cyclist: Cyclist, index) => (
-                    <div
-                      key={cyclist.name}
-                      className="flex items-center border-b-1 last:border-b-0 border-surface-400 mx-2 py-2"
-                    >
-                      <span className="mr-2">{index + 1}.</span>
-                      <span className="overflow-hidden text-ellipsis whitespace-nowrap block w-full">
-                        {cyclist.name}
-                      </span>
-                    </div>
-                  ))}
-                  {userTeam.reserveCyclists.map((cyclist: Cyclist, index) => (
-                    <div
-                      key={cyclist.name}
-                      className="flex items-center border-b-1 last:border-b-0 border-surface-400 mx-2 py-2 text-surface-900"
-                    >
-                      <span className="mr-2">{index + 1}.</span>
-                      <span className="overflow-hidden text-ellipsis whitespace-nowrap block w-full">
-                        {cyclist.name}
-                      </span>
-                    </div>
-                  ))}
+                  {userTeam.cyclistAssignments
+                    .filter(
+                      (cyclistAssignments) =>
+                        cyclistAssignments.role === CyclistRole.MAIN,
+                    )
+                    .map((cyclistAssignments) => cyclistAssignments.cyclist)
+                    .map((cyclist: CyclistDTO, index) => (
+                      <div
+                        key={`${cyclist.id}-${index}`}
+                        className="flex items-center border-b-1 last:border-b-0 border-surface-400 mx-2 py-2"
+                      >
+                        <span className="mr-2">{index + 1}.</span>
+                        <span className="overflow-hidden text-ellipsis whitespace-nowrap block w-full">
+                          {cyclist.name}
+                        </span>
+                      </div>
+                    ))}
+                  {userTeam.cyclistAssignments
+                    .filter(
+                      (cyclistAssignments) =>
+                        cyclistAssignments.role === CyclistRole.RESERVE,
+                    )
+                    .map((cyclistAssignments) => cyclistAssignments.cyclist)
+                    .map((cyclist: CyclistDTO, index) => (
+                      <div
+                        key={`${cyclist.id}-${index}`}
+                        className="flex items-center border-b-1 last:border-b-0 border-surface-400 mx-2 py-2 text-surface-900"
+                      >
+                        <span className="mr-2">{index + 1}.</span>
+                        <span className="overflow-hidden text-ellipsis whitespace-nowrap block w-full">
+                          {cyclist.name}
+                        </span>
+                      </div>
+                    ))}
                 </div>
               </div>
             ))}
@@ -221,11 +232,12 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
           label="Klaar"
           disabled={userTeams
             .filter(
-              (userTeam: UserTeam) => userTeam.competitionId == competition.id,
+              (userTeam: UserTeamDTO) =>
+                userTeam.competitionId == competition.id,
             )
             .some(
               (userTeam) =>
-                userTeam.mainCyclists.length + userTeam.reserveCyclists.length <
+                userTeam.cyclistAssignments.length <
                 competition.maxMainCyclists + competition.maxReserveCyclists,
             )}
           onClick={() =>
