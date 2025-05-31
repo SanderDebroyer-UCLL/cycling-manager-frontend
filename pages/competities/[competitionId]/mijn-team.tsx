@@ -27,7 +27,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { countryAbbreviationMap } from '@/utils/country-abbreviation-map-lowercase';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
-import { User, UserDTO } from '@/types/user';
+import { UserDTO } from '@/types/user';
 import { fetchUsers, resetUsersStatus } from '@/features/users/users.slice';
 import { confirmPopup } from 'primereact/confirmpopup';
 import SelectingPhase from '@/components/SelectingPhase';
@@ -107,13 +107,14 @@ const index = () => {
   // Fetch points data when needed
   useEffect(() => {
     // Early return if data is already available or currently loading
-    if (mainReservePointsCyclist !== null || pointsStatus !== 'idle') {
+    if (mainReservePointsCyclist !== null) {
       return;
     }
     // Early return if required data is missing
     if (!user?.id || !competition?.id) {
       return;
     }
+    console.log('here');
     // Dispatch appropriate action based on competition structure
     const fetchAction =
       competition.races.length === 1
@@ -295,6 +296,9 @@ const index = () => {
   }, [initialPoints, mainReservePointsCyclist]);
 
   useEffect(() => {
+    if (!competition || !userTeams) {
+      return;
+    }
     const mainCyclistsCount = userTeams.reduce(
       (count: number, team: UserTeamDTO) =>
         count + team.cyclistAssignments.length,
@@ -302,7 +306,11 @@ const index = () => {
     );
     if (
       competition &&
-      mainCyclistsCount === competition.maxMainCyclists * userTeams.length
+      mainCyclistsCount ===
+        competition.maxMainCyclists *
+          userTeams.filter(
+            (userTeam) => userTeam.competitionId === competition.id,
+          ).length
     ) {
       setMainTeamPopupVisible(true);
     } else {
@@ -567,9 +575,15 @@ const index = () => {
   if (
     !competition ||
     userTeams === null ||
-    (CompetitionStatus.STARTED && !mainReservePointsCyclist)
+    (competition.competitionStatus === CompetitionStatus.STARTED &&
+      !mainReservePointsCyclist)
   ) {
-    return <LoadingOverlay />;
+    return (
+      <>
+        waaaaaaa
+        <LoadingOverlay />
+      </>
+    );
   }
 
   if (competition.competitionStatus === CompetitionStatus.SORTING) {

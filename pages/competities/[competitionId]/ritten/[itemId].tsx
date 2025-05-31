@@ -104,6 +104,27 @@ const index = () => {
     }
   }, [competitionStatus]);
 
+  // Add this new useEffect specifically for competition changes
+  useEffect(() => {
+    if (!competition?.id || !competitionId) return;
+    dispatch(resetPointsStatus());
+    if (activeStage) {
+      dispatch(
+        fetchStagePointsForStage({
+          competitionId: competition.id,
+          stageId: activeStage.id,
+        }),
+      );
+    } else if (activeRace) {
+      dispatch(
+        fetchRacePointsForRace({
+          competitionId: competition.id,
+          raceId: activeRace.id,
+        }),
+      );
+    }
+  }, [dispatch, competition?.id]);
+
   useEffect(() => {
     setStageResultsState(stageResults);
   }, [stageResults]);

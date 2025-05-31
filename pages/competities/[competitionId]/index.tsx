@@ -10,7 +10,13 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { Nullable } from 'primereact/ts-helpers';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateRaceData } from '@/features/race/race.slice';
 import LoadingOverlay from '@/components/LoadingOverlay';
@@ -25,6 +31,7 @@ const index = () => {
   const [totalElevation, setTotalElevation] = useState(0);
   const [visible, setVisible] = useState(false);
   const [updateRaceDataLoading, setUpdateRaceDataLoading] = useState(false);
+
   const competition: CompetitionDTO | null = useSelector(
     (state: any) => state.competition.competitionDTO,
   );
@@ -34,97 +41,132 @@ const index = () => {
   const userTeamsState = useSelector(
     (state: RootState) => state.userTeams.status,
   );
-
   const raceStatus = useSelector((state: RootState) => state.race.status);
-
   const dispatch = useDispatch<AppDispatch>();
   const { competitionId } = router.query;
 
-  useEffect(() => {
-    if (competition) {
-      if (competition.races[0].stages.length > 0) {
-        const distance = competition.races[0].stages
-          .map((stage) => Number(stage.distance))
-          .reduce((total, distance) => total + distance, 0)
-          .toFixed(1);
-        setTotalDistance(Number(distance));
-        const elevation = competition.races[0].stages
-          .map((stage) => Number(stage.verticalMeters))
-          .reduce((total, distance) => total + distance, 0)
-          .toFixed(1);
-        setTotalElevation(Number(elevation));
-      } else {
-        const distance = competition.races
-          .map((race) => Number(race.distance))
-          .reduce((total, distance) => total + distance, 0)
-          .toFixed(1);
-        setTotalDistance(Number(distance));
-        const elevation = competition.races
-          .map((race) => Number(race.distance))
-          .reduce((total, distance) => total + distance, 0)
-          .toFixed(1);
-        setTotalElevation(Number(elevation));
-      }
-    }
-  });
+  // Helper function to safely parse competitionId
+  const getCompetitionIdAsNumber = useCallback(
+    (id: string | string[] | undefined): number | null => {
+      if (!id) return null;
+      const idString = Array.isArray(id) ? id[0] : id;
+      return Number(idString);
+    },
+    [],
+  );
 
-  useEffect(() => {
-    if (raceStatus === 'loading') {
-      setUpdateRaceDataLoading(true);
-    } else {
-      setUpdateRaceDataLoading(false);
+  const competitionIdNumber = useMemo(
+    () => getCompetitionIdAsNumber(competitionId),
+    [competitionId, getCompetitionIdAsNumber],
+  );
+
+  // Helper function to calculate totals from stages
+  const calculateStageStats = useCallback((stages: any[]) => {
+    const distance = stages.reduce(
+      (total, stage) => total + Number(stage.distance || 0),
+      0,
+    );
+    const elevation = stages.reduce(
+      (total, stage) => total + Number(stage.verticalMeters || 0),
+      0,
+    );
+
+    return {
+      distance: Number(distance.toFixed(1)),
+      elevation: Number(elevation.toFixed(1)),
+    };
+  }, []);
+
+  // Helper function to calculate totals from races
+  const calculateRaceStats = useCallback((races: any[]) => {
+    const distance = races.reduce(
+      (total, race) => total + Number(race.distance || 0),
+      0,
+    );
+    // Fixed bug: was using race.distance for elevation calculation
+    const elevation = races.reduce(
+      (total, race) => total + Number(race.verticalMeters || 0),
+      0,
+    );
+
+    return {
+      distance: Number(distance.toFixed(1)),
+      elevation: Number(elevation.toFixed(1)),
+    };
+  }, []);
+
+  // Helper function to calculate date range
+  const calculateDateRange = useCallback((races: any[]) => {
+    if (!races.length) return null;
+
+    const startDates = races.map((race) => new Date(race.startDate).getTime());
+    const endDates = races.map((race) => new Date(race.endDate).getTime());
+
+    const earliestStart = Math.min(...startDates);
+    const latestEnd = Math.max(...endDates);
+
+    return [new Date(earliestStart), new Date(latestEnd)];
+  }, []);
+
+  // Memoized calculations based on competition data
+  const competitionStats = useMemo(() => {
+    if (!competition?.races?.length) {
+      return { distance: 0, elevation: 0, dateRange: null };
     }
+
+    const hasStages = competition.races[0]?.stages?.length > 0;
+    let stats;
+
+    if (hasStages) {
+      stats = calculateStageStats(competition.races[0].stages);
+    } else {
+      stats = calculateRaceStats(competition.races);
+    }
+
+    const dateRange = calculateDateRange(competition.races);
+
+    return {
+      distance: stats.distance,
+      elevation: stats.elevation,
+      dateRange,
+    };
+  }, [
+    competition,
+    calculateStageStats,
+    calculateRaceStats,
+    calculateDateRange,
+  ]);
+
+  // Update state when competition stats change
+  useEffect(() => {
+    setTotalDistance(competitionStats.distance);
+    setTotalElevation(competitionStats.elevation);
+    setDates(competitionStats.dateRange);
+  }, [competitionStats]);
+
+  // Handle race status loading state
+  useEffect(() => {
+    setUpdateRaceDataLoading(raceStatus === 'loading');
   }, [raceStatus]);
 
+  // Fetch cyclists with DNS when needed
   useEffect(() => {
-    if (cyclistWithDNS.length === 0 || userTeamsState === 'idle') {
-      if (!competitionId) return;
-      dispatch(
-        fetchCyclistsWithDNS(
-          Number(
-            Array.isArray(competitionId) ? competitionId[0] : competitionId,
-          ),
-        ),
-      );
-    }
-  }, [dispatch, competitionId]);
-
-  useEffect(() => {
-    if (
-      competition &&
-      competitionId &&
-      competition.id !==
-        Number(Array.isArray(competitionId) ? competitionId[0] : competitionId)
-    ) {
-      dispatch(
-        fetchCompetitionById(
-          Number(
-            Array.isArray(competitionId) ? competitionId[0] : competitionId,
-          ),
-        ),
-      );
-    }
-  }, [dispatch, competition, competitionId]);
-
-  useEffect(() => {
-    if (competition) {
-      const startDates = competition.races.map(
-        (race) => new Date(race.startDate),
-      );
-      const endDates = competition.races.map((race) => new Date(race.endDate));
-      const startDate =
-        startDates.length > 0
-          ? new Date(Math.min(...startDates.map((date) => date.getTime())))
-          : null;
-      const endDate =
-        endDates.length > 0
-          ? new Date(Math.max(...endDates.map((date) => date.getTime())))
-          : null;
-      if (startDate && endDate) {
-        setDates([startDate, endDate]);
+    if (!cyclistWithDNS || userTeamsState === 'idle') {
+      if (competitionIdNumber) {
+        dispatch(fetchCyclistsWithDNS(competitionIdNumber));
       }
     }
-  }, [dispatch, competition]);
+  }, [dispatch, competitionIdNumber, cyclistWithDNS, userTeamsState]);
+
+  // Fetch competition data when ID changes or doesn't match current competition
+  useEffect(() => {
+    if (
+      competitionIdNumber &&
+      (!competition || competition.id !== competitionIdNumber)
+    ) {
+      dispatch(fetchCompetitionById(competitionIdNumber));
+    }
+  }, [dispatch, competition, competitionIdNumber]);
 
   if (!competition) {
     return <LoadingOverlay />;
@@ -247,6 +289,7 @@ const index = () => {
                     : competition.races
                 }
                 tableStyle={{ width: '100%' }}
+                emptyMessage="Geen ritten gevonden"
               >
                 <Column header="Naam" field="name" />
                 <Column header="Afstand" field="distance" />
@@ -256,7 +299,10 @@ const index = () => {
         </div>
       </div>
       <div style={container} className="flex flex-row gap-4 h-full w-full">
-        <DataTable value={cyclistWithDNS}>
+        <DataTable
+          value={cyclistWithDNS}
+          emptyMessage="Geen actieve renners die zijn gestopt"
+        >
           <Column field="name" header="Naam" />
           <Column field="team.name" header="Team" />
           <Column field="dnsReason" header="Reden" />
