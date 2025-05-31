@@ -31,7 +31,7 @@ export const getCompetitions = async () => {
   return res.json();
 };
 
-export const getCompetition = async (competitionId: string) => {
+export const getCompetition = async (competitionId: number) => {
   const res = await fetch(
     process.env.NEXT_PUBLIC_API_URL + '/competitions/' + competitionId,
     {

@@ -1,11 +1,18 @@
 export interface StagePoints {
   points: number;
   fullName: string;
-  userId: string;
+  userid: number;
 }
 
 export interface StagePointsPerCyclist {
   points: number;
   cyclistName: string;
-  userId: string;
+  cyclistId: number;
+  userId: number;
+  isCyclistActive: boolean;
+}
+
+export interface MainReserveStagePointsCyclist {
+  mainCyclists: StagePointsPerCyclist[];
+  reserveCyclists: StagePointsPerCyclist[];
 }

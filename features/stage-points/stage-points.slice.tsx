@@ -4,23 +4,29 @@ import {
   getStagePointsForAllStages,
   getStagePointsForStage,
 } from '@/services/stage-points.service';
-import { StagePoints, StagePointsPerCyclist } from '@/types/stage-points';
+import {
+  MainReserveStagePointsCyclist,
+  StagePoints,
+  StagePointsPerCyclist,
+} from '@/types/stage-points';
 
 interface StagePointsState {
   stagePoints: StagePoints[];
   stagePointsPerCyclist: StagePointsPerCyclist[];
+  mainReserveStagePointsCyclist: MainReserveStagePointsCyclist | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
 const initialStagePointsState: StagePointsState = {
   stagePoints: [],
   stagePointsPerCyclist: [],
+  mainReserveStagePointsCyclist: null,
   status: 'idle',
 };
 
 export const fetchStagePointsForStage = createAsyncThunk(
   'stagePointss/fetchStagePoints',
-  async (params: { competitionId: string; stageId: string }) => {
+  async (params: { competitionId: number; stageId: number }) => {
     const { competitionId, stageId } = params;
     const stagePoints = await getStagePointsForStage(competitionId, stageId);
     return stagePoints;
@@ -29,7 +35,7 @@ export const fetchStagePointsForStage = createAsyncThunk(
 
 export const fetchStagePointsForAllStages = createAsyncThunk(
   'stagePoints/fetchStagePointsForAllStages',
-  async (params: { competitionId: string; userId: string }) => {
+  async (params: { competitionId: number; userId: number }) => {
     const { competitionId, userId } = params;
     const stagePoints = await getStagePointsForAllStages(competitionId, userId);
     return stagePoints;
@@ -37,11 +43,29 @@ export const fetchStagePointsForAllStages = createAsyncThunk(
 );
 
 const Slice = createSlice({
-  name: 'user',
+  name: 'stagePoints',
   initialState: initialStagePointsState,
   reducers: {
     resetStagePointsStatus(state) {
       state.status = 'idle';
+    },
+    updateMainReserveStagePointsCyclist(
+      state,
+      action: PayloadAction<MainReserveStagePointsCyclist>,
+    ) {
+      if (!action.payload) {
+        return;
+      }
+      state.mainReserveStagePointsCyclist = action.payload;
+    },
+    setStagePointsPerCyclist(
+      state,
+      action: PayloadAction<StagePointsPerCyclist[]>,
+    ) {
+      if (!action.payload) {
+        return;
+      }
+      state.stagePointsPerCyclist = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -64,9 +88,9 @@ const Slice = createSlice({
       })
       .addCase(
         fetchStagePointsForAllStages.fulfilled,
-        (state, action: PayloadAction<StagePointsPerCyclist[]>) => {
+        (state, action: PayloadAction<MainReserveStagePointsCyclist>) => {
           state.status = 'succeeded';
-          state.stagePointsPerCyclist = action.payload;
+          state.mainReserveStagePointsCyclist = action.payload;
         },
       )
       .addCase(fetchStagePointsForAllStages.rejected, (state) => {
@@ -75,6 +99,10 @@ const Slice = createSlice({
   },
 });
 
-export const { resetStagePointsStatus } = Slice.actions;
+export const {
+  resetStagePointsStatus,
+  updateMainReserveStagePointsCyclist,
+  setStagePointsPerCyclist,
+} = Slice.actions;
 
 export default Slice.reducer;

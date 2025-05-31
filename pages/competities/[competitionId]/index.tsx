@@ -2,18 +2,21 @@ import CompetitieLayout from '@/components/competitieLayout';
 import { container } from '@/const/containerStyle';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import { AppDispatch, RootState } from '@/store/store';
-import { Competition } from '@/types/competition';
+import { Competition, CompetitionDTO } from '@/types/competition';
 import { useRouter } from 'next/router';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
-import { ProgressSpinner } from 'primereact/progressspinner';
 import { Nullable } from 'primereact/ts-helpers';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Race, updateRaceData } from '@/features/race/race.slice';
+import { updateRaceData } from '@/features/race/race.slice';
+import LoadingOverlay from '@/components/LoadingOverlay';
+import { Race, RaceDTO } from '@/types/race';
+import { RefreshCw } from 'lucide-react';
+import { fetchCyclistsWithDNS } from '@/features/user-teams/user-teams.slice';
 
 const index = () => {
   const router = useRouter();
@@ -22,10 +25,16 @@ const index = () => {
   const [totalElevation, setTotalElevation] = useState(0);
   const [visible, setVisible] = useState(false);
   const [updateRaceDataLoading, setUpdateRaceDataLoading] = useState(false);
-  const documentStyle = getComputedStyle(document.documentElement);
-  const competition: Competition = useSelector(
-    (state: any) => state.competition.data,
+  const competition: CompetitionDTO | null = useSelector(
+    (state: any) => state.competition.competitionDTO,
   );
+  const cyclistWithDNS = useSelector(
+    (state: RootState) => state.userTeams.cyclistsWithDNS,
+  );
+  const userTeamsState = useSelector(
+    (state: RootState) => state.userTeams.status,
+  );
+
   const raceStatus = useSelector((state: RootState) => state.race.status);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -68,12 +77,32 @@ const index = () => {
   }, [raceStatus]);
 
   useEffect(() => {
+    if (cyclistWithDNS.length === 0 || userTeamsState === 'idle') {
+      if (!competitionId) return;
+      dispatch(
+        fetchCyclistsWithDNS(
+          Number(
+            Array.isArray(competitionId) ? competitionId[0] : competitionId,
+          ),
+        ),
+      );
+    }
+  }, [dispatch, competitionId]);
+
+  useEffect(() => {
     if (
       competition &&
       competitionId &&
-      competition.id.toString().trim() !== competitionId.toString().trim()
+      competition.id !==
+        Number(Array.isArray(competitionId) ? competitionId[0] : competitionId)
     ) {
-      dispatch(fetchCompetitionById(competitionId.toString()));
+      dispatch(
+        fetchCompetitionById(
+          Number(
+            Array.isArray(competitionId) ? competitionId[0] : competitionId,
+          ),
+        ),
+      );
     }
   }, [dispatch, competition, competitionId]);
 
@@ -98,16 +127,7 @@ const index = () => {
   }, [dispatch, competition]);
 
   if (!competition) {
-    return (
-      <div className="fixed inset-0 flex justify-center items-center bg-surface-100 z-9999">
-        <ProgressSpinner
-          style={{ width: '100px', height: '100px' }}
-          strokeWidth="8"
-          className="stroke-primary-500"
-          animationDuration=".5s"
-        />
-      </div>
-    );
+    return <LoadingOverlay />;
   }
 
   return (
@@ -149,20 +169,23 @@ const index = () => {
             ? competition.races[0].name
             : competition.name}
           <Button
-            // rounded
-            outlined
-            icon="pi pi-refresh"
-            rounded
-            className="max-w-48"
+            raised
+            icon={() => (
+              <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
+            )}
+            tooltip="Haal de laatste data op"
+            tooltipOptions={{ showDelay: 500 }}
+            aria-label="Haal de laatste data op"
+            className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
             loading={updateRaceDataLoading}
             onClick={() =>
               competition.races[0].stages.length > 0
                 ? dispatch(updateRaceData(competition.races[0].name))
-                : competition.races.forEach((race: Race) =>
+                : competition.races.forEach((race: RaceDTO) =>
                     dispatch(updateRaceData(race.name)),
                   )
             }
-          ></Button>
+          />
         </h2>
       </div>
       <div className="flex gap-10 w-full">
@@ -176,7 +199,7 @@ const index = () => {
               <h3 className="font-semibold">Totale afstand</h3>
               <div
                 style={container}
-                className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl"
+                className="flex flex-col justify-center gap-2 p-4  bg-surface rounded-xl font-semibold text-xl"
               >
                 {totalDistance} km
                 {competition.races[0].stages.length > 0 ? (
@@ -195,7 +218,7 @@ const index = () => {
               <h3 className="font-semibold">Totaal hoogtemeters</h3>
               <div
                 style={container}
-                className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl"
+                className="flex flex-col justify-center gap-2 p-4  bg-surface rounded-xl font-semibold text-xl"
               >
                 {totalElevation} m
                 <span className="text-sm font-normal">
@@ -231,6 +254,13 @@ const index = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div style={container} className="flex flex-row gap-4 h-full w-full">
+        <DataTable value={cyclistWithDNS}>
+          <Column field="name" header="Naam" />
+          <Column field="team.name" header="Team" />
+          <Column field="dnsReason" header="Reden" />
+        </DataTable>
       </div>
     </div>
   );

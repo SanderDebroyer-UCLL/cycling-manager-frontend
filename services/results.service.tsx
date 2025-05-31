@@ -1,8 +1,15 @@
-import { ResultType } from "@/const/resultType";
+import { ResultType } from '@/const/resultType';
 
-export const getResultsByStageIdByType = async (stageId: string, resultType: ResultType) => {
+export const getResultsByStageIdByType = async (
+  stageId: number,
+  resultType: ResultType,
+) => {
   const res = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + '/stageResults/' + stageId + '?type=' + resultType,
+    process.env.NEXT_PUBLIC_API_URL +
+      '/stageResults/' +
+      stageId +
+      '?type=' +
+      resultType,
     {
       method: 'GET',
       headers: {
@@ -21,7 +28,7 @@ export const getResultsByStageIdByType = async (stageId: string, resultType: Res
   return data;
 };
 
-export const getRaceResultsByRaceId = async (raceId: string) => {
+export const getRaceResultsByRaceId = async (raceId: number) => {
   const res = await fetch(
     process.env.NEXT_PUBLIC_API_URL + '/raceResults/race/' + raceId,
     {

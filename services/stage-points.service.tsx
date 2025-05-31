@@ -1,6 +1,6 @@
 export const getStagePointsForStage = async (
-  competitionId: string,
-  stageId: string,
+  competitionId: number,
+  stageId: number,
 ) => {
   const res = await fetch(
     process.env.NEXT_PUBLIC_API_URL +
@@ -27,8 +27,8 @@ export const getStagePointsForStage = async (
 };
 
 export const getStagePointsForAllStages = async (
-  competitionId: string,
-  userId: string,
+  competitionId: number,
+  userId: number,
 ) => {
   const res = await fetch(
     process.env.NEXT_PUBLIC_API_URL +

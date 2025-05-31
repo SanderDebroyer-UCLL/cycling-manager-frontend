@@ -1,4 +1,5 @@
 import CompetitieLayout from '@/components/competitieLayout';
+import LoadingOverlay from '@/components/LoadingOverlay';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import { AppDispatch } from '@/store/store';
 import { useRouter } from 'next/router';
@@ -11,7 +12,9 @@ export default function RittenIndex() {
   const { competitionId } = router.query;
   const dispatch = useDispatch<AppDispatch>();
 
-  const competition = useSelector((state: any) => state.competition.data);
+  const competition = useSelector(
+    (state: any) => state.competition.competitionDTO,
+  );
 
   useEffect(() => {
     if (
@@ -19,7 +22,13 @@ export default function RittenIndex() {
       competitionId &&
       competition.id.toString().trim() !== competitionId.toString().trim()
     ) {
-      dispatch(fetchCompetitionById(competitionId.toString()));
+      dispatch(
+        fetchCompetitionById(
+          Number(
+            Array.isArray(competitionId) ? competitionId[0] : competitionId,
+          ),
+        ),
+      );
     }
   }, [dispatch, competition, competitionId]);
 
@@ -40,16 +49,7 @@ export default function RittenIndex() {
     }
   }, [competition, competitionId, router]);
 
-  return (
-    <div className="fixed inset-0 flex justify-center items-center bg-surface-100 z-9999">
-      <ProgressSpinner
-        style={{ width: '100px', height: '100px' }}
-        strokeWidth="8"
-        className="stroke-primary-500"
-        animationDuration=".5s"
-      />
-    </div>
-  );
+  return <LoadingOverlay />;
 }
 
 RittenIndex.getLayout = (page: ReactNode) => (

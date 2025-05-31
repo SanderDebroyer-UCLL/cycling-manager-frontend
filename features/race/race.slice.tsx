@@ -1,16 +1,11 @@
 // src/features/race/raceSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { getAllRaces, reloadRaceData } from '@/services/race.service';
+import { Race, RaceDTO } from '@/types/race';
 
 // Define Race type based on your API response
-export interface Race {
-  id: string;
-  name: string;
-  // add more fields as needed
-}
-
 interface RacesState {
-  data: Race[];
+  data: RaceDTO[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
@@ -41,10 +36,13 @@ const raceSlice = createSlice({
       .addCase(fetchRace.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(fetchRace.fulfilled, (state, action: PayloadAction<Race[]>) => {
-        state.status = 'succeeded';
-        state.data = action.payload;
-      })
+      .addCase(
+        fetchRace.fulfilled,
+        (state, action: PayloadAction<RaceDTO[]>) => {
+          state.status = 'succeeded';
+          state.data = action.payload;
+        },
+      )
       .addCase(fetchRace.rejected, (state) => {
         state.status = 'failed';
       })
@@ -53,7 +51,7 @@ const raceSlice = createSlice({
       })
       .addCase(
         updateRaceData.fulfilled,
-        (state, action: PayloadAction<Race[]>) => {
+        (state, action: PayloadAction<RaceDTO[]>) => {
           state.status = 'succeeded';
           state.data = action.payload;
         },

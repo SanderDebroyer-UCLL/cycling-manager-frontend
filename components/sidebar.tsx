@@ -1,18 +1,17 @@
-import { grandTours } from '@/const/data';
-import React, { use, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Bike, Medal, SquareGanttChart, Users } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import type { AppDispatch } from '@/store/store';
-import { Competition } from '@/types/competition';
+import { CompetitionDTO } from '@/types/competition';
 import { usePathname } from 'next/navigation';
-import path from 'path';
+import LoadingOverlay from './LoadingOverlay';
 
 const Sidebar = () => {
-  const competition: Competition = useSelector(
-    (state: any) => state.competition.data,
+  const competition: CompetitionDTO | null = useSelector(
+    (state: any) => state.competition.competitionDTO,
   );
   const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
@@ -25,7 +24,13 @@ const Sidebar = () => {
 
   useEffect(() => {
     if (!competition && competitionId) {
-      dispatch(fetchCompetitionById(competitionId.toString()));
+      dispatch(
+        fetchCompetitionById(
+          Number(
+            Array.isArray(competitionId) ? competitionId[0] : competitionId,
+          ),
+        ),
+      );
     }
   }, [dispatch, competition, competitionId]);
 
@@ -34,11 +39,15 @@ const Sidebar = () => {
     !competition ||
     competition.id?.toString() !== competitionId?.toString()
   ) {
-    return null; // Or a loading spinner
+    return (
+      <>
+        <LoadingOverlay />
+      </>
+    );
   }
 
   return (
-    <div className="w-[350px] border-r-1 flex flex-col gap-4 text-lg font-regular border-surface-500 bg-surface-100 py-8 text-dark-700">
+    <div className="w-[320px] flex flex-col gap-4 text-lg font-regular bg-surface py-8 text-dark-900 ">
       <div className="px-6 py-1 flex gap-2 items-center text-xl font-bold font-manrope pb-6">
         {competition.name}
       </div>
@@ -56,14 +65,14 @@ const Sidebar = () => {
       <div className="flex flex-col pb-2">
         <Link
           href={`/competities/${competitionId}`}
-          className={` ${isNotActive(['ritten', 'mijn-team', 'klassement']) ? '!border-primary-500 !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface-100 hover:border-primary-500 px-6 hover:font-semibold py-2`}
+          className={` ${isNotActive(['ritten', 'mijn-team', 'klassement']) ? '!border-primary !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface hover:border-primary px-6 hover:font-semibold py-2`}
         >
           <SquareGanttChart size={18} className="stroke-dark-700" />
           Overzicht
         </Link>
         <Link
           href={`/competities/${competitionId}/ritten`}
-          className={` ${isActive('ritten') ? '!border-primary-500 !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface-100 hover:border-primary-500 px-6 hover:font-semibold py-2`}
+          className={` ${isActive('ritten') ? '!border-primary !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface hover:border-primary px-6 hover:font-semibold py-2`}
         >
           <Bike size={18} className="stroke-dark-700" />
           Ritten
@@ -76,14 +85,14 @@ const Sidebar = () => {
       <div className="flex flex-col pb-2">
         <Link
           href={`/competities/${competitionId}/mijn-team`}
-          className={` ${isActive('mijn-team') ? '!border-primary-500 !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface-100 hover:border-primary-500 px-6 hover:font-semibold py-2`}
+          className={` ${isActive('mijn-team') ? '!border-primary !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface hover:border-primary px-6 hover:font-semibold py-2`}
         >
           <Users size={18} className="stroke-dark-700" />
           Mijn team
         </Link>
         <Link
           href={`/competities/${competitionId}/klassement`}
-          className={` ${isActive('klassement') ? '!border-primary-500 !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface-100 hover:border-primary-500 px-6 hover:font-semibold py-2`}
+          className={` ${isActive('klassement') ? '!border-primary !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface hover:border-primary px-6 hover:font-semibold py-2`}
         >
           <Medal size={18} className="stroke-dark-700" />
           Klassement
