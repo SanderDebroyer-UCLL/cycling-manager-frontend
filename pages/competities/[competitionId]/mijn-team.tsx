@@ -114,7 +114,6 @@ const index = () => {
     if (!user?.id || !competition?.id) {
       return;
     }
-    console.log('here');
     // Dispatch appropriate action based on competition structure
     const fetchAction =
       competition.races.length === 1
