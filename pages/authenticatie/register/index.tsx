@@ -126,7 +126,7 @@ export default function Register() {
               />
             </IconField>
             {firstNameError && (
-              <p className="text-red-500 text-sm pt-2">{firstNameError}</p>
+              <p className="text-error text-sm pt-2">{firstNameError}</p>
             )}
           </div>
           <div>
@@ -139,7 +139,7 @@ export default function Register() {
               />
             </IconField>
             {lastNameError && (
-              <p className="text-red-500 text-sm pt-2">{lastNameError}</p>
+              <p className="text-error text-sm pt-2">{lastNameError}</p>
             )}
           </div>
           <div>
@@ -152,7 +152,7 @@ export default function Register() {
               />
             </IconField>
             {emailError && (
-              <p className="text-red-500 text-sm pt-2">{emailError}</p>
+              <p className="text-error text-sm pt-2">{emailError}</p>
             )}
           </div>
 
@@ -167,7 +167,7 @@ export default function Register() {
               />
             </IconField>
             {passwordError && (
-              <p className="text-red-500 text-sm pt-2">{passwordError}</p>
+              <p className="text-error text-sm pt-2">{passwordError}</p>
             )}
           </div>
           <div>
@@ -181,7 +181,7 @@ export default function Register() {
               />
             </IconField>
             {repeatPasswordError && (
-              <p className="text-red-500 text-sm pt-2">{repeatPasswordError}</p>
+              <p className="text-error text-sm pt-2">{repeatPasswordError}</p>
             )}
           </div>
           <Button

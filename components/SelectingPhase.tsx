@@ -1,5 +1,5 @@
+import { containerLargerPadding } from '@/const/containerStyle';
 import {
-  Competition,
   CompetitionDTO,
   CompetitionPick,
   CompetitionStatus,
@@ -156,15 +156,15 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
             .map((userTeam: UserTeamDTO) => (
               <div
                 key={userTeam.id}
-                style={container}
-                className={`flex-shrink-0 w-[300px] whitespace-nowrap overflow-hidden text-ellipsis ${
+                style={containerLargerPadding}
+                className={`flex-shrink-0 w-[300px] whitespace-nowrap  overflow-hidden text-ellipsis text-on-secondary-fixed transition-all ${
                   competition.competitionPicks.find(
                     (competitionPick: CompetitionPick) =>
                       competitionPick.userId == userTeam.user.id &&
                       competitionPick.pickOrder === competition.currentPick,
                   )
-                    ? '!border-2 !border-primary-500'
-                    : ''
+                    ? 'border-2 border-outline !bg-primary-container'
+                    : '!bg-secondary-container'
                 }`}
               >
                 <h2 className="text-xl font-semibold overflow-hidden text-ellipsis">
@@ -197,7 +197,7 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
                     .map((cyclist: CyclistDTO, index) => (
                       <div
                         key={`${cyclist.id}-${index}`}
-                        className="flex items-center border-b-1 last:border-b-0 border-surface-400 mx-2 py-2 text-surface-900"
+                        className={`flex items-center border-b-1 last:border-b-0 mx-2 py-2 border-on-secondary-container text-on-secondary-container`}
                       >
                         <span className="mr-2">{index + 1}.</span>
                         <span className="overflow-hidden text-ellipsis whitespace-nowrap block w-full">

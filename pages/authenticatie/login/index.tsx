@@ -104,7 +104,7 @@ export default function Login() {
               />
             </IconField>
             {emailError && (
-              <div className="text-red-500 text-sm pt-2">{emailError}</div>
+              <div className="text-error text-sm pt-2">{emailError}</div>
             )}
           </div>
 
@@ -122,7 +122,7 @@ export default function Login() {
             </IconField>
 
             {passwordError && (
-              <div className="text-red-500 text-sm pt-2">{passwordError}</div>
+              <div className="text-error text-sm pt-2">{passwordError}</div>
             )}
           </div>
 

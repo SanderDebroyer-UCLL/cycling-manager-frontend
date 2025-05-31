@@ -22,6 +22,16 @@ export const container: CSSProperties = {
   // border: '1px solid #b3c4d6',
 };
 
+export const containerLargerPadding: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  backgroundColor: '#ECEEF4',
+  borderRadius: '0.75rem',
+  padding: '1.5rem',
+  gap: '0.5rem',
+  // border: '1px solid #b3c4d6',
+};
+
 export const oldContainer: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
