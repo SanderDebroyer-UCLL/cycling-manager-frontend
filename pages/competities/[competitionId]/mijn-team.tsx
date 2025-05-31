@@ -303,13 +303,13 @@ const index = () => {
         count + team.cyclistAssignments.length,
       0,
     );
+    if (mainCyclistsCount === 0) return;
     if (
-      competition &&
       mainCyclistsCount ===
-        competition.maxMainCyclists *
-          userTeams.filter(
-            (userTeam) => userTeam.competitionId === competition.id,
-          ).length
+      competition.maxMainCyclists *
+        userTeams.filter(
+          (userTeam) => userTeam.competitionId === competition.id,
+        ).length
     ) {
       setMainTeamPopupVisible(true);
     } else {
@@ -575,11 +575,12 @@ const index = () => {
     !competition ||
     userTeams === null ||
     (competition.competitionStatus === CompetitionStatus.STARTED &&
+      cyclistsState.length === 0) ||
+    (competition.competitionStatus === CompetitionStatus.STARTED &&
       !mainReservePointsCyclist)
   ) {
     return (
       <>
-        waaaaaaa
         <LoadingOverlay />
       </>
     );
