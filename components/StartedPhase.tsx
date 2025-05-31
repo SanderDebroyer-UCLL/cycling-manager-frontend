@@ -1,20 +1,15 @@
 import { container } from '@/const/containerStyle';
-import { Competition, CompetitionDTO } from '@/types/competition';
-import {
-  MainReserveStagePointsCyclist,
-  StagePointsPerCyclist,
-} from '@/types/stage-points';
+import { CompetitionDTO } from '@/types/competition';
+import { MainReservePointsCyclist, PointsPerCyclist } from '@/types/points';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import React from 'react';
 
 interface StartedPhaseProps {
-  mainReserveStagePointsCyclist: MainReserveStagePointsCyclist | null;
-  cyclistDeactivateTemplate: (
-    rowData: StagePointsPerCyclist,
-  ) => React.ReactNode;
-  activateCyclistTemplate: (rowData: StagePointsPerCyclist) => React.ReactNode;
+  mainReservePointsCyclist: MainReservePointsCyclist | null;
+  cyclistDeactivateTemplate: (rowData: PointsPerCyclist) => React.ReactNode;
+  activateCyclistTemplate: (rowData: PointsPerCyclist) => React.ReactNode;
   teamChanged: boolean;
   resetChanges: () => void;
   handleSubmitTeamChanges: () => void;
@@ -22,7 +17,7 @@ interface StartedPhaseProps {
 }
 
 const StartedPhase: React.FC<StartedPhaseProps> = ({
-  mainReserveStagePointsCyclist,
+  mainReservePointsCyclist,
   cyclistDeactivateTemplate,
   activateCyclistTemplate,
   teamChanged,
@@ -41,7 +36,7 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
           <div style={container} className="max-h-[70vh] overflow-y-auto">
             <DataTable
               key={Date.now()}
-              value={mainReserveStagePointsCyclist?.mainCyclists}
+              value={mainReservePointsCyclist?.mainCyclists}
             >
               <Column header="Naam" field="cyclistName" />
               <Column header="Punten Verdiend" field="points" />
@@ -54,7 +49,7 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
           <div style={container} className="max-h-[70vh] overflow-y-auto">
             <DataTable
               key={Date.now()} // or another unique key that changes when needed
-              value={mainReserveStagePointsCyclist?.reserveCyclists}
+              value={mainReservePointsCyclist?.reserveCyclists}
             >
               <Column header="Naam" field="cyclistName" />
               <Column header="Punten Verdiend" field="points" />
@@ -67,7 +62,7 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
         {teamChanged && (
           <>
             <Button label="Annuleer" raised onClick={() => resetChanges()} />
-            {mainReserveStagePointsCyclist?.mainCyclists.length ===
+            {mainReservePointsCyclist?.mainCyclists.length ===
               competition.maxMainCyclists && (
               <Button
                 label="Update team"

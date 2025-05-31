@@ -28,7 +28,7 @@ const SelectableCard: React.FC<SelectableCardProps> = ({
     >
       <p className="font-semibold text-lg flex items-center pb-1">{title}</p>
       <p className="flex items-center gap-2">
-        <Flag className="w-4 h-4 stroke-3 stroke-on-primary-fixed-variant" />
+        <Flag className="shrink-0 w-4 h-4 stroke-3 stroke-on-primary-fixed-variant" />
         <span className="truncate overflow-hidden whitespace-nowrap">
           {subtitle}
         </span>

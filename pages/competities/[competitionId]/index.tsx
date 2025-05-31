@@ -14,7 +14,7 @@ import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateRaceData } from '@/features/race/race.slice';
 import LoadingOverlay from '@/components/LoadingOverlay';
-import { Race, RaceDTO } from '@/types/race';
+import { RaceDTO } from '@/types/race';
 import { RefreshCw } from 'lucide-react';
 import { fetchCyclistsWithDNS } from '@/features/user-teams/user-teams.slice';
 

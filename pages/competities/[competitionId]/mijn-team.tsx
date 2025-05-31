@@ -34,17 +34,15 @@ import SelectingPhase from '@/components/SelectingPhase';
 import SortingPhase from '@/components/SortingPhase';
 import { container } from '@/const/containerStyle';
 import StartedPhase from '@/components/StartedPhase';
-import {
-  fetchStagePointsForAllStages,
-  updateMainReserveStagePointsCyclist,
-} from '@/features/stage-points/stage-points.slice';
-import { Cylinder, UserPlus, UserX } from 'lucide-react';
-import {
-  MainReserveStagePointsCyclist,
-  StagePointsPerCyclist,
-} from '@/types/stage-points';
+import { UserPlus, UserX } from 'lucide-react';
+import { MainReservePointsCyclist, PointsPerCyclist } from '@/types/points';
 import { Button } from 'primereact/button';
 import LoadingOverlay from '@/components/LoadingOverlay';
+import {
+  fetchRacePointsForAllRaces,
+  fetchStagePointsForAllStages,
+  updateMainReservePointsCyclist,
+} from '@/features/points/points.slice';
 
 const index = () => {
   const router = useRouter();
@@ -60,8 +58,8 @@ const index = () => {
   const [mainTeamPopupVisible, setMainTeamPopupVisible] =
     useState<boolean>(false);
   const [confirmTarget, setConfirmTarget] = useState<Element | null>(null);
-  const [initialStagePoints, setInitialStagePoints] =
-    useState<MainReserveStagePointsCyclist | null>(null);
+  const [initialPoints, setInitialPoints] =
+    useState<MainReservePointsCyclist | null>(null);
   const [teamChanged, setTeamChanged] = useState<boolean>(false);
   const usersStatus = useSelector((state: RootState) => state.users.status);
   const userTeamsStatus = useSelector(
@@ -70,11 +68,9 @@ const index = () => {
   const cyclistsStatus = useSelector(
     (state: RootState) => state.cyclists.status,
   );
-  const stagePointsStatus = useSelector(
-    (state: RootState) => state.stagePoints.status,
-  );
-  const mainReserveStagePointsCyclist = useSelector(
-    (state: RootState) => state.stagePoints.mainReserveStagePointsCyclist,
+  const pointsStatus = useSelector((state: RootState) => state.points.status);
+  const mainReservePointsCyclist = useSelector(
+    (state: RootState) => state.points.mainReservePointsCyclist,
   );
   const cyclists: CyclistDTO[] = useSelector(
     (state: RootState) => state.cyclists.data,
@@ -94,53 +90,50 @@ const index = () => {
   const email = sessionStorage.getItem('email');
   const dispatch = useDispatch<AppDispatch>();
 
+  // Set competition ref when competition changes
   useEffect(() => {
-    if (!competition) {
-      return;
+    if (competition) {
+      competitionRef.current = competition;
     }
-    competitionRef.current = competition;
   }, [competition]);
 
+  // Set initial points when data is first available
   useEffect(() => {
-    // Only set once, when data is first fetched and initial copy is not set yet
-    if (
-      mainReserveStagePointsCyclist &&
-      mainReserveStagePointsCyclist !== null &&
-      !initialStagePoints
-    ) {
-      setInitialStagePoints(mainReserveStagePointsCyclist);
+    if (mainReservePointsCyclist && !initialPoints) {
+      setInitialPoints(mainReservePointsCyclist);
     }
-  }, [mainReserveStagePointsCyclist, initialStagePoints]);
+  }, [mainReservePointsCyclist, initialPoints]);
 
+  // Fetch points data when needed
   useEffect(() => {
-    if (
-      mainReserveStagePointsCyclist === null ||
-      stagePointsStatus === 'idle'
-    ) {
-      if (!user || !user.id || !competition || !competition.id) {
-        return;
-      }
-      dispatch(
-        fetchStagePointsForAllStages({
-          competitionId: competition.id,
-          userId: user.id,
-        }),
-      );
+    // Early return if data is already available or currently loading
+    if (mainReservePointsCyclist !== null || pointsStatus !== 'idle') {
+      return;
     }
-  }, [
-    dispatch,
-    mainReserveStagePointsCyclist,
-    stagePointsStatus,
-    user,
-    competition,
-  ]);
+    // Early return if required data is missing
+    if (!user?.id || !competition?.id) {
+      return;
+    }
+    // Dispatch appropriate action based on competition structure
+    const fetchAction =
+      competition.races.length === 1
+        ? fetchStagePointsForAllStages
+        : fetchRacePointsForAllRaces;
+    dispatch(
+      fetchAction({
+        competitionId: competition.id,
+        userId: user.id,
+      }),
+    );
+  }, [dispatch, mainReservePointsCyclist, pointsStatus, user, competition]);
 
+  // Filter cyclists and set cyclist limits when data is available
   useEffect(() => {
     if (cyclistsStatus === 'succeeded' && cyclists && userTeams.length > 0) {
       const filteredCyclists = cyclists.filter((cyclist) => {
         return !userTeams.some((userTeam: UserTeamDTO) =>
           userTeam.cyclistAssignments
-            .map((cyclist) => cyclist.cyclist)
+            .map((assignment) => assignment.cyclist)
             .some(
               (teamCyclist) => teamCyclist.name.trim() === cyclist.name.trim(),
             ),
@@ -150,56 +143,54 @@ const index = () => {
     }
   }, [cyclists, userTeams, cyclistsStatus]);
 
+  // Set cyclist count limits when competition data is available
   useEffect(() => {
-    if (
-      competition &&
-      competition.maxMainCyclists &&
-      competition.maxReserveCyclists
-    ) {
+    if (competition?.maxMainCyclists && competition?.maxReserveCyclists) {
       setCyclistCount(competition.maxMainCyclists);
       setReserveCyclistCount(competition.maxReserveCyclists);
     }
-  }, [competition]);
+  }, [competition?.maxMainCyclists, competition?.maxReserveCyclists]);
 
+  // Sort users based on pick order when data is available
   useEffect(() => {
-    if (usersStatus === 'succeeded' && competition) {
+    if (usersStatus === 'succeeded' && competition?.competitionPicks) {
       const sortedUsers = competition.competitionPicks
-        .slice() // clone the array to avoid mutating the original (which is read-only)
+        .slice() // clone the array to avoid mutating the original
         .sort((a, b) => a.pickOrder - b.pickOrder)
-        .map((pick: CompetitionPick) => {
-          return users.find((user) => user.id === pick.userId) || null;
-        })
+        .map((pick: CompetitionPick) =>
+          users.find((user) => user.id === pick.userId),
+        )
         .filter((user): user is UserDTO => user !== null);
 
       setUsersState(sortedUsers);
       resetUsersStatus();
     }
-  }, [competition && competition.competitionPicks, usersStatus, users]);
+  }, [competition?.competitionPicks, usersStatus, users]);
 
+  // Fetch all required data when missing - Combined fetch effects
   useEffect(() => {
     if (!users || usersStatus === 'idle') {
       dispatch(fetchUsers());
     }
-  }, [users]);
-
-  useEffect(() => {
     if (!cyclists || cyclistsStatus === 'idle') {
       dispatch(fetchCyclists());
     }
-  }, [userTeams]);
-
-  useEffect(() => {
     if (!userTeams || userTeamsStatus === 'idle') {
       dispatch(fetchUserTeam());
     }
-  }, [userTeams]);
+  }, [
+    users,
+    usersStatus,
+    cyclists,
+    cyclistsStatus,
+    userTeams,
+    userTeamsStatus,
+    dispatch,
+  ]);
 
+  // Set loading state based on cyclists status - Simplified
   useEffect(() => {
-    if (cyclistsStatus === 'loading') {
-      setLoading(true);
-    } else {
-      setLoading(false);
-    }
+    setLoading(cyclistsStatus === 'loading');
   }, [cyclistsStatus]);
 
   useEffect(() => {
@@ -294,11 +285,14 @@ const index = () => {
   }, []);
 
   useEffect(() => {
+    if (!initialPoints || !mainReservePointsCyclist) {
+      return;
+    }
     const isEqual =
-      JSON.stringify(initialStagePoints) ===
-      JSON.stringify(mainReserveStagePointsCyclist);
+      JSON.stringify(initialPoints) ===
+      JSON.stringify(mainReservePointsCyclist);
     setTeamChanged(!isEqual);
-  }, [initialStagePoints, mainReserveStagePointsCyclist]);
+  }, [initialPoints, mainReservePointsCyclist]);
 
   useEffect(() => {
     const mainCyclistsCount = userTeams.reduce(
@@ -414,74 +408,64 @@ const index = () => {
     });
   };
 
-  const handleDeactivateMain = (
-    stagePointsPerCyclist: StagePointsPerCyclist,
-  ) => {
-    if (!mainReserveStagePointsCyclist) {
+  const handleDeactivateMain = (PointsPerCyclist: PointsPerCyclist) => {
+    if (!mainReservePointsCyclist) {
       return;
     }
 
-    const { cyclistId, cyclistName } = stagePointsPerCyclist;
+    const { cyclistId, cyclistName } = PointsPerCyclist;
 
-    const updatedMainReserveStagePointsCyclist: MainReserveStagePointsCyclist =
-      {
-        mainCyclists: mainReserveStagePointsCyclist.mainCyclists.filter(
-          (cyclist) => cyclist.cyclistId !== cyclistId,
-        ),
-        reserveCyclists: [
-          ...mainReserveStagePointsCyclist.reserveCyclists,
-          {
-            cyclistName,
-            cyclistId,
-            points: 0,
-            isCyclistActive: false,
-            userId: 0,
-          },
-        ],
-      };
+    const updatedMainReservePointsCyclist: MainReservePointsCyclist = {
+      mainCyclists: mainReservePointsCyclist.mainCyclists.filter(
+        (cyclist) => cyclist.cyclistId !== cyclistId,
+      ),
+      reserveCyclists: [
+        ...mainReservePointsCyclist.reserveCyclists,
+        {
+          cyclistName,
+          cyclistId,
+          points: 0,
+          isCyclistActive: false,
+          userId: 0,
+        },
+      ],
+    };
 
-    dispatch(
-      updateMainReserveStagePointsCyclist(updatedMainReserveStagePointsCyclist),
-    );
+    dispatch(updateMainReservePointsCyclist(updatedMainReservePointsCyclist));
   };
 
-  const handleActivateReserve = (
-    stagePointsPerCyclist: StagePointsPerCyclist,
-  ) => {
-    if (!mainReserveStagePointsCyclist) {
+  const handleActivateReserve = (PointsPerCyclist: PointsPerCyclist) => {
+    if (!mainReservePointsCyclist) {
       return;
     }
 
-    const { cyclistId, cyclistName } = stagePointsPerCyclist;
+    const { cyclistId, cyclistName } = PointsPerCyclist;
 
-    const updatedMainReserveStagePointsCyclist: MainReserveStagePointsCyclist =
-      {
-        mainCyclists: [
-          ...mainReserveStagePointsCyclist.mainCyclists,
-          {
-            cyclistName,
-            cyclistId,
-            points: 0,
-            isCyclistActive: true,
-            userId: 0,
-          },
-        ],
-        reserveCyclists: mainReserveStagePointsCyclist.reserveCyclists.filter(
-          (cyclist) => cyclist.cyclistId !== cyclistId,
-        ),
-      };
+    const updatedMainReservePointsCyclist: MainReservePointsCyclist = {
+      mainCyclists: [
+        ...mainReservePointsCyclist.mainCyclists,
+        {
+          cyclistName,
+          cyclistId,
+          points: 0,
+          isCyclistActive: true,
+          userId: 0,
+        },
+      ],
+      reserveCyclists: mainReservePointsCyclist.reserveCyclists.filter(
+        (cyclist) => cyclist.cyclistId !== cyclistId,
+      ),
+    };
 
-    dispatch(
-      updateMainReserveStagePointsCyclist(updatedMainReserveStagePointsCyclist),
-    );
+    dispatch(updateMainReservePointsCyclist(updatedMainReservePointsCyclist));
   };
 
   const handleSubmitTeamChanges = () => {
-    if (!mainReserveStagePointsCyclist || !competition || !email) {
+    if (!mainReservePointsCyclist || !competition || !email) {
       return;
     }
-    const mainCyclistIds = mainReserveStagePointsCyclist?.mainCyclists.map(
-      (stagePoint: StagePointsPerCyclist) => stagePoint.cyclistId,
+    const mainCyclistIds = mainReservePointsCyclist?.mainCyclists.map(
+      (Point: PointsPerCyclist) => Point.cyclistId,
     );
     const userTeam = userTeams.find(
       (team) =>
@@ -490,10 +474,9 @@ const index = () => {
     if (!userTeam) {
       return;
     }
-    const reserveCyclistIds =
-      mainReserveStagePointsCyclist?.reserveCyclists.map(
-        (stagePoint: StagePointsPerCyclist) => stagePoint.cyclistId,
-      );
+    const reserveCyclistIds = mainReservePointsCyclist?.reserveCyclists.map(
+      (Point: PointsPerCyclist) => Point.cyclistId,
+    );
 
     dispatch(
       postUpdateUserTeamMainCyclists({
@@ -532,13 +515,13 @@ const index = () => {
   };
 
   const handleResetChanges = () => {
-    if (!initialStagePoints) {
+    if (!initialPoints) {
       return;
     }
-    dispatch(updateMainReserveStagePointsCyclist(initialStagePoints));
+    dispatch(updateMainReservePointsCyclist(initialPoints));
   };
 
-  const cyclistDeactivateTemplate = (rowData: StagePointsPerCyclist) => {
+  const cyclistDeactivateTemplate = (rowData: PointsPerCyclist) => {
     if (!rowData.isCyclistActive) {
       return (
         <>
@@ -556,12 +539,12 @@ const index = () => {
     }
   };
 
-  const activateCyclistTemplate = (rowData: StagePointsPerCyclist) => {
-    if (!mainReserveStagePointsCyclist || !competition) {
+  const activateCyclistTemplate = (rowData: PointsPerCyclist) => {
+    if (!mainReservePointsCyclist || !competition) {
       return;
     }
     if (
-      mainReserveStagePointsCyclist?.reserveCyclists.length >
+      mainReservePointsCyclist?.reserveCyclists.length >
         competition.maxReserveCyclists &&
       rowData.isCyclistActive === true
     ) {
@@ -584,7 +567,7 @@ const index = () => {
   if (
     !competition ||
     userTeams === null ||
-    (CompetitionStatus.STARTED && !mainReserveStagePointsCyclist)
+    (CompetitionStatus.STARTED && !mainReservePointsCyclist)
   ) {
     return <LoadingOverlay />;
   }
@@ -638,7 +621,7 @@ const index = () => {
           resetChanges={() => handleResetChanges()}
           activateCyclistTemplate={activateCyclistTemplate}
           teamChanged={teamChanged}
-          mainReserveStagePointsCyclist={mainReserveStagePointsCyclist}
+          mainReservePointsCyclist={mainReservePointsCyclist}
         />
       </>
     );

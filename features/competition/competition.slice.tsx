@@ -10,6 +10,7 @@ import {
 import {
   createCompetition,
   getCompetition,
+  getCompetitionResultsUpdate,
 } from '@/services/competition.service';
 
 interface CompetitionState {
@@ -37,6 +38,14 @@ export const fetchCompetitionById = createAsyncThunk(
   async (competitionId: number) => {
     const competition = await getCompetition(competitionId);
     return competition;
+  },
+);
+
+export const fetchCompetitionResultsUpdate = createAsyncThunk(
+  'competition/fetchCompetitionResultsUpdate',
+  async (competitionId: number) => {
+    const data = await getCompetitionResultsUpdate(competitionId);
+    return data;
   },
 );
 
@@ -115,6 +124,18 @@ const competitionSlice = createSlice({
         },
       )
       .addCase(fetchCompetitionById.rejected, (state) => {
+        state.status = 'failed';
+      })
+      .addCase(fetchCompetitionResultsUpdate.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(
+        fetchCompetitionResultsUpdate.fulfilled,
+        (state, action: PayloadAction<Competition>) => {
+          state.status = 'succeeded';
+        },
+      )
+      .addCase(fetchCompetitionResultsUpdate.rejected, (state) => {
         state.status = 'failed';
       });
   },
