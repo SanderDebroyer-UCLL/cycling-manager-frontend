@@ -116,9 +116,9 @@ const index = () => {
     }
     // Dispatch appropriate action based on competition structure
     const fetchAction =
-      competition.races.length === 1
-        ? fetchStagePointsForAllStages
-        : fetchRacePointsForAllRaces;
+      competition.races[0].stages.length === 0
+        ? fetchRacePointsForAllRaces
+        : fetchStagePointsForAllStages;
     dispatch(
       fetchAction({
         competitionId: competition.id,

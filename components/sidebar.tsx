@@ -3,11 +3,18 @@ import Link from 'next/link';
 import { ArrowLeft, Bike, Medal, SquareGanttChart, Users } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCompetitionById } from '@/features/competition/competition.slice';
+import {
+  fetchCompetitionById,
+  resetCompetitionStatus,
+} from '@/features/competition/competition.slice';
 import type { AppDispatch } from '@/store/store';
 import { CompetitionDTO } from '@/types/competition';
 import { usePathname } from 'next/navigation';
 import LoadingOverlay from './LoadingOverlay';
+import { resetPointsStatus } from '@/features/points/points.slice';
+import { resetStageResultsStatus } from '@/features/stage-results/stage-results.slice';
+import { resetRaceResultsStatus } from '@/features/race-results/race-results.slice';
+import { resetRaceStatus } from '@/features/race/race.slice';
 
 const Sidebar = () => {
   const competition: CompetitionDTO | null = useSelector(
@@ -34,6 +41,14 @@ const Sidebar = () => {
     }
   }, [dispatch, competition, competitionId]);
 
+  const handleReturnToCompetitions = () => {
+    dispatch(resetPointsStatus());
+    dispatch(resetStageResultsStatus());
+    dispatch(resetRaceResultsStatus());
+    dispatch(resetRaceStatus());
+    dispatch(resetCompetitionStatus());
+  };
+
   // Guard clause: Don't render sidebar until competition is loaded
   if (
     !competition ||
@@ -54,6 +69,9 @@ const Sidebar = () => {
       <Link
         href="/competities"
         className="flex gap-3 px-6 py-1 font-semibold font-manrope items-center pb-4"
+        onClick={() => {
+          handleReturnToCompetitions();
+        }}
       >
         <ArrowLeft size={18} className="stroke-dark-700" /> Terug naar
         competities

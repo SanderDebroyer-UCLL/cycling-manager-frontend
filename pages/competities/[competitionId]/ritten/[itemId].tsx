@@ -6,7 +6,7 @@ import { ResultType } from '@/const/resultType';
 import {
   fetchCompetitionById,
   fetchCompetitionResultsUpdate,
-  updateCompetition,
+  resetCompetitionStatus,
 } from '@/features/competition/competition.slice';
 import {
   fetchRaceResultsByRaceId,
@@ -104,27 +104,6 @@ const index = () => {
     }
   }, [competitionStatus]);
 
-  // Add this new useEffect specifically for competition changes
-  useEffect(() => {
-    if (!competition?.id || !competitionId) return;
-    dispatch(resetPointsStatus());
-    if (activeStage) {
-      dispatch(
-        fetchStagePointsForStage({
-          competitionId: competition.id,
-          stageId: activeStage.id,
-        }),
-      );
-    } else if (activeRace) {
-      dispatch(
-        fetchRacePointsForRace({
-          competitionId: competition.id,
-          raceId: activeRace.id,
-        }),
-      );
-    }
-  }, [dispatch, competition?.id]);
-
   useEffect(() => {
     setStageResultsState(stageResults);
   }, [stageResults]);
@@ -201,6 +180,28 @@ const index = () => {
       setResultLoading(false);
     }
   }, [resultLoading]);
+
+  useEffect(() => {
+    if (competitionStatus === 'succeeded') {
+      if (activeStage?.id) {
+        dispatch(
+          fetchResultsByStageIdByType({
+            stageId: activeStage.id,
+            resultType: ResultType.STAGE,
+          }),
+        );
+        dispatch(
+          fetchResultsByStageIdByType({
+            stageId: activeStage.id,
+            resultType: ResultType.GC,
+          }),
+        );
+      }
+      if (!activeRace) return;
+      dispatch(fetchRaceResultsByRaceId(activeRace.id));
+      dispatch(resetCompetitionStatus());
+    }
+  }, [competitionStatus]);
 
   useEffect(() => {
     if (!competition || !itemId) return;

@@ -30,7 +30,11 @@ export const updateRaceData = createAsyncThunk(
 const raceSlice = createSlice({
   name: 'race',
   initialState,
-  reducers: {},
+  reducers: {
+    resetRaceStatus: (state) => {
+      state.status = 'idle';
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchRace.pending, (state) => {
@@ -61,5 +65,7 @@ const raceSlice = createSlice({
       });
   },
 });
+
+export const { resetRaceStatus } = raceSlice.actions;
 
 export default raceSlice.reducer;
