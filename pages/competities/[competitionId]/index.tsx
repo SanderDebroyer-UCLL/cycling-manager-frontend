@@ -23,6 +23,10 @@ import LoadingOverlay from '@/components/LoadingOverlay';
 import { RaceDTO } from '@/types/race';
 import { RefreshCw } from 'lucide-react';
 import { fetchCyclistsWithDNS } from '@/features/user-teams/user-teams.slice';
+import TableChipBodyTemplate from '@/components/TableChipBodyTemplate';
+import StageTypeChipBodyTemplate from '@/components/ParcoursTypeChipBodyTemplate';
+import { getCompetitionStatusSubtext } from '@/utils/competition-status-map';
+import DropOutReasonChipBodyTemplate from '@/components/DropOutReasonChipBodyTemplate';
 
 const index = () => {
   const router = useRouter();
@@ -137,6 +141,30 @@ const index = () => {
     calculateDateRange,
   ]);
 
+  // Memoize competition data structure to avoid repeated calculations
+  const competitionData = useMemo(() => {
+    if (!competition?.races?.length) {
+      return {
+        hasStages: false,
+        displayName: '',
+        items: [],
+        itemCount: 0,
+        itemType: 'wedstrijden',
+      };
+    }
+
+    const firstRace = competition.races[0];
+    const hasStages = firstRace?.stages?.length > 0;
+
+    return {
+      hasStages,
+      displayName: hasStages ? firstRace.name : competition.name,
+      items: hasStages ? firstRace.stages : competition.races,
+      itemCount: hasStages ? firstRace.stages.length : competition.races.length,
+      itemType: hasStages ? 'ritten' : 'wedstrijden',
+    };
+  }, [competition]);
+
   // Update state when competition stats change
   useEffect(() => {
     setTotalDistance(competitionStats.distance);
@@ -168,7 +196,25 @@ const index = () => {
     }
   }, [dispatch, competition, competitionIdNumber]);
 
-  if (!competition) {
+  // Handler functions
+  const handleRefreshData = useCallback(() => {
+    if (competitionData.hasStages && competition?.races?.length) {
+      dispatch(updateRaceData(competition.races[0].name));
+    } else if (competition?.races?.length) {
+      competition.races.forEach((race: RaceDTO) =>
+        dispatch(updateRaceData(race.name)),
+      );
+    }
+  }, [competitionData.hasStages, competition, dispatch]);
+
+  const handleStageSelection = useCallback(
+    (selectedItem: any) => {
+      router.push(`/competities/${competitionId}/ritten/${selectedItem.id}`);
+    },
+    [router, competitionId],
+  );
+
+  if (!competition || !competitionData) {
     return <LoadingOverlay />;
   }
 
@@ -204,12 +250,10 @@ const index = () => {
           </div>
         </div>
       </Dialog>
+
       <div className="flex flex-col gap-10">
-        <h2 className=" text-xl font-bold flex gap-4 items-center">
-          Overzicht{' '}
-          {competition.races[0].stages.length > 0
-            ? competition.races[0].name
-            : competition.name}
+        <h2 className="text-xl font-bold flex gap-4 items-center">
+          Overzicht {competitionData.displayName}
           <Button
             raised
             icon={() => (
@@ -220,56 +264,92 @@ const index = () => {
             aria-label="Haal de laatste data op"
             className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
             loading={updateRaceDataLoading}
-            onClick={() =>
-              competition.races[0].stages.length > 0
-                ? dispatch(updateRaceData(competition.races[0].name))
-                : competition.races.forEach((race: RaceDTO) =>
-                    dispatch(updateRaceData(race.name)),
-                  )
-            }
+            onClick={handleRefreshData}
           />
         </h2>
       </div>
+
       <div className="flex gap-10 w-full">
-        <div className="flex flex-1/4 flex-col gap-2 max-h-[500px]">
+        <div className="flex flex-1/4 flex-col gap-2 max-h-[440px]">
           <h3 className="font-semibold">Duur Competitie</h3>
-          <Calendar value={dates} inline selectionMode="range" />
+          <Calendar
+            value={dates}
+            inline
+            selectionMode="range"
+            className="h-full"
+          />
         </div>
-        <div className="flex flex-row flex-3/4 gap-10 w-full max-h-[500px]">
-          <div className="flex flex-col gap-10">
+
+        <div className="flex flex-row flex-3/4 gap-10 w-full max-h-[440px]">
+          <div className="flex flex-col justify-between flex-1/3">
             <div className="flex flex-col gap-2">
               <h3 className="font-semibold">Totale afstand</h3>
               <div
                 style={container}
-                className="flex flex-col justify-center gap-2 p-4  bg-surface rounded-xl font-semibold text-xl"
+                className="flex flex-col justify-center gap-2 font-semibold text-xl"
               >
                 {totalDistance} km
-                {competition.races[0].stages.length > 0 ? (
-                  <span className="text-sm font-normal">
-                    verdeeld over {competition.races[0].stages.length}{' '}
-                    ritten{' '}
-                  </span>
-                ) : (
-                  <span className="text-sm font-normal">
-                    verdeeld over {competition.races.length} wedstrijden{' '}
-                  </span>
-                )}
+                <span className="text-sm font-normal">
+                  verdeeld over {competitionData.itemCount}{' '}
+                  {competitionData.itemType}
+                </span>
               </div>
             </div>
+
             <div className="flex flex-col gap-2">
-              <h3 className="font-semibold">Totaal hoogtemeters</h3>
+              <h3 className="font-semibold">
+                {competitionData.hasStages
+                  ? 'Totaal hoogtemeters'
+                  : 'Competitie Duur'}
+              </h3>
               <div
                 style={container}
-                className="flex flex-col justify-center gap-2 p-4  bg-surface rounded-xl font-semibold text-xl"
+                className="flex flex-col justify-center gap-2 font-semibold text-xl"
               >
-                {totalElevation} m
+                {competitionData.hasStages
+                  ? `${totalElevation} m`
+                  : `${Math.ceil(
+                      (new Date(
+                        [...(competitionData.items as RaceDTO[])].sort(
+                          (a, b) =>
+                            new Date(a.startDate).getTime() -
+                            new Date(b.startDate).getTime(),
+                        )[competitionData.items.length - 1].endDate,
+                      ).getTime() -
+                        new Date(
+                          [...(competitionData.items as RaceDTO[])].sort(
+                            (a, b) =>
+                              new Date(a.startDate).getTime() -
+                              new Date(b.startDate).getTime(),
+                          )[0].startDate,
+                        ).getTime()) /
+                        (1000 * 60 * 60 * 24),
+                    )} dagen`}
                 <span className="text-sm font-normal">
-                  Dat is {(totalElevation / 1.82).toFixed(0)} keer Niels
+                  {competitionData.hasStages
+                    ? `Dat is ${(totalElevation / 1.82).toFixed(0)} keer Niels`
+                    : `Van eerste tot laatste koers`}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <h3 className="font-semibold">Competitie Status</h3>
+              <div
+                style={container}
+                className="flex flex-col justify-center gap-2 font-semibold text-xl capitalize"
+              >
+                {competition.competitionStatus.toLocaleLowerCase()}
+                <span className="text-sm font-normal normal-case">
+                  {getCompetitionStatusSubtext(
+                    competition.competitionStatus,
+                  )}{' '}
                 </span>
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
+
+          <div className="flex flex-col gap-2 flex-2/3">
             <h3 className="font-semibold">Ritten</h3>
             <div
               style={container}
@@ -278,35 +358,44 @@ const index = () => {
               <DataTable
                 selectionMode="single"
                 selection={null}
-                onSelectionChange={(e) =>
-                  router.push(
-                    `/competities/${competitionId}/ritten/${e.value.id}`,
-                  )
-                }
-                value={
-                  competition.races[0].stages.length > 0
-                    ? competition.races[0].stages
-                    : competition.races
-                }
+                onSelectionChange={(e) => handleStageSelection(e.value)}
+                value={competitionData.items}
                 tableStyle={{ width: '100%' }}
                 emptyMessage="Geen ritten gevonden"
               >
                 <Column header="Naam" field="name" />
                 <Column header="Afstand" field="distance" />
+                {competitionData.hasStages ? (
+                  <Column
+                    header="Type Parcours"
+                    field="parcoursType"
+                    body={StageTypeChipBodyTemplate}
+                  />
+                ) : (
+                  <Column body={TableChipBodyTemplate} header="niveau" />
+                )}
               </DataTable>
             </div>
           </div>
         </div>
       </div>
-      <div style={container} className="flex flex-row gap-4 h-full w-full">
-        <DataTable
-          value={cyclistWithDNS}
-          emptyMessage="Geen actieve renners die zijn gestopt"
-        >
-          <Column field="name" header="Naam" />
-          <Column field="team.name" header="Team" />
-          <Column field="dnsReason" header="Reden" />
-        </DataTable>
+
+      <div className="flex flex-col gap-2">
+        <h3 className="font-semibold">Renners die zijn uitgevallen</h3>
+        <div style={container} className="flex flex-row gap-4 h-full w-full">
+          <DataTable
+            value={cyclistWithDNS}
+            emptyMessage="Geen renners in teams die zijn uitgevallen"
+          >
+            <Column field="name" header="Naam" />
+            <Column field="team.name" header="Team" />
+            <Column field="dnsReason" header="Reden" />
+            <Column
+             header="Reden" 
+              body={DropOutReasonChipBodyTemplate}
+            />
+          </DataTable>
+        </div>
       </div>
     </div>
   );

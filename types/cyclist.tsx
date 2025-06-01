@@ -19,4 +19,16 @@ export interface CyclistDTO {
   cyclistUrl: string;
   team: Team;
   upcomingRaces: string[];
+  dnsReason?: DropOutReason;
+}
+
+export enum DropOutReason {
+  DNS = 'DNS', // Did Not Start
+  DNF = 'DNF', // Did Not Finish
+  DSQ = 'DSQ', // Disqualified
+  OTL = 'OTL', // Outside Time Limit
+  HD = 'HD', // Hors Délai (same as OTL but French term)
+  AB = 'AB', // Abandon
+  DF = 'DF', // Défaillance (mechanical/health issue)
+  NP = 'NP', // Non-Partant (did not start, French term)
 }
