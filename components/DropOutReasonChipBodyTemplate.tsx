@@ -3,8 +3,6 @@ import {
   UserX,
   Ban,
   Clock,
-  AlertTriangle,
-  Stethoscope,
   Wrench,
   X,
   HelpCircle,

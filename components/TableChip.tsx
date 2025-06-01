@@ -1,6 +1,6 @@
 import React from 'react';
 
-type TableChipProps = {
+export type TableChipProps = {
   label: string;
   Icon: React.ElementType;
   type:

@@ -23,6 +23,7 @@ export interface UserDTO {
   email: string;
   jwtToken: string;
   role: 'admin' | 'user';
+  totalPoints: number;
 }
 
 export interface RegisterUserDetails {

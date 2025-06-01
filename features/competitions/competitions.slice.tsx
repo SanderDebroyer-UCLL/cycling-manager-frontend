@@ -1,10 +1,9 @@
-// src/features/user/userSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { getCompetitions } from '@/services/competition.service';
-import { Competition } from '@/types/competition';
+import { Competition, CompetitionDTO } from '@/types/competition';
 
 interface CompetitionsState {
-  data: Competition[];
+  data: CompetitionDTO[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
@@ -36,7 +35,7 @@ const competitionsSlice = createSlice({
       })
       .addCase(
         fetchCompetitions.fulfilled,
-        (state, action: PayloadAction<Competition[]>) => {
+        (state, action: PayloadAction<CompetitionDTO[]>) => {
           state.status = 'succeeded';
           state.data = action.payload;
         },
