@@ -87,10 +87,10 @@ export default function Overview() {
                   <div
                     className={`flex items-center justify-center font-semibold text-lg rounded-t-xl w-full shadow-md ${
                       index === 1
-                        ? 'h-28 bg-blue-500'
+                        ? 'h-28 bg-primary'
                         : index === 0
-                          ? 'h-21 bg-blue-400'
-                          : 'h-14 bg-blue-300'
+                          ? 'h-21 bg-primary-fixed-dim'
+                          : 'h-14 bg-primary-fixed'
                     }`}
                   >
                     <p className="bg-surface rounded-full p-4  h-6 w-6 flex items-center justify-center">
