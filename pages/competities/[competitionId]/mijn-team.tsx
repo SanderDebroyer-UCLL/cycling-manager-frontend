@@ -129,7 +129,7 @@ const index = () => {
 
   // Filter cyclists and set cyclist limits when data is available
   useEffect(() => {
-    if (cyclistsStatus === 'succeeded' && cyclists && userTeams.length > 0) {
+    if (cyclistsStatus === 'succeeded' && cyclists && userTeams) {
       const filteredCyclists = cyclists.filter((cyclist) => {
         return !userTeams.some((userTeam: UserTeamDTO) =>
           userTeam.cyclistAssignments
@@ -141,7 +141,7 @@ const index = () => {
       });
       setCyclistsState(filteredCyclists);
     }
-  }, [cyclists, userTeams, cyclistsStatus]);
+  }, [dispatch, cyclists, userTeams, cyclistsStatus]);
 
   // Set cyclist count limits when competition data is available
   useEffect(() => {
@@ -175,7 +175,7 @@ const index = () => {
     if (!cyclists || cyclistsStatus === 'idle') {
       dispatch(fetchCyclists());
     }
-    if (!userTeams || userTeamsStatus === 'idle') {
+    if (userTeams.length === 0 || !userTeams || userTeamsStatus === 'idle') {
       dispatch(fetchUserTeam());
     }
   }, [

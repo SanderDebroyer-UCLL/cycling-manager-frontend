@@ -10,7 +10,6 @@ import {
   UserTeamDTO,
 } from '@/types/user-team';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { stat } from 'fs';
 
 interface UserTeamsState {
   data: UserTeamDTO[];
@@ -162,6 +161,9 @@ const userTeamsSlice = createSlice({
       }
       state.data = action.payload;
     },
+    resetUserTeamsStatus: (state) => {
+      state.status = 'idle';
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -198,5 +200,6 @@ export const {
   updateUserTeamCyclists,
   removeCyclistFromUserTeamCylists,
   setUserTeams,
+  resetUserTeamsStatus,
 } = userTeamsSlice.actions;
 export default userTeamsSlice.reducer;

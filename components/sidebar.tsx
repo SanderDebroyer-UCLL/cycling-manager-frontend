@@ -15,6 +15,8 @@ import { resetPointsStatus } from '@/features/points/points.slice';
 import { resetStageResultsStatus } from '@/features/stage-results/stage-results.slice';
 import { resetRaceResultsStatus } from '@/features/race-results/race-results.slice';
 import { resetRaceStatus } from '@/features/race/race.slice';
+import { resetUserTeamsStatus } from '@/features/user-teams/user-teams.slice';
+import { resetCyclistsStatus } from '@/features/cyclists/cyclists.slice';
 
 const Sidebar = () => {
   const competition: CompetitionDTO | null = useSelector(
@@ -47,6 +49,8 @@ const Sidebar = () => {
     dispatch(resetRaceResultsStatus());
     dispatch(resetRaceStatus());
     dispatch(resetCompetitionStatus());
+    dispatch(resetUserTeamsStatus());
+    dispatch(resetCyclistsStatus());
   };
 
   // Guard clause: Don't render sidebar until competition is loaded

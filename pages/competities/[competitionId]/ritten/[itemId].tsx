@@ -286,7 +286,7 @@ const index = () => {
 
   return (
     <div>
-      <div className="flex flex-col gap-12 w-full">
+      <div className="flex flex-col gap-10 w-full">
         <div className="flex flex-col gap-6">
           <h2 className=" text-xl font-bold flex gap-4 items-center">
             Ritten{' '}

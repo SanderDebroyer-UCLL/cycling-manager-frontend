@@ -177,14 +177,11 @@ const index = () => {
     setUpdateRaceDataLoading(raceStatus === 'loading');
   }, [raceStatus]);
 
-  // Fetch cyclists with DNS when needed
   useEffect(() => {
-    if (!cyclistWithDNS || userTeamsState === 'idle') {
-      if (competitionIdNumber) {
-        dispatch(fetchCyclistsWithDNS(competitionIdNumber));
-      }
+    if (competitionIdNumber) {
+      dispatch(fetchCyclistsWithDNS(competitionIdNumber));
     }
-  }, [dispatch, competitionIdNumber, cyclistWithDNS, userTeamsState]);
+  }, [dispatch, competitionIdNumber]);
 
   // Fetch competition data when ID changes or doesn't match current competition
   useEffect(() => {
@@ -214,7 +211,7 @@ const index = () => {
     [router, competitionId],
   );
 
-  if (!competition || !competitionData) {
+  if (!competition || !competitionData || !cyclistWithDNS) {
     return <LoadingOverlay />;
   }
 
