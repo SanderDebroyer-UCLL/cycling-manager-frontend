@@ -52,6 +52,7 @@ import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import PointsChipBodyTemplate from '@/components/PointsChipBodyTemplate';
 
 const index = () => {
   const router = useRouter();
@@ -576,7 +577,11 @@ const index = () => {
                     className=""
                   >
                     <Column field="fullName" header="Deelnemer" />
-                    <Column field="points" header="Punten" />
+                    <Column
+                      field="points"
+                      header="Punten"
+                      body={PointsChipBodyTemplate}
+                    />
                   </DataTable>
                 </div>
               </div>
