@@ -570,7 +570,7 @@ const index = () => {
                 <h3 className="font-semibold">Punten verdiend per deelnemer</h3>
                 <div
                   style={container}
-                  className="flex flex-col h-full overflow-auto"
+                  className="flex flex-col h-full overflow-auto max-h-[300px]"
                 >
                   <DataTable
                     value={points}
@@ -596,7 +596,7 @@ const index = () => {
                 <h3 className="font-semibold">Uitslag Race</h3>
                 <div
                   style={container}
-                  className="flex flex-col h-full overflow-auto"
+                  className="flex flex-col h-full overflow-auto max-h-[500px]"
                 >
                   <DataTable
                     paginator
