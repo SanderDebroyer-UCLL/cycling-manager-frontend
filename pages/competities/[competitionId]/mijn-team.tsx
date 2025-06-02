@@ -1,6 +1,7 @@
 import CompetitieLayout from '@/components/competitieLayout';
 import {
   fetchCompetitionById,
+  resetCompetitionStatus,
   updateCompetition,
   updateCompetitionPick,
   updateCompetitionStatus,
@@ -11,6 +12,7 @@ import { fetchCyclists } from '@/features/cyclists/cyclists.slice';
 import {
   fetchUserTeam,
   postUpdateUserTeamMainCyclists,
+  resetUserTeamsStatus,
   updateUserTeamCyclists,
 } from '@/features/user-teams/user-teams.slice';
 import { AppDispatch, RootState } from '@/store/store';
@@ -41,6 +43,7 @@ import LoadingOverlay from '@/components/LoadingOverlay';
 import {
   fetchRacePointsForAllRaces,
   fetchStagePointsForAllStages,
+  resetPointsStatus,
   updateMainReservePointsCyclist,
 } from '@/features/points/points.slice';
 
@@ -104,34 +107,14 @@ const index = () => {
     }
   }, [mainReservePointsCyclist, initialPoints]);
 
-  // Fetch points data when needed
-  useEffect(() => {
-    // Early return if data is already available or currently loading
-    if (mainReservePointsCyclist !== null) {
-      return;
-    }
-    // Early return if required data is missing
-    if (!user?.id || !competition?.id) {
-      return;
-    }
-    // Dispatch appropriate action based on competition structure
-    const fetchAction =
-      competition.races[0].stages.length === 0
-        ? fetchRacePointsForAllRaces
-        : fetchStagePointsForAllStages;
-    dispatch(
-      fetchAction({
-        competitionId: competition.id,
-        userId: user.id,
-      }),
-    );
-  }, [dispatch, mainReservePointsCyclist, pointsStatus, user, competition]);
-
   // Filter cyclists and set cyclist limits when data is available
   useEffect(() => {
     if (cyclistsStatus === 'succeeded' && cyclists && userTeams) {
+      const filteredUserTeams = userTeams.filter(
+        (userTeam: UserTeamDTO) => userTeam.competitionId === competition?.id,
+      );
       const filteredCyclists = cyclists.filter((cyclist) => {
-        return !userTeams.some((userTeam: UserTeamDTO) =>
+        return !filteredUserTeams.some((userTeam: UserTeamDTO) =>
           userTeam.cyclistAssignments
             .map((assignment) => assignment.cyclist)
             .some(
@@ -175,6 +158,19 @@ const index = () => {
     if (!cyclists || cyclistsStatus === 'idle') {
       dispatch(fetchCyclists());
     }
+    if (!mainReservePointsCyclist || pointsStatus === 'idle') {
+      const fetchAction =
+        competition?.races[0].stages.length === 0
+          ? fetchRacePointsForAllRaces
+          : fetchStagePointsForAllStages;
+      if (!user || !competition) return;
+      dispatch(
+        fetchAction({
+          competitionId: competition?.id,
+          userId: user?.id,
+        }),
+      );
+    }
     if (userTeams.length === 0 || !userTeams || userTeamsStatus === 'idle') {
       dispatch(fetchUserTeam());
     }
@@ -185,6 +181,7 @@ const index = () => {
     cyclistsStatus,
     userTeams,
     userTeamsStatus,
+    pointsStatus,
     dispatch,
   ]);
 
@@ -262,6 +259,8 @@ const index = () => {
           }
 
           dispatch(updateCompetitionStatus(competitionStatus));
+          console.log(`Competition status updated to: ${competitionStatus}`);
+          dispatch(resetPointsStatus());
         });
         stompClient.subscribe('/topic/count', (message) => {
           const parsed = JSON.parse(message.body);

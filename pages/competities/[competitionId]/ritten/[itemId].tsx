@@ -444,7 +444,11 @@ const index = () => {
                     className=""
                   >
                     <Column field="fullName" header="Deelnemer" />
-                    <Column field="points" header="Punten" />
+                    <Column
+                      field="points"
+                      header="Punten"
+                      body={PointsChipBodyTemplate}
+                    />
                   </DataTable>
                 </div>
               </div>

@@ -386,7 +386,6 @@ const index = () => {
           >
             <Column field="name" header="Naam" />
             <Column field="team.name" header="Team" />
-            <Column field="dnsReason" header="Reden" />
             <Column header="Reden" body={DropOutReasonChipBodyTemplate} />
           </DataTable>
         </div>
