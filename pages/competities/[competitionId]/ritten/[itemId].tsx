@@ -433,13 +433,13 @@ const index = () => {
                 <h3 className="font-semibold">Punten verdiend per deelnemer</h3>
                 <div
                   style={container}
-                  className="flex flex-col h-full overflow-auto"
+                  className="flex flex-col h-full overflow-auto max-h-[300px]"
                 >
                   <DataTable
                     value={points}
                     dataKey="userId"
-                    sortField="position"
-                    sortOrder={1}
+                    sortField="points"
+                    sortOrder={-1}
                     emptyMessage="Geen resultaten gevonden"
                     className=""
                   >
@@ -459,7 +459,7 @@ const index = () => {
                 <h3 className="font-semibold">Uitslag Rit</h3>
                 <div
                   style={container}
-                  className="flex flex-col h-full overflow-auto"
+                  className="flex flex-col h-full overflow-auto max-h-[500px]"
                 >
                   <div className="flex gap-4">
                     <Chip
@@ -575,8 +575,8 @@ const index = () => {
                   <DataTable
                     value={points}
                     dataKey="userId"
-                    sortField="position"
-                    sortOrder={1}
+                    sortField="points"
+                    sortOrder={-1}
                     emptyMessage="Geen resultaten gevonden"
                     className=""
                   >
