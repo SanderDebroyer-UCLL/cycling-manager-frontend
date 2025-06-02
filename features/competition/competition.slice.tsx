@@ -124,7 +124,18 @@ const competitionSlice = createSlice({
         fetchCompetitionById.fulfilled,
         (state, action: PayloadAction<CompetitionDTO>) => {
           state.status = 'succeeded';
-          state.competitionDTO = action.payload;
+
+          // Clone and sort races by startDate (assuming ISO string)
+          const sortedRaces = [...action.payload.races].sort(
+            (a, b) =>
+              new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+          );
+
+          // Save modified DTO with sorted races
+          state.competitionDTO = {
+            ...action.payload,
+            races: sortedRaces,
+          };
         },
       )
       .addCase(fetchCompetitionById.rejected, (state) => {
