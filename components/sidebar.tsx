@@ -112,13 +112,15 @@ const Sidebar = () => {
           <Users size={18} className="stroke-dark-700" />
           Mijn team
         </Link>
-        <Link
-          href={`/competities/${competitionId}/klassement`}
-          className={` ${isActive('klassement') ? '!border-primary !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface hover:border-primary px-6 hover:font-semibold py-2`}
-        >
-          <Medal size={18} className="stroke-dark-700" />
-          Klassement
-        </Link>
+        {competition.races[0].stages.length > 0 && (
+          <Link
+            href={`/competities/${competitionId}/klassement`}
+            className={` ${isActive('klassement') ? '!border-primary !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface hover:border-primary px-6 hover:font-semibold py-2`}
+          >
+            <Medal size={18} className="stroke-dark-700" />
+            Klassement
+          </Link>
+        )}
       </div>
     </div>
   );
