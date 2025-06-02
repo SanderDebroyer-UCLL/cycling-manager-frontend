@@ -50,7 +50,10 @@ export default function Overview() {
     (a: UserDTO, b: UserDTO) => (b.totalPoints ?? 0) - (a.totalPoints ?? 0),
   );
   // Reorder: [2nd, 1st, 3rd]
-  const topThreeUsers = [sortedUsers[1], sortedUsers[0], sortedUsers[2]];
+  const topThreeUsers =
+    sortedUsers.length >= 3
+      ? [sortedUsers[1], sortedUsers[0], sortedUsers[2]]
+      : sortedUsers.slice(0, 3);
 
   const nameBodyTemplate = (user: UserDTO) => {
     return (
@@ -62,7 +65,7 @@ export default function Overview() {
     );
   };
 
-  if (!users || users.length === 0) {
+  if (!users || !competitions || users.length === 0) {
     return <LoadingOverlay />;
   }
 
@@ -141,34 +144,43 @@ export default function Overview() {
             className="w-fit h-80 bg-surface flex flex-col justify-center gap-6 rounded-xl shadow-md overflow-hidden p-8"
           >
             <div className="flex flex-row gap-8 items-end justify-center">
-              {topThreeUsers.map((user: UserDTO, index) => (
-                <div className="flex flex-col items-center gap-1" key={user.id}>
-                  <div className="h-12 w-12 rounded-full flex items-center justify-center bg-secondary-container text-on-secondary-container font-semibold">
-                    {user.firstName.slice(0, 1).toUpperCase()}
-                    {user.lastName.slice(0, 1).toUpperCase()}
-                  </div>
-                  <p> {user.firstName} </p>
+              {topThreeUsers.map((user: UserDTO | undefined, index) =>
+                user ? (
                   <div
-                    className={`flex items-center justify-center font-semibold text-lg rounded-t-xl w-full shadow-md ${
-                      index === 1
-                        ? 'h-28 bg-primary'
-                        : index === 0
-                          ? 'h-21 bg-primary-fixed-dim'
-                          : 'h-14 bg-primary-fixed'
-                    }`}
+                    className="flex flex-col items-center gap-1"
+                    key={user.id}
                   >
-                    <p className="bg-surface rounded-full p-4  h-6 w-6 flex items-center justify-center">
-                      {index == 1 ? 1 : index == 0 ? 2 : 3}
-                    </p>
+                    <div className="h-12 w-12 rounded-full flex items-center justify-center bg-secondary-container text-on-secondary-container font-semibold">
+                      {user.firstName.slice(0, 1).toUpperCase()}
+                      {user.lastName.slice(0, 1).toUpperCase()}
+                    </div>
+                    <p> {user.firstName} </p>
+                    <div
+                      className={`flex items-center justify-center font-semibold text-lg rounded-t-xl w-full shadow-md ${
+                        index === 1
+                          ? 'h-28 bg-primary'
+                          : index === 0
+                            ? 'h-21 bg-primary-fixed-dim'
+                            : 'h-14 bg-primary-fixed'
+                      }`}
+                    >
+                      <p className="bg-surface rounded-full p-4  h-6 w-6 flex items-center justify-center">
+                        {index == 1 ? 1 : index == 0 ? 2 : 3}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ) : null,
+              )}
             </div>
             <p className="text-center">
-              {sortedUsers[0].firstName} staat op de eerste plaats{' '}
-              {sortedUsers[0].totalPoints ??
-                0 - (sortedUsers[1].totalPoints ?? 0)}{' '}
-              punten voor op {sortedUsers[1].firstName}
+              {sortedUsers[0] && sortedUsers[1] ? (
+                <p className="text-center">
+                  {sortedUsers[0].firstName} staat op de eerste plaats{' '}
+                  {(sortedUsers[0].totalPoints ?? 0) -
+                    (sortedUsers[1].totalPoints ?? 0)}{' '}
+                  punten voor op {sortedUsers[1].firstName}
+                </p>
+              ) : null}
             </p>
           </div>
         </div>
