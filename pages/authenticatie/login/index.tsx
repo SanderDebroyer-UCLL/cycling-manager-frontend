@@ -65,16 +65,18 @@ export default function Login() {
       });
       sessionStorage.setItem('jwtToken', jwtRes.jwtToken);
       sessionStorage.setItem('email', jwtRes.email);
-      router.push('/overzicht');
       dispatch(resetUserStatus());
+      setTimeout(() => {
+        router.push('/overzicht');
+      }, 0);
     } else if (status === 'failed') {
       showErrorToast({
         summary: 'Login mislukt',
         detail: error || 'Er is iets misgegaan.',
       });
-      dispatch(resetUserStatus()); // reset status to avoid repeated error messages
+      dispatch(resetUserStatus());
     }
-  }, [status, router]);
+  }, [status, router, dispatch, jwtRes, error]);
 
   useEffect(() => {
     if (status === 'loading') {

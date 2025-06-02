@@ -91,8 +91,10 @@ export default function Register() {
         summary: 'Registratie succesvol',
         detail: 'Login in met je nieuwe account.',
       });
-      router.push('/authenticatie/login');
-      dispatch(resetUserStatus()); // reset status to avoid repeated redirects
+      dispatch(resetUserStatus());
+      setTimeout(() => {
+        router.push('/authenticatie/login');
+      }, 0);
     } else if (status === 'failed') {
       showErrorToast({
         summary: 'Registreren mislukt',

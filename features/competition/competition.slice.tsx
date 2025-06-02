@@ -17,12 +17,14 @@ interface CompetitionState {
   competition: Competition | null;
   competitionDTO: CompetitionDTO | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  error: string | null;
 }
 
 const initialCompetitionState: CompetitionState = {
   competition: null,
   competitionDTO: null,
   status: 'idle',
+  error: null,
 };
 
 export const createCompetitionRequest = createAsyncThunk(
@@ -110,8 +112,10 @@ const competitionSlice = createSlice({
           state.competitionDTO = action.payload;
         },
       )
-      .addCase(createCompetitionRequest.rejected, (state) => {
+      .addCase(createCompetitionRequest.rejected, (state, action) => {
         state.status = 'failed';
+        state.error =
+          action.error.message || 'Mislukt om competitie aan te maken';
       })
       .addCase(fetchCompetitionById.pending, (state) => {
         state.status = 'loading';

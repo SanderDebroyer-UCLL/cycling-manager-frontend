@@ -24,6 +24,7 @@ import {
 import { Race } from '@/types/race';
 import LinkBodyTemplate from '@/components/LinkBodyTemplate';
 import { container } from '@/const/containerStyle';
+import { showErrorToast } from '@/services/toast.service';
 
 const Index = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -59,6 +60,10 @@ const Index = () => {
   const [nodes, setNodes] = useState<TreeNode[]>([]);
   const [visible, setVisible] = React.useState(false);
   const [competitionloading, setCompetitionLoading] = useState<boolean>(false);
+  const competitionError = useSelector(
+    (state: RootState) => state.competition.error,
+  );
+
   const [competitionsloading, setCompetitionsLoading] =
     useState<boolean>(false);
 
@@ -150,6 +155,11 @@ const Index = () => {
       setSelectedRaces(null);
       setSelectedUsers([]);
       dispatch(resetCompetitionsStatus());
+    } else if (competitionStatus === 'failed') {
+      showErrorToast({
+        summary: 'Competitie aanmaken mislukt',
+        detail: competitionError || 'Er is iets misgegaan.',
+      });
     }
   }, [competitionStatus, dispatch]);
 
