@@ -59,9 +59,7 @@ export default function Overview() {
   const nameBodyTemplate = (user: UserDTO) => {
     return (
       <div className="flex items-center gap-2">
-        <p>
-          {user.firstName} {user.lastName}
-        </p>
+        {user.firstName} {user.lastName}
       </div>
     );
   };
@@ -119,6 +117,7 @@ export default function Overview() {
                       }
                       alt={competition.name}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover"
                     />
 
@@ -174,7 +173,7 @@ export default function Overview() {
                 ) : null,
               )}
             </div>
-            <p className="text-center">
+            <div className="text-center">
               {sortedUsers[0] && sortedUsers[1] ? (
                 <p className="text-center">
                   {sortedUsers[0].firstName} staat op de eerste plaats{' '}
@@ -183,7 +182,7 @@ export default function Overview() {
                   punten voor op {sortedUsers[1].firstName}
                 </p>
               ) : null}
-            </p>
+            </div>
           </div>
         </div>
         <div className="flex flex-col gap-4 w-full flex-3/4">
