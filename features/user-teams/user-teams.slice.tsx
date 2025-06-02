@@ -1,15 +1,25 @@
-import { getAllUserTeams } from '@/services/user-team.service';
-import { Cyclist } from '@/types/cyclist';
-import { UserTeam } from '@/types/user-team';
+import {
+  getAllUserTeams,
+  getCyclistsWithDNS,
+  updateUserTeamMainCyclists,
+} from '@/services/user-team.service';
+import { CyclistDTO } from '@/types/cyclist';
+import {
+  CyclistAssignmentDTO,
+  CyclistRole,
+  UserTeamDTO,
+} from '@/types/user-team';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
 interface UserTeamsState {
-  data: UserTeam[];
+  data: UserTeamDTO[];
+  cyclistsWithDNS: CyclistDTO[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
 const initialState: UserTeamsState = {
   data: [],
+  cyclistsWithDNS: [],
   status: 'idle',
 };
 
@@ -21,17 +31,117 @@ export const fetchUserTeam = createAsyncThunk(
   },
 );
 
+export const postUpdateUserTeamMainCyclists = createAsyncThunk(
+  'userTeam/updateUserTeamMainCyclists',
+  async (params: {
+    mainCyclistIds: number[];
+    reserveCyclistIds: number[];
+    userTeamId: number;
+  }) => {
+    const data = await updateUserTeamMainCyclists(
+      params.mainCyclistIds,
+      params.reserveCyclistIds,
+      params.userTeamId,
+    );
+    return data;
+  },
+);
+
+export const fetchCyclistsWithDNS = createAsyncThunk(
+  'userTeam/fetchCyclistsWithDNS',
+  async (competitionId: number) => {
+    const data = await getCyclistsWithDNS(competitionId);
+    return data;
+  },
+);
+
 const userTeamsSlice = createSlice({
-  name: 'userTeams',
+  name: 'userTeam',
   initialState,
   reducers: {
     updateUserTeamCyclists: (
       state,
       action: PayloadAction<{
         cyclistName: string;
+        cyclistId: number;
         email: string;
-        competitionId: string;
+        competitionId: number;
         maxCyclists?: number;
+        pointsScored?: number;
+      }>,
+    ) => {
+      const { cyclistName, cyclistId, email, competitionId, maxCyclists } =
+        action.payload;
+      const team = state.data.find(
+        (team) =>
+          team.user.email === email && team.competitionId === competitionId,
+      );
+      if (team) {
+        // Prevent duplicates
+        if (
+          team.cyclistAssignments.filter(
+            (cyclistAssignments) =>
+              cyclistAssignments.role === CyclistRole.MAIN,
+          ).length >= (maxCyclists || 15)
+        ) {
+          const cyclistAssignment: CyclistAssignmentDTO = {
+            id: 0,
+            cyclist: {
+              name: cyclistName,
+              id: cyclistId,
+              team: {
+                id: 0,
+                name: '',
+                ranking: 0,
+                teamUrl: '',
+              },
+              age: 0,
+              country: '',
+              ranking: 0,
+              cyclistUrl: '',
+              upcomingRaces: [],
+            },
+            role: CyclistRole.RESERVE,
+            fromStage: 0,
+            toStage: 0,
+          };
+          team.cyclistAssignments.push(cyclistAssignment);
+        } else if (
+          !team.cyclistAssignments.some(
+            (assignment) => assignment.cyclist.name === cyclistName,
+          )
+        ) {
+          const cyclistAssignment: CyclistAssignmentDTO = {
+            id: 0,
+            cyclist: {
+              name: cyclistName,
+              id: cyclistId,
+              team: {
+                id: 0,
+                name: '',
+                ranking: 0,
+                teamUrl: '',
+              },
+              age: 0,
+              country: '',
+              ranking: 0,
+              cyclistUrl: '',
+              upcomingRaces: [],
+            },
+            role: CyclistRole.MAIN,
+            fromStage: 0,
+            toStage: 0,
+          };
+          team.cyclistAssignments.push(cyclistAssignment);
+        }
+      }
+    },
+    removeCyclistFromUserTeamCylists: (
+      state,
+      action: PayloadAction<{
+        cyclistName: string;
+        email: string;
+        competitionId: number;
       }>,
     ) => {
       const { cyclistName, email, competitionId } = action.payload;
@@ -40,28 +150,19 @@ const userTeamsSlice = createSlice({
           team.user.email === email && team.competitionId === competitionId,
       );
       if (team) {
-        // Prevent duplicates
-        if (team.mainCyclists.length >= (action.payload.maxCyclists || 15)) {
-          const cyclist: Cyclist = {
-            name: cyclistName,
-            id: '',
-            team: [],
-            age: 0,
-            country: '',
-          };
-          team.reserveCyclists.push(cyclist);
-          return;
-        } else if (!team.mainCyclists.find((c) => c.name === cyclistName)) {
-          const cyclist: Cyclist = {
-            name: cyclistName,
-            id: '',
-            team: [],
-            age: 0,
-            country: '',
-          };
-          team.mainCyclists.push(cyclist);
-        }
+        team.cyclistAssignments.filter(
+          (cyclistAssignments) => cyclistAssignments.role === CyclistRole.MAIN,
+        );
       }
+    },
+    setUserTeams: (state, action: PayloadAction<UserTeamDTO[]>) => {
+      if (!action.payload) {
+        return;
+      }
+      state.data = action.payload;
+    },
+    resetUserTeamsStatus: (state) => {
+      state.status = 'idle';
     },
   },
   extraReducers: (builder) => {
@@ -71,16 +172,34 @@ const userTeamsSlice = createSlice({
       })
       .addCase(
         fetchUserTeam.fulfilled,
-        (state, action: PayloadAction<UserTeam[]>) => {
+        (state, action: PayloadAction<UserTeamDTO[]>) => {
           state.status = 'succeeded';
           state.data = action.payload;
         },
       )
       .addCase(fetchUserTeam.rejected, (state) => {
         state.status = 'failed';
+      })
+      .addCase(fetchCyclistsWithDNS.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(
+        fetchCyclistsWithDNS.fulfilled,
+        (state, action: PayloadAction<CyclistDTO[]>) => {
+          state.status = 'succeeded';
+          state.cyclistsWithDNS = action.payload;
+        },
+      )
+      .addCase(fetchCyclistsWithDNS.rejected, (state) => {
+        state.status = 'failed';
       });
   },
 });
 
-export const { updateUserTeamCyclists } = userTeamsSlice.actions;
+export const {
+  updateUserTeamCyclists,
+  removeCyclistFromUserTeamCylists,
+  setUserTeams,
+  resetUserTeamsStatus,
+} = userTeamsSlice.actions;
 export default userTeamsSlice.reducer;

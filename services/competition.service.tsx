@@ -31,7 +31,7 @@ export const getCompetitions = async () => {
   return res.json();
 };
 
-export const getCompetition = async (competitionId: string) => {
+export const getCompetition = async (competitionId: number) => {
   const res = await fetch(
     process.env.NEXT_PUBLIC_API_URL + '/competitions/' + competitionId,
     {
@@ -45,6 +45,25 @@ export const getCompetition = async (competitionId: string) => {
 
   if (!res.ok) {
     throw new Error('Failed to fetch competition');
+  }
+
+  return res.json();
+};
+
+export const getCompetitionResultsUpdate = async (competitionId: number) => {
+  const res = await fetch(
+    process.env.NEXT_PUBLIC_API_URL + '/competitions/results/' + competitionId,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
+      },
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch competition results update');
   }
 
   return res.json();

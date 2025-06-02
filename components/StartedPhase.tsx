@@ -1,23 +1,29 @@
 import { container } from '@/const/containerStyle';
-import { Competition } from '@/types/competition';
-import { StagePoints, StagePointsPerCyclist } from '@/types/stage-points';
-import { UserTeam } from '@/types/user-team';
+import { CompetitionDTO } from '@/types/competition';
+import { MainReservePointsCyclist, PointsPerCyclist } from '@/types/points';
+import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 interface StartedPhaseProps {
-  stagePoints: StagePointsPerCyclist[] | StagePoints[];
-  email: string | null;
-  competition: Competition;
-  userTeams: UserTeam[];
+  mainReservePointsCyclist: MainReservePointsCyclist | null;
+  cyclistDeactivateTemplate: (rowData: PointsPerCyclist) => React.ReactNode;
+  activateCyclistTemplate: (rowData: PointsPerCyclist) => React.ReactNode;
+  teamChanged: boolean;
+  resetChanges: () => void;
+  handleSubmitTeamChanges: () => void;
+  competition: CompetitionDTO;
 }
 
 const StartedPhase: React.FC<StartedPhaseProps> = ({
-  stagePoints,
-  email,
+  mainReservePointsCyclist,
+  cyclistDeactivateTemplate,
+  activateCyclistTemplate,
+  teamChanged,
+  resetChanges,
+  handleSubmitTeamChanges,
   competition,
-  userTeams,
 }) => {
   return (
     <div className="flex flex-col gap-12 w-full">
@@ -28,9 +34,13 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
         <div className="flex flex-col flex-1 gap-2">
           <h3 className="font-semibold">Huidige Selectie</h3>
           <div style={container} className="max-h-[70vh] overflow-y-auto">
-            <DataTable value={stagePoints}>
+            <DataTable
+              key={Date.now()}
+              value={mainReservePointsCyclist?.mainCyclists}
+            >
               <Column header="Naam" field="cyclistName" />
               <Column header="Punten Verdiend" field="points" />
+              <Column body={cyclistDeactivateTemplate} header="Deactiveer" />
             </DataTable>
           </div>
         </div>
@@ -38,20 +48,29 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
           <h3 className="font-semibold">Reserve renners</h3>
           <div style={container} className="max-h-[70vh] overflow-y-auto">
             <DataTable
-              value={
-                userTeams.find(
-                  (team) =>
-                    team.competitionId === competition.id &&
-                    team.user.email === email,
-                )?.reserveCyclists
-              }
+              key={Date.now()} // or another unique key that changes when needed
+              value={mainReservePointsCyclist?.reserveCyclists}
             >
-              <Column header="Naam" field="name" />
-              <Column header="Team" field="team" />
-              <Column header="Punten Verdiend" field="pointsScored" />
+              <Column header="Naam" field="cyclistName" />
+              <Column header="Punten Verdiend" field="points" />
+              <Column body={activateCyclistTemplate} header="Activeer" />
             </DataTable>
           </div>
         </div>
+      </div>
+      <div className="flex w-full justify-between">
+        {teamChanged && (
+          <>
+            <Button label="Annuleer" raised onClick={() => resetChanges()} />
+            {mainReservePointsCyclist?.mainCyclists.length ===
+              competition.maxMainCyclists && (
+              <Button
+                label="Update team"
+                onClick={() => handleSubmitTeamChanges()}
+              />
+            )}
+          </>
+        )}
       </div>
     </div>
   );

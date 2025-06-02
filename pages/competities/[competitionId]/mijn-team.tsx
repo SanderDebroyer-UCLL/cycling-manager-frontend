@@ -10,44 +10,57 @@ import {
 import { fetchCyclists } from '@/features/cyclists/cyclists.slice';
 import {
   fetchUserTeam,
+  postUpdateUserTeamMainCyclists,
   updateUserTeamCyclists,
 } from '@/features/user-teams/user-teams.slice';
 import { AppDispatch, RootState } from '@/store/store';
 import {
-  Competition,
+  CompetitionDTO,
   CompetitionPick,
   CompetitionStatus,
 } from '@/types/competition';
-import { Cyclist } from '@/types/cyclist';
-import { UserTeam } from '@/types/user-team';
+import { CyclistDTO } from '@/types/cyclist';
+import { UserTeamDTO } from '@/types/user-team';
 import { useRouter } from 'next/router';
-import { ProgressSpinner } from 'primereact/progressspinner';
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { countryAbbreviationMap } from '@/utils/country-abbreviation-map-lowercase';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
-import { User } from '@/types/user';
+import { UserDTO } from '@/types/user';
 import { fetchUsers, resetUsersStatus } from '@/features/users/users.slice';
-import { confirmPopup, ConfirmPopup } from 'primereact/confirmpopup';
+import { confirmPopup } from 'primereact/confirmpopup';
 import SelectingPhase from '@/components/SelectingPhase';
 import SortingPhase from '@/components/SortingPhase';
 import { container } from '@/const/containerStyle';
 import StartedPhase from '@/components/StartedPhase';
-import { fetchStagePointsForAllStages } from '@/features/stage-points/stage-points.slice';
+import { UserPlus, UserX } from 'lucide-react';
+import { MainReservePointsCyclist, PointsPerCyclist } from '@/types/points';
+import { Button } from 'primereact/button';
+import LoadingOverlay from '@/components/LoadingOverlay';
+import {
+  fetchRacePointsForAllRaces,
+  fetchStagePointsForAllStages,
+  updateMainReservePointsCyclist,
+} from '@/features/points/points.slice';
 
 const index = () => {
   const router = useRouter();
   const { competitionId } = router.query;
-  const [usersState, setUsersState] = useState<User[]>([]);
-  const [cyclistsState, setCyclistsState] = useState<Cyclist[]>([]);
+  const [usersState, setUsersState] = useState<UserDTO[]>([]);
+  const [cyclistsState, setCyclistsState] = useState<CyclistDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedCyclist, setSelectedCyclist] = useState<Cyclist | null>(null);
+  const [selectedCyclist, setSelectedCyclist] = useState<CyclistDTO | null>(
+    null,
+  );
   const [reserveCyclistCount, setReserveCyclistCount] = useState<number>(0);
   const [cyclistCount, setCyclistCount] = useState<number>(0);
   const [mainTeamPopupVisible, setMainTeamPopupVisible] =
     useState<boolean>(false);
   const [confirmTarget, setConfirmTarget] = useState<Element | null>(null);
+  const [initialPoints, setInitialPoints] =
+    useState<MainReservePointsCyclist | null>(null);
+  const [teamChanged, setTeamChanged] = useState<boolean>(false);
   const usersStatus = useSelector((state: RootState) => state.users.status);
   const userTeamsStatus = useSelector(
     (state: RootState) => state.userTeams.status,
@@ -55,114 +68,129 @@ const index = () => {
   const cyclistsStatus = useSelector(
     (state: RootState) => state.cyclists.status,
   );
-  const stagePointsStatus = useSelector(
-    (state: RootState) => state.stagePoints.status,
+  const pointsStatus = useSelector((state: RootState) => state.points.status);
+  const mainReservePointsCyclist = useSelector(
+    (state: RootState) => state.points.mainReservePointsCyclist,
   );
-  const stagePoints = useSelector(
-    (state: RootState) => state.stagePoints.stagePointsPerCyclist,
-  );
-  const cyclists: Cyclist[] = useSelector(
+  const cyclists: CyclistDTO[] = useSelector(
     (state: RootState) => state.cyclists.data,
   );
-  const user: User | null = useSelector((state: RootState) => state.user.data);
-  const users: User[] = useSelector((state: RootState) => state.users.data);
-  const userTeams: UserTeam[] = useSelector(
+  const user: UserDTO | null = useSelector(
+    (state: RootState) => state.user.userDTO,
+  );
+  const users: UserDTO[] = useSelector((state: RootState) => state.users.data);
+  const userTeams: UserTeamDTO[] = useSelector(
     (state: any) => state.userTeams.data,
   );
-  const competition: Competition = useSelector(
-    (state: any) => state.competition.data,
+  const competition: CompetitionDTO | null = useSelector(
+    (state: any) => state.competition.competitionDTO,
   );
-  const competitionRef = useRef<Competition | null>(null);
+  const competitionRef = useRef<CompetitionDTO | null>(null);
   const stompClientRef = useRef<Client | null>(null);
   const email = sessionStorage.getItem('email');
   const dispatch = useDispatch<AppDispatch>();
 
+  // Set competition ref when competition changes
   useEffect(() => {
-    competitionRef.current = competition;
+    if (competition) {
+      competitionRef.current = competition;
+    }
   }, [competition]);
 
+  // Set initial points when data is first available
   useEffect(() => {
-    if (stagePoints.length === 0 || stagePointsStatus === 'idle') {
-      if (!user || !user.id || !competition || !competition.id) {
-        return;
-      }
-      dispatch(
-        fetchStagePointsForAllStages({
-          competitionId: competition.id,
-          userId: user.id.toString(),
-        }),
-      );
+    if (mainReservePointsCyclist && !initialPoints) {
+      setInitialPoints(mainReservePointsCyclist);
     }
-  }, [dispatch, stagePoints, stagePointsStatus, user, competition]);
+  }, [mainReservePointsCyclist, initialPoints]);
 
+  // Fetch points data when needed
   useEffect(() => {
-    if (cyclistsStatus === 'succeeded' && cyclists) {
+    // Early return if data is already available or currently loading
+    if (mainReservePointsCyclist !== null) {
+      return;
+    }
+    // Early return if required data is missing
+    if (!user?.id || !competition?.id) {
+      return;
+    }
+    // Dispatch appropriate action based on competition structure
+    const fetchAction =
+      competition.races[0].stages.length === 0
+        ? fetchRacePointsForAllRaces
+        : fetchStagePointsForAllStages;
+    dispatch(
+      fetchAction({
+        competitionId: competition.id,
+        userId: user.id,
+      }),
+    );
+  }, [dispatch, mainReservePointsCyclist, pointsStatus, user, competition]);
+
+  // Filter cyclists and set cyclist limits when data is available
+  useEffect(() => {
+    if (cyclistsStatus === 'succeeded' && cyclists && userTeams) {
       const filteredCyclists = cyclists.filter((cyclist) => {
-        return !userTeams.some(
-          (userTeam: UserTeam) =>
-            userTeam.mainCyclists.some(
+        return !userTeams.some((userTeam: UserTeamDTO) =>
+          userTeam.cyclistAssignments
+            .map((assignment) => assignment.cyclist)
+            .some(
               (teamCyclist) => teamCyclist.name.trim() === cyclist.name.trim(),
-            ) ||
-            userTeam.reserveCyclists?.some(
-              (reserveCyclist) =>
-                reserveCyclist.name.trim() === cyclist.name.trim(),
             ),
         );
       });
       setCyclistsState(filteredCyclists);
     }
-  }, [cyclists, userTeams, cyclistsStatus]);
+  }, [dispatch, cyclists, userTeams, cyclistsStatus]);
 
+  // Set cyclist count limits when competition data is available
   useEffect(() => {
-    if (
-      competition &&
-      competition.maxMainCyclists &&
-      competition.maxReserveCyclists
-    ) {
+    if (competition?.maxMainCyclists && competition?.maxReserveCyclists) {
       setCyclistCount(competition.maxMainCyclists);
       setReserveCyclistCount(competition.maxReserveCyclists);
     }
-  }, [competition]);
+  }, [competition?.maxMainCyclists, competition?.maxReserveCyclists]);
 
+  // Sort users based on pick order when data is available
   useEffect(() => {
-    if (usersStatus === 'succeeded' && competition) {
+    if (usersStatus === 'succeeded' && competition?.competitionPicks) {
       const sortedUsers = competition.competitionPicks
-        .slice() // clone the array to avoid mutating the original (which is read-only)
+        .slice() // clone the array to avoid mutating the original
         .sort((a, b) => a.pickOrder - b.pickOrder)
-        .map((pick: CompetitionPick) => {
-          return users.find((user) => user.id === pick.userId) || null;
-        })
-        .filter((user): user is User => user !== null);
+        .map((pick: CompetitionPick) =>
+          users.find((user) => user.id === pick.userId),
+        )
+        .filter((user): user is UserDTO => user !== null);
 
       setUsersState(sortedUsers);
       resetUsersStatus();
     }
-  }, [competition && competition.competitionPicks, usersStatus, users]);
+  }, [competition?.competitionPicks, usersStatus, users]);
 
+  // Fetch all required data when missing - Combined fetch effects
   useEffect(() => {
     if (!users || usersStatus === 'idle') {
       dispatch(fetchUsers());
     }
-  }, [users]);
-
-  useEffect(() => {
     if (!cyclists || cyclistsStatus === 'idle') {
       dispatch(fetchCyclists());
     }
-  }, [userTeams]);
-
-  useEffect(() => {
-    if (!userTeams || userTeamsStatus === 'idle') {
+    if (userTeams.length === 0 || !userTeams || userTeamsStatus === 'idle') {
       dispatch(fetchUserTeam());
     }
-  }, [userTeams]);
+  }, [
+    users,
+    usersStatus,
+    cyclists,
+    cyclistsStatus,
+    userTeams,
+    userTeamsStatus,
+    dispatch,
+  ]);
 
+  // Set loading state based on cyclists status - Simplified
   useEffect(() => {
-    if (cyclistsStatus === 'loading') {
-      setLoading(true);
-    } else {
-      setLoading(false);
-    }
+    setLoading(cyclistsStatus === 'loading');
   }, [cyclistsStatus]);
 
   useEffect(() => {
@@ -170,9 +198,18 @@ const index = () => {
       (!competition && competitionId) ||
       (competition &&
         competitionId &&
-        competition.id.toString().trim() !== competitionId.toString().trim())
+        competition.id !==
+          Number(
+            Array.isArray(competitionId) ? competitionId[0] : competitionId,
+          ))
     ) {
-      dispatch(fetchCompetitionById(competitionId.toString()));
+      dispatch(
+        fetchCompetitionById(
+          Number(
+            Array.isArray(competitionId) ? competitionId[0] : competitionId,
+          ),
+        ),
+      );
     }
   }, [dispatch, competition, competitionId]);
 
@@ -185,9 +222,10 @@ const index = () => {
         stompClient.subscribe('/topic/picks', (message) => {
           const pick: {
             cyclistName: string;
+            cyclistId: number;
             email: string;
             currentPick: number;
-            competitionId: string;
+            competitionId: number;
             maxCyclists: number;
           } = JSON.parse(message.body);
 
@@ -202,7 +240,7 @@ const index = () => {
         stompClient.subscribe('/topic/order', (message) => {
           const order: {
             competitionPicks: CompetitionPick[];
-            competitionId: string;
+            competitionId: number;
           } = JSON.parse(message.body);
 
           if (!competitionRef.current) {
@@ -247,18 +285,37 @@ const index = () => {
   }, []);
 
   useEffect(() => {
+    if (!initialPoints || !mainReservePointsCyclist) {
+      return;
+    }
+    const isEqual =
+      JSON.stringify(initialPoints) ===
+      JSON.stringify(mainReservePointsCyclist);
+    setTeamChanged(!isEqual);
+  }, [initialPoints, mainReservePointsCyclist]);
+
+  useEffect(() => {
+    if (!competition || !userTeams) {
+      return;
+    }
+    const mainCyclistsCount = userTeams.reduce(
+      (count: number, team: UserTeamDTO) =>
+        count + team.cyclistAssignments.length,
+      0,
+    );
+    if (mainCyclistsCount === 0) return;
     if (
-      competition &&
-      userTeams.every(
-        (team: UserTeam) =>
-          team.mainCyclists.length === competition.maxMainCyclists,
-      )
+      mainCyclistsCount ===
+      competition.maxMainCyclists *
+        userTeams.filter(
+          (userTeam) => userTeam.competitionId === competition.id,
+        ).length
     ) {
       setMainTeamPopupVisible(true);
     } else {
       setMainTeamPopupVisible(false);
     }
-  }, []);
+  }, [userTeams, competition]);
 
   useEffect(() => {
     if (selectedCyclist && confirmTarget) {
@@ -268,7 +325,7 @@ const index = () => {
         icon: 'pi pi-exclamation-triangle',
         defaultFocus: 'accept',
         accept: () => {
-          if (stompClientRef.current === null) {
+          if (stompClientRef.current === null || !competition) {
             return;
           }
           stompClientRef.current?.publish({
@@ -298,7 +355,7 @@ const index = () => {
       console.warn('STOMP client not connected yet.');
       return;
     }
-    if (stompClientRef.current === null) {
+    if (stompClientRef.current === null || !competition) {
       return;
     }
     stompClientRef.current?.publish({
@@ -318,7 +375,7 @@ const index = () => {
     setCyclistCount(count);
     const client = stompClientRef.current;
 
-    if (!client || !client.connected) {
+    if (!client || !client.connected || !competition) {
       console.warn('STOMP client not connected yet.');
       return;
     }
@@ -336,9 +393,9 @@ const index = () => {
     });
   };
 
-  const handleUsersChange = (users: User[]) => {
+  const handleUsersChange = (users: UserDTO[]) => {
     setUsersState(users);
-    if (stompClientRef.current === null) {
+    if (stompClientRef.current === null || !competition) {
       return;
     }
     stompClientRef.current?.publish({
@@ -358,7 +415,86 @@ const index = () => {
     });
   };
 
-  const itemTemplate = (user: User, index: number) => {
+  const handleDeactivateMain = (PointsPerCyclist: PointsPerCyclist) => {
+    if (!mainReservePointsCyclist) {
+      return;
+    }
+
+    const { cyclistId, cyclistName } = PointsPerCyclist;
+
+    const updatedMainReservePointsCyclist: MainReservePointsCyclist = {
+      mainCyclists: mainReservePointsCyclist.mainCyclists.filter(
+        (cyclist) => cyclist.cyclistId !== cyclistId,
+      ),
+      reserveCyclists: [
+        ...mainReservePointsCyclist.reserveCyclists,
+        {
+          cyclistName,
+          cyclistId,
+          points: 0,
+          isCyclistActive: false,
+          userId: 0,
+        },
+      ],
+    };
+
+    dispatch(updateMainReservePointsCyclist(updatedMainReservePointsCyclist));
+  };
+
+  const handleActivateReserve = (PointsPerCyclist: PointsPerCyclist) => {
+    if (!mainReservePointsCyclist) {
+      return;
+    }
+
+    const { cyclistId, cyclistName } = PointsPerCyclist;
+
+    const updatedMainReservePointsCyclist: MainReservePointsCyclist = {
+      mainCyclists: [
+        ...mainReservePointsCyclist.mainCyclists,
+        {
+          cyclistName,
+          cyclistId,
+          points: 0,
+          isCyclistActive: true,
+          userId: 0,
+        },
+      ],
+      reserveCyclists: mainReservePointsCyclist.reserveCyclists.filter(
+        (cyclist) => cyclist.cyclistId !== cyclistId,
+      ),
+    };
+
+    dispatch(updateMainReservePointsCyclist(updatedMainReservePointsCyclist));
+  };
+
+  const handleSubmitTeamChanges = () => {
+    if (!mainReservePointsCyclist || !competition || !email) {
+      return;
+    }
+    const mainCyclistIds = mainReservePointsCyclist?.mainCyclists.map(
+      (Point: PointsPerCyclist) => Point.cyclistId,
+    );
+    const userTeam = userTeams.find(
+      (team) =>
+        team.user.email === email && team.competitionId === competition.id,
+    );
+    if (!userTeam) {
+      return;
+    }
+    const reserveCyclistIds = mainReservePointsCyclist?.reserveCyclists.map(
+      (Point: PointsPerCyclist) => Point.cyclistId,
+    );
+
+    dispatch(
+      postUpdateUserTeamMainCyclists({
+        mainCyclistIds,
+        reserveCyclistIds,
+        userTeamId: userTeam.id,
+      }),
+    );
+  };
+
+  const itemTemplate = (user: UserDTO, index: number) => {
     return (
       <div className="flex flex-wrap p-2 align-items-center gap-3">
         <span className="w-6 text-right font-bold text-primary-500">
@@ -372,7 +508,7 @@ const index = () => {
     );
   };
 
-  const countryBodyTemplate = (rowData: Cyclist) => {
+  const countryBodyTemplate = (rowData: CyclistDTO) => {
     return (
       <div className="flex align-items-center gap-2">
         <img
@@ -385,16 +521,68 @@ const index = () => {
     );
   };
 
-  if (!competition || userTeams === null || userTeams.length === 0) {
+  const handleResetChanges = () => {
+    if (!initialPoints) {
+      return;
+    }
+    dispatch(updateMainReservePointsCyclist(initialPoints));
+  };
+
+  const cyclistDeactivateTemplate = (rowData: PointsPerCyclist) => {
+    if (!rowData.isCyclistActive) {
+      return (
+        <>
+          <Button
+            label="Deactiveer"
+            severity="danger"
+            icon={() => <UserX size={16} className="mr-2 stroke-[2.5]" />}
+            raised
+            onClick={() => handleDeactivateMain(rowData)}
+          />
+        </>
+      );
+    } else {
+      return <div></div>;
+    }
+  };
+
+  const activateCyclistTemplate = (rowData: PointsPerCyclist) => {
+    if (!mainReservePointsCyclist || !competition) {
+      return;
+    }
+    if (
+      mainReservePointsCyclist?.reserveCyclists.length >
+        competition.maxReserveCyclists &&
+      rowData.isCyclistActive === true
+    ) {
+      return (
+        <>
+          <Button
+            label="Activeer"
+            size="small"
+            icon={() => <UserPlus size={16} className="mr-2 stroke-[2.5]" />}
+            raised
+            onClick={() => handleActivateReserve(rowData)}
+          />
+        </>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
+  if (
+    !competition ||
+    userTeams === null ||
+    (competition.competitionStatus === CompetitionStatus.STARTED &&
+      cyclistsState.length === 0) ||
+    (competition.competitionStatus === CompetitionStatus.STARTED &&
+      !mainReservePointsCyclist)
+  ) {
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-surface-100 z-9999">
-        <ProgressSpinner
-          style={{ width: '100px', height: '100px' }}
-          strokeWidth="8"
-          className="stroke-primary-500"
-          animationDuration=".5s"
-        />
-      </div>
+      <>
+        <LoadingOverlay />
+      </>
     );
   }
 
@@ -441,10 +629,13 @@ const index = () => {
     return (
       <>
         <StartedPhase
-          userTeams={userTeams}
-          stagePoints={stagePoints}
-          email={email}
           competition={competition}
+          handleSubmitTeamChanges={handleSubmitTeamChanges}
+          cyclistDeactivateTemplate={cyclistDeactivateTemplate}
+          resetChanges={() => handleResetChanges()}
+          activateCyclistTemplate={activateCyclistTemplate}
+          teamChanged={teamChanged}
+          mainReservePointsCyclist={mainReservePointsCyclist}
         />
       </>
     );

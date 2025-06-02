@@ -1,16 +1,11 @@
 // src/features/race/raceSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { getAllRaces, reloadRaceData } from '@/services/race.service';
+import { Race, RaceDTO } from '@/types/race';
 
 // Define Race type based on your API response
-export interface Race {
-  id: string;
-  name: string;
-  // add more fields as needed
-}
-
 interface RacesState {
-  data: Race[];
+  data: RaceDTO[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
@@ -35,16 +30,23 @@ export const updateRaceData = createAsyncThunk(
 const raceSlice = createSlice({
   name: 'race',
   initialState,
-  reducers: {},
+  reducers: {
+    resetRaceStatus: (state) => {
+      state.status = 'idle';
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchRace.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(fetchRace.fulfilled, (state, action: PayloadAction<Race[]>) => {
-        state.status = 'succeeded';
-        state.data = action.payload;
-      })
+      .addCase(
+        fetchRace.fulfilled,
+        (state, action: PayloadAction<RaceDTO[]>) => {
+          state.status = 'succeeded';
+          state.data = action.payload;
+        },
+      )
       .addCase(fetchRace.rejected, (state) => {
         state.status = 'failed';
       })
@@ -53,7 +55,7 @@ const raceSlice = createSlice({
       })
       .addCase(
         updateRaceData.fulfilled,
-        (state, action: PayloadAction<Race[]>) => {
+        (state, action: PayloadAction<RaceDTO[]>) => {
           state.status = 'succeeded';
           state.data = action.payload;
         },
@@ -63,5 +65,7 @@ const raceSlice = createSlice({
       });
   },
 });
+
+export const { resetRaceStatus } = raceSlice.actions;
 
 export default raceSlice.reducer;

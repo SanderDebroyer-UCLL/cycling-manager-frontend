@@ -1,17 +1,19 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { loginUser, registerUser } from '@/services/auth.service';
 import { Credentials } from '@/types/credentials';
-import { RegisterUserDetails, User } from '@/types/user';
+import { JwtRes, RegisterUserDetails, User, UserDTO } from '@/types/user';
 import { getLoggedInUser } from '@/services/user.service';
 
 interface UserState {
-  data: User | null;
+  userDTO: UserDTO | null;
+  jwtRes: JwtRes | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed' | 'not-authenticated';
   error: string | null;
 }
 
 const initialUserState: UserState = {
-  data: null,
+  userDTO: null,
+  jwtRes: null,
   status: 'idle',
   error: null,
 };
@@ -49,21 +51,15 @@ const userSlice = createSlice({
     },
     setUser(state, action) {
       if (action.payload === null) {
-        state.data = null;
+        state.userDTO = null;
         return;
       }
 
-      if (state.data === null) {
-        state.data = {
-          email: '',
-          jwtToken: '',
-          firstName: '',
-          lastName: '',
-          password: '',
-        };
+      if (state.userDTO === null) {
+        return;
       }
-      state.data.email = action.payload.email;
-      state.data.jwtToken = action.payload.jwtToken;
+      state.userDTO.email = action.payload.email;
+      state.userDTO.jwtToken = action.payload.jwtToken;
     },
   },
   extraReducers: (builder) => {
@@ -74,9 +70,9 @@ const userSlice = createSlice({
       })
       .addCase(
         loginUserRequest.fulfilled,
-        (state, action: PayloadAction<User>) => {
+        (state, action: PayloadAction<JwtRes>) => {
           state.status = 'succeeded';
-          state.data = action.payload;
+          state.jwtRes = action.payload;
           state.error = null;
         },
       )
@@ -89,14 +85,9 @@ const userSlice = createSlice({
         state.status = 'loading';
         state.error = null; // clear previous errors on new request
       })
-      .addCase(
-        registerUserRequest.fulfilled,
-        (state, action: PayloadAction<User>) => {
-          state.status = 'succeeded';
-          state.data = null;
-          state.error = null;
-        },
-      )
+      .addCase(registerUserRequest.fulfilled, (state) => {
+        state.status = 'succeeded';
+      })
       .addCase(registerUserRequest.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to register';
@@ -107,13 +98,13 @@ const userSlice = createSlice({
       })
       .addCase(
         requestLoggedInUser.fulfilled,
-        (state, action: PayloadAction<User>) => {
+        (state, action: PayloadAction<UserDTO>) => {
           state.status = 'succeeded';
-          state.data = action.payload;
+          state.userDTO = action.payload;
           state.error = null;
         },
       )
-      .addCase(requestLoggedInUser.rejected, (state, action) => {
+      .addCase(requestLoggedInUser.rejected, (state) => {
         state.status = 'not-authenticated';
         state.error = null;
       });

@@ -1,4 +1,3 @@
-import { selectCurrentUser } from '@/features/user/user.selector';
 import {
   registerUserRequest,
   resetUserStatus,
@@ -33,7 +32,7 @@ export default function Register() {
   const router = useRouter();
   const status = useSelector((state: RootState) => state.user.status);
   const error = useSelector((state: RootState) => state.user.error);
-  const user = useSelector(selectCurrentUser);
+  const user = useSelector((state: RootState) => state.user.userDTO);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -114,7 +113,7 @@ export default function Register() {
   return (
     <>
       <main className="flex items-center justify-center max-w-[70vw] mx-auto p-20 text-dark-700">
-        <div className="bg-surface-100 flex flex-col justify-center gap-4 px-16 py-20  rounded-lg">
+        <div className="bg-surface flex flex-col justify-center gap-4 px-16 py-20  rounded-xl">
           <h2 className="font-semibold text-lg">Registreer</h2>
           <p>Vul uw gegevens in a.u.b.</p>
           <div>
@@ -127,7 +126,7 @@ export default function Register() {
               />
             </IconField>
             {firstNameError && (
-              <p className="text-red-500 text-sm pt-2">{firstNameError}</p>
+              <p className="text-error text-sm pt-2">{firstNameError}</p>
             )}
           </div>
           <div>
@@ -140,7 +139,7 @@ export default function Register() {
               />
             </IconField>
             {lastNameError && (
-              <p className="text-red-500 text-sm pt-2">{lastNameError}</p>
+              <p className="text-error text-sm pt-2">{lastNameError}</p>
             )}
           </div>
           <div>
@@ -153,7 +152,7 @@ export default function Register() {
               />
             </IconField>
             {emailError && (
-              <p className="text-red-500 text-sm pt-2">{emailError}</p>
+              <p className="text-error text-sm pt-2">{emailError}</p>
             )}
           </div>
 
@@ -168,7 +167,7 @@ export default function Register() {
               />
             </IconField>
             {passwordError && (
-              <p className="text-red-500 text-sm pt-2">{passwordError}</p>
+              <p className="text-error text-sm pt-2">{passwordError}</p>
             )}
           </div>
           <div>
@@ -182,7 +181,7 @@ export default function Register() {
               />
             </IconField>
             {repeatPasswordError && (
-              <p className="text-red-500 text-sm pt-2">{repeatPasswordError}</p>
+              <p className="text-error text-sm pt-2">{repeatPasswordError}</p>
             )}
           </div>
           <Button

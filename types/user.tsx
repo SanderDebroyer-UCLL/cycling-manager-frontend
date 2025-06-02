@@ -10,6 +10,21 @@ export interface User {
   jwtToken?: string;
 }
 
+export interface JwtRes {
+  jwtToken: string;
+  email: string;
+  role: 'admin' | 'user';
+}
+
+export interface UserDTO {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  jwtToken: string;
+  role: 'admin' | 'user';
+  totalPoints: number;
+}
 
 export interface RegisterUserDetails {
   firstName: string;

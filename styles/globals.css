@@ -13,16 +13,53 @@
 @import 'tailwindcss/preflight' layer(base);
 @import 'tailwindcss/utilities' layer(utilities);
 
+body {
+  @apply text-on-surface;
+}
+
+.p-confirm-popup-footer {
+  @apply flex justify-end gap-2;
+}
+
+.p-tooltip {
+  filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3))
+    drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.15));
+}
+
+.p-tooltip.p-tooltip-right .p-tooltip-arrow {
+  @apply border-r-inverse-surface;
+}
+
+.p-tooltip-text {
+  @apply bg-inverse-surface border-r-inverse-surface text-inverse-on-surface text-xs px-2 py-1;
+}
+
+.p-inputtext {
+  @apply rounded-xl font-semibold border-2;
+}
+
+.p-inputtext span {
+  @apply text-on-surface;
+}
+
+.p-inputtext:enabled {
+  @apply border-outline;
+}
+
+.p-inputtext:enabled:focus {
+  @apply border-outline shadow-[0_0_0_0.2rem_#d1e4ff];
+}
+
 .p-datepicker {
-  @apply bg-surface-100 border-[1px] p-4 border-surface-500;
+  @apply bg-surface-container border-none p-4 rounded-xl;
+}
+
+.p-datepicker-header {
+  @apply bg-surface-container rounded-xl p-2;
 }
 
 .p-toast {
   @apply !top-[80px];
-}
-
-.p-datepicker-header {
-  @apply bg-surface-100 rounded-lg p-2;
 }
 
 .p-datepicker span {
@@ -34,55 +71,125 @@
 }
 
 .p-datepicker table td > span.p-highlight {
-  @apply bg-primary-500 rounded-full text-surface-50;
+  @apply bg-primary rounded-full text-surface-bright;
 }
 
 .p-datatable {
-  @apply bg-surface-100 rounded-lg;
+  @apply bg-surface-container rounded-xl;
 }
 
 .p-datatable-header {
-  @apply bg-surface-100 border-none;
+  @apply bg-surface-container border-none;
 }
 
 .p-datatable-thead th {
-  @apply bg-surface-100 border-none;
+  @apply bg-surface-container border-none;
 }
 
 .p-datatable-tbody tr {
-  @apply bg-surface-100 border-none;
+  @apply bg-surface-container border-none;
 }
 
 .p-paginator {
-  @apply bg-surface-100 border-none;
+  @apply bg-surface-container border-none;
+}
+
+.p-button:disabled {
+  @apply opacity-50 cursor-not-allowed;
 }
 
 .p-button:not(:disabled) {
-  @apply bg-primary-500 transition-all;
+  @apply bg-primary text-on-primary border-2 border-primary;
 }
 
-.p-button:not(:disabled):hover {
-  @apply bg-primary-600;
+.p-button:not(:disabled).p-button-secondary {
+  @apply bg-secondary text-on-secondary border-2 border-secondary;
 }
 
-.p-button.p-button-text {
-  @apply bg-transparent;
+.p-button:not(:disabled).p-button-danger {
+  @apply bg-error text-on-error border-2 border-error;
 }
 
-.p-button.p-button-text:hover {
-  @apply bg-surface-100;
+.p-button.p-button-outlined {
+  @apply border-2 border-primary text-primary bg-transparent;
 }
 
-.p-button-secondary.p-button.p-button-outlined:not(:disabled) {
-  @apply border-[#64748b];
+.p-button.p-button-outlined.p-button-secondary {
+  @apply border-2 border-secondary text-secondary bg-transparent;
 }
 
-.p-button.p-button-outlined:not(:disabled) {
-  @apply bg-transparent border-primary-500;
+.p-button.p-button-outlined.p-button-danger {
+  @apply border-2 text-error bg-transparent border-error;
 }
 
-.p-button.p-button-outlined:not(:disabled):hover {
-  @apply bg-surface-100;
+/* Base button styles */
+.p-button {
+  @apply bg-primary border-primary text-on-primary relative overflow-hidden font-semibold flex items-center justify-center select-none
+      px-4 py-2 rounded-xl transition-all
+      text-sm leading-normal;
+}
+
+/* Add pseudo-element ::before for hover effect */
+.p-button::before {
+  content: '';
+  @apply absolute inset-0 opacity-0 transition-opacity duration-200;
+}
+
+/* Primary Filled Button */
+.p-button::before {
+  @apply bg-on-primary;
+}
+
+.p-button:hover::before {
+  @apply opacity-[0.16];
+}
+
+/* Secondary */
+.p-button.p-button-secondary {
+  @apply bg-secondary text-on-secondary;
+}
+
+.p-button.p-button-secondary::before {
+  @apply bg-on-secondary;
+}
+
+/* Danger/Error */
+.p-button.p-button-danger {
+  @apply bg-error text-on-error;
+}
+
+.p-button.p-button-danger::before {
+  @apply bg-on-error;
+}
+
+/* Primary Raised */
+.p-button.p-button-raised {
+  @apply bg-primary-container text-on-primary-container border-2 border-transparent shadow-none;
+}
+.p-button.p-button-raised::before {
+  @apply bg-on-primary-container;
+}
+
+/* Secondary Raised */
+.p-button.p-button-raised.p-button-secondary {
+  @apply bg-secondary-container text-on-secondary-container border-2 border-transparent shadow-none;
+}
+.p-button.p-button-raised.p-button-secondary::before {
+  @apply bg-on-secondary-container;
+}
+
+/* Danger/Error Raised */
+.p-button.p-button-raised.p-button-danger {
+  @apply bg-error-container text-on-error-container border-2 border-transparent shadow-none;
+}
+.p-button.p-button-raised.p-button-danger::before {
+  @apply bg-on-error-container;
+}
+
+.p-treeselect-panel {
+  width: 100% !important;
+  max-width: 402px !important;
+  box-sizing: border-box;
 }
 
 @theme {
@@ -94,137 +201,53 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  --color-surface-50: #f9fafb; /* Base */
-  --color-surface-100: #f4f6f9; /* Lighter */
-  --color-surface-200: #e9eff5; /* Light */
-  --color-surface-300: #dbe2eb; /* Normal */
-  --color-surface-400: #ccd6e1; /* Darker */
-  --color-surface-500: #b3c4d6; /* Dark */
-  --color-surface-600: #9aaab8; /* Darker */
-  --color-surface-700: #7d8d9e; /* Deeper */
-  --color-surface-800: #6a7a8d; /* Deepest */
-  --color-surface-900: #4f5b6b; /* Darkest */
-
-  --color-dark-50: #b2bbc6; /* Lighter */
-  --color-dark-100: #a3adbb; /* Light :hover */
-  --color-dark-200: #909dad; /* Light :active */
-  --color-dark-300: #546881; /* Normal */
-  --color-dark-400: #47586e; /* Normal :hover */
-  --color-dark-500: #3d4c5e; /* Normal :active */
-  --color-dark-600: #1d242d; /* Dark */
-  --color-dark-700: #151a20; /* Dark :hover */
-  --color-dark-800: #090b0e; /* Dark :active */
-
-  --color-primary-50: #eff6ff; /* Very light */
-  --color-primary-100: #dbeafe; /* Extra light */
-  --color-primary-200: #bfdbfe; /* Light */
-  --color-primary-300: #93c5fd; /* Soft primary */
-  --color-primary-400: #60a5fa; /* Mid-light */
-  --color-primary-500: #2563eb; /* Base */
-  --color-primary-600: #1d4ed8; /* Stronger */
-  --color-primary-700: #1e40af; /* Dark */
-  --color-primary-800: #1e3a8a; /* Darker */
-  --color-primary-900: #172554; /* Deepest */
-
-  --color-red-50: #ffe5e7; /* very light pinkish red */
-  --color-red-100: #fbbfc4; /* soft light red */
-  --color-red-200: #f58a94; /* lighter red */
-  --color-red-300: #ef4a5a; /* soft red */
-  --color-red-400: #e61f34; /* vibrant red */
-  --color-red-500: #e30613; /* base: La Vuelta red */
-  --color-red-600: #cb0511; /* slightly darker */
-  --color-red-700: #b10410; /* deep red */
-  --color-red-800: #8e030d; /* darker red */
-  --color-red-900: #6c020a; /* very dark red */
-
-  --color-yellow-50: #fffcf0; /* Base */
-  --color-yellow-100: #fff7cc; /* Lighter */
-  --color-yellow-200: #fff199; /* Light */
-  --color-yellow-300: #ffe75e; /* Normal */
-  --color-yellow-400: #ffdd2a; /* Darker */
-  --color-yellow-500: #ffd700; /* Dark */
-  --color-yellow-600: #e6c100; /* Darker */
-  --color-yellow-700: #c4a700; /* Deeper */
-  --color-yellow-800: #9e8800; /* Deepest */
-  --color-yellow-900: #6f5e00; /* Darkest */
-
-  --color-blue-50: #eff6ff; /* Very light */
-  --color-blue-100: #dbeafe; /* Extra light */
-  --color-blue-200: #bfdbfe; /* Light */
-  --color-blue-300: #93c5fd; /* Soft blue */
-  --color-blue-400: #60a5fa; /* Mid-light */
-  --color-blue-500: #2563eb; /* Base */
-  --color-blue-600: #1d4ed8; /* Stronger */
-  --color-blue-700: #1e40af; /* Dark */
-  --color-blue-800: #1e3a8a; /* Darker */
-  --color-blue-900: #172554; /* Deepest */
-
-  --color-pink-50: #fff5f9; /* Base */
-  --color-pink-100: #ffe3ed; /* Lighter */
-  --color-pink-200: #ffc1d6; /* Light */
-  --color-pink-300: #ff9abb; /* Normal */
-  --color-pink-400: #ff729f; /* Darker */
-  --color-pink-500: #ff286e; /* Dark */
-  --color-pink-600: #e02164; /* Darker */
-  --color-pink-700: #bf1d58; /* Deeper */
-  --color-pink-800: #991748; /* Deepest */
-  --color-pink-900: #701132; /* Darkest */
-}
-
-.yellow {
-  --color-yellow-50: #fffcf0; /* Base */
-  --color-yellow-100: #fff7cc; /* Lighter */
-  --color-yellow-200: #fff199; /* Light */
-  --color-yellow-300: #ffe75e; /* Normal */
-  --color-yellow-400: #ffdd2a; /* Darker */
-  --color-yellow-500: #ffd700; /* Dark */
-  --color-yellow-600: #e6c100; /* Darker */
-  --color-yellow-700: #c4a700; /* Deeper */
-  --color-yellow-800: #9e8800; /* Deepest */
-  --color-yellow-900: #6f5e00; /* Darkest */
-}
-
-.pink {
-  --color-pink-50: #fff5f9; /* Base */
-  --color-pink-100: #ffe3ed; /* Lighter */
-  --color-pink-200: #ffc1d6; /* Light */
-  --color-pink-300: #ff9abb; /* Normal */
-  --color-pink-400: #ff729f; /* Darker */
-  --color-pink-500: #ff286e; /* Dark */
-  --color-pink-600: #e02164; /* Darker */
-  --color-pink-700: #bf1d58; /* Deeper */
-  --color-pink-800: #991748; /* Deepest */
-  --color-pink-900: #701132; /* Darkest */
-}
-
-.blue {
-  --color-blue-50: #eff6ff; /* Very light */
-  --color-blue-100: #dbeafe; /* Extra light */
-  --color-blue-200: #bfdbfe; /* Light */
-  --color-blue-300: #93c5fd; /* Soft blue */
-  --color-blue-400: #60a5fa; /* Mid-light */
-  --color-blue-500: #2563eb; /* Base */
-  --color-blue-600: #1d4ed8; /* Stronger */
-  --color-blue-700: #1e40af; /* Dark */
-  --color-blue-800: #1e3a8a; /* Darker */
-  --color-blue-900: #172554; /* Deepest */
-}
-
-.red {
-  --color-red-50: #ffe5e7; /* very light pinkish red */
-  --color-red-100: #fbbfc4; /* soft light red */
-  --color-red-200: #f58a94; /* lighter red */
-  --color-red-300: #ef4a5a; /* soft red */
-  --color-red-400: #e61f34; /* vibrant red */
-  --color-red-500: #e30613; /* base: La Vuelta red */
-  --color-red-600: #cb0511; /* slightly darker */
-  --color-red-700: #b10410; /* deep red */
-  --color-red-800: #8e030d; /* darker red */
-  --color-red-900: #6c020a; /* very dark red */
-}
-
-.p-treeselect-panel {
-  width: 100% !important;
-  max-width: 402px !important;
-  box-sizing: border-box;
+  --color-primary: #35618e;
+  --color-surface-tint: #35618e;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #d1e4ff;
+  --color-on-primary-container: #184975;
+  --color-secondary: #535f70;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d6e3f7;
+  --color-on-secondary-container: #3b4858;
+  --color-tertiary: #6b5778;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #f2daff;
+  --color-on-tertiary-container: #523f5f;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-background: #f8f9ff;
+  --color-on-background: #191c20;
+  --color-surface: #f8f9ff;
+  --color-on-surface: #191c20;
+  --color-surface-variant: #dfe2eb;
+  --color-on-surface-variant: #42474e;
+  --color-outline: #73777f;
+  --color-outline-variant: #c3c7cf;
+  --color-shadow: #000000;
+  --color-scrim: #000000;
+  --color-inverse-surface: #2e3135;
+  --color-inverse-on-surface: #eff0f7;
+  --color-inverse-primary: #a0cafd;
+  --color-primary-fixed: #d1e4ff;
+  --color-on-primary-fixed: #001d36;
+  --color-primary-fixed-dim: #a0cafd;
+  --color-on-primary-fixed-variant: #184975;
+  --color-secondary-fixed: #d6e3f7;
+  --color-on-secondary-fixed: #101c2b;
+  --color-secondary-fixed-dim: #bac8db;
+  --color-on-secondary-fixed-variant: #3b4858;
+  --color-tertiary-fixed: #f2daff;
+  --color-on-tertiary-fixed: #251432;
+  --color-tertiary-fixed-dim: #d6bee5;
+  --color-on-tertiary-fixed-variant: #523f5f;
+  --color-surface-dim: #d8dae0;
+  --color-surface-bright: #f8f9ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f2f3f9;
+  --color-surface-container: #eceef4;
+  --color-surface-container-high: #e6e8ee;
+  --color-surface-container-highest: #e1e2e8;
 }

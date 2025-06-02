@@ -9,7 +9,7 @@ import userTeamsReducer from '@/features/user-teams/user-teams.slice';
 import cyclistsReducer from '@/features/cyclists/cyclists.slice';
 import stageResultsReducer from '@/features/stage-results/stage-results.slice';
 import raceResultsReducer from '@/features/race-results/race-results.slice';
-import stagePointsReducer from '@/features/stage-points/stage-points.slice';
+import pointsReducer from '@/features/points/points.slice';
 
 const store = configureStore({
   reducer: {
@@ -22,7 +22,7 @@ const store = configureStore({
     cyclists: cyclistsReducer,
     stageResults: stageResultsReducer,
     raceResults: raceResultsReducer,
-    stagePoints: stagePointsReducer,
+    points: pointsReducer,
   },
 });
 

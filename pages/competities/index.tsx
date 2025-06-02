@@ -162,7 +162,7 @@ const Index = () => {
         </div>
         <div
           style={container}
-          className="overflow-hidden overflow-y-auto rounded-lg max-h-[75vh]"
+          className="overflow-hidden overflow-y-auto rounded-xl max-h-[75vh]"
         >
           <DataTable
             value={competitions}
@@ -200,7 +200,7 @@ const Index = () => {
             <label htmlFor="">Naam</label>
             <InputText value={name} onChange={(e) => setName(e.target.value)} />
             {nameError && (
-              <div className="text-red-500 text-sm mt-2">{nameError}</div>
+              <div className="text-error text-sm mt-2">{nameError}</div>
             )}
           </div>
           <div className="flex flex-col w-full gap-2">
@@ -276,7 +276,7 @@ const Index = () => {
               unselectable="on"
             ></TreeSelect>
             {selectedRacesError && (
-              <div className="text-red-500 text-sm mt-2">
+              <div className="text-error text-sm mt-2">
                 {selectedRacesError}
               </div>
             )}
@@ -295,7 +295,7 @@ const Index = () => {
               className="w-full md:w-20rem"
             />
             {selectedUsersError && (
-              <div className="text-red-500 text-sm mt-2">
+              <div className="text-error text-sm mt-2">
                 {selectedUsersError}
               </div>
             )}

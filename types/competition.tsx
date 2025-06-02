@@ -1,5 +1,5 @@
-import { Race } from './race';
-import { User } from './user';
+import { Race, RaceDTO, Stage } from './race';
+import { User, UserDTO } from './user';
 
 export interface CreateCompetitionDetails {
   name: string;
@@ -7,8 +7,20 @@ export interface CreateCompetitionDetails {
   raceIds: number[];
 }
 
+export interface CompetitionDTO {
+  id: number;
+  name: string;
+  races: RaceDTO[];
+  users: UserDTO[];
+  competitionStatus: CompetitionStatus;
+  maxMainCyclists: number;
+  maxReserveCyclists: number;
+  currentPick: number;
+  competitionPicks: CompetitionPick[];
+}
+
 export interface Competition {
-  id: string;
+  id: number;
   name: string;
   races: Race[];
   users: User[];
@@ -20,7 +32,7 @@ export interface Competition {
 }
 
 export interface CompetitionPick {
-  id: string;
+  id: number;
   userId: number;
   pickOrder: number;
 }

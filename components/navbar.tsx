@@ -14,7 +14,7 @@ const navbar = () => {
   const dispatch = useDispatch<AppDispatch>();
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
-  const user = useSelector((state: RootState) => state.user.data);
+  const user = useSelector((state: RootState) => state.user.userDTO);
 
   const logoutHandler = () => {
     dispatch(setUser(null)); // Of een specifieke logout action als je die hebt
@@ -48,23 +48,23 @@ const navbar = () => {
   ];
 
   return (
-    <div className="flex items-center justify-between text-dark-700 h-16 border-b-1 border-surface-500 backdrop-blur-md px-20">
+    <div className="flex items-center justify-between text-dark-700 h-16 border-b-1 border-outline backdrop-blur-md px-20">
       {user ? (
         <div className="flex gap-12 items-center font-bold">
           <Link href="/" className="text-dark-700 text-2xl italic font-anton ">
-            C<span className=" text-blue-500">M</span>
+            C<span className=" text-primary">M</span>
           </Link>
           <ul className="flex gap-7 font-semibold">
             <Link href="/overzicht">
               <li
-                className={`h-16 flex items-center ${isActive('/overzicht') ? 'border-b-2 border-blue-500' : 'text-dark-700'}`}
+                className={`h-16 flex items-center border-b-4 border-transparent pt-1 ${isActive('/overzicht') ? '!border-primary' : 'text-dark-700'}`}
               >
                 Overzicht
               </li>
             </Link>
             <Link href="/competities">
               <li
-                className={`h-16 flex items-center ${isActive('/competities') ? 'border-b-2 border-blue-500' : 'text-dark-700'}`}
+                className={`h-16 flex items-center border-b-4 border-transparent pt-1 ${isActive('/competities') ? '!border-primary' : 'text-dark-700'}`}
               >
                 Competities
               </li>
@@ -74,7 +74,7 @@ const navbar = () => {
       ) : (
         <div className="text-2xl italic font-bold">
           <Link href="/" className="text-dark-700">
-            CYCLING <span className=" text-blue-500">MANAGER</span>
+            CYCLING <span className=" text-primary">MANAGER</span>
           </Link>
         </div>
       )}
@@ -84,14 +84,14 @@ const navbar = () => {
             onClick={(event) => menuLeft.current!.toggle(event)}
             className="cursor-pointer"
           >
-            <User size={24} className="stroke-blue-500" />
+            <User size={24} className="stroke-primary" />
           </div>
           <Menu model={items} popup ref={menuLeft} id="popup_menu_left" />
         </>
       ) : (
         <div className="flex gap-4">
           <Link href="/authenticatie/login">
-            <Button label="Login" severity="secondary" outlined />
+            <Button label="Login" raised />
           </Link>
           <Link href="/authenticatie/register">
             <Button label="Registeer" />

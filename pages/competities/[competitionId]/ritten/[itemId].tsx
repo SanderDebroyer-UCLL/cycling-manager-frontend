@@ -1,42 +1,66 @@
+import Chip from '@/components/chip';
 import CompetitieLayout from '@/components/competitieLayout';
+import SelectableCard from '@/components/SelectableCard';
 import { container } from '@/const/containerStyle';
 import { ResultType } from '@/const/resultType';
-import { fetchCompetitionById } from '@/features/competition/competition.slice';
+import {
+  fetchCompetitionById,
+  fetchCompetitionResultsUpdate,
+  resetCompetitionStatus,
+} from '@/features/competition/competition.slice';
 import {
   fetchRaceResultsByRaceId,
   resetRaceResultsStatus,
 } from '@/features/race-results/race-results.slice';
 import {
+  fetchRacePointsForRace,
   fetchStagePointsForStage,
-  resetStagePointsStatus,
-} from '@/features/stage-points/stage-points.slice';
+  resetPointsStatus,
+} from '@/features/points/points.slice';
 import {
   fetchResultsByStageIdByType,
   resetStageResultsStatus,
 } from '@/features/stage-results/stage-results.slice';
 import { AppDispatch } from '@/store/store';
-import { Competition } from '@/types/competition';
-import { ParcoursType, Race, Stage, StageResult } from '@/types/race';
+import { CompetitionDTO } from '@/types/competition';
+import {
+  ParcoursType,
+  Race,
+  RaceDTO,
+  Stage,
+  StageDTO,
+  StageResult,
+} from '@/types/race';
 import { RaceResult } from '@/types/race-result';
-import { StagePoints } from '@/types/stage-points';
+import { Points } from '@/types/points';
 import {
   parcoursDescriptions,
   ParcoursTypeKeyMap,
 } from '@/utils/parcours-key-map';
-import { Calendar, Flag } from 'lucide-react';
+import {
+  FlagIcon,
+  Mountain,
+  RefreshCw,
+  Star,
+  Trophy,
+  UserIcon,
+} from 'lucide-react';
 import { useRouter } from 'next/router';
+import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import React, { ReactNode, use, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import PointsChipBodyTemplate from '@/components/PointsChipBodyTemplate';
 
 const index = () => {
   const router = useRouter();
   const { competitionId, itemId } = router.query;
 
-  const [activeStage, setActiveStage] = useState<Stage | null>(null);
-  const [activeRace, setActiveRace] = useState<Race | null>(null);
+  const [activeStage, setActiveStage] = useState<StageDTO | null>(null);
+  const [activeRace, setActiveRace] = useState<RaceDTO | null>(null);
+  const [competitionLoading, setCompetitionLoading] = useState(false);
   const [resultLoading, setResultLoading] = useState(false);
   const [resultStatus, setResultStatus] = useState<ResultType>(
     ResultType.STAGE,
@@ -49,8 +73,11 @@ const index = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const competition: Competition = useSelector(
-    (state: any) => state.competition.data,
+  const competitionStatus: string = useSelector(
+    (state: any) => state.competition.status,
+  );
+  const competition: CompetitionDTO | null = useSelector(
+    (state: any) => state.competition.competitionDTO,
   );
   const stageResults: StageResult[] = useSelector(
     (state: any) => state.stageResults.etappeResult,
@@ -64,15 +91,19 @@ const index = () => {
   const raceResultsStatus: string = useSelector(
     (state: any) => state.raceResults.status,
   );
-  const stagePointsStatus: string = useSelector(
-    (state: any) => state.stagePoints.status,
-  );
+  const pointsStatus: string = useSelector((state: any) => state.points.status);
   const stageGCResults: StageResult[] = useSelector(
     (state: any) => state.stageResults.gcResult,
   );
-  const stagePoints: StagePoints[] = useSelector(
-    (state: any) => state.stagePoints.stagePoints,
-  );
+  const points: Points[] = useSelector((state: any) => state.points.points);
+
+  useEffect(() => {
+    if (competitionStatus === 'loading') {
+      setCompetitionLoading(true);
+    } else {
+      setCompetitionLoading(false);
+    }
+  }, [competitionStatus]);
 
   useEffect(() => {
     setStageResultsState(stageResults);
@@ -87,15 +118,32 @@ const index = () => {
   }, [raceResults]);
 
   useEffect(() => {
-    if (stagePointsStatus === 'idle' && activeStage?.id) {
-      dispatch(
-        fetchStagePointsForStage({
-          competitionId: competition.id,
-          stageId: activeStage.id,
-        }),
-      );
+    if (!competition || !competitionId) return;
+    if (pointsStatus === 'idle') {
+      if (activeStage) {
+        dispatch(
+          fetchStagePointsForStage({
+            competitionId: competition?.id,
+            stageId: activeStage.id,
+          }),
+        );
+      } else if (activeRace) {
+        dispatch(
+          fetchRacePointsForRace({
+            competitionId: competition?.id,
+            raceId: activeRace.id,
+          }),
+        );
+      }
     }
-  }, [dispatch, stagePointsStatus, activeStage?.id]);
+  }, [
+    dispatch,
+    pointsStatus,
+    competition?.id,
+    competitionId,
+    activeStage?.id,
+    activeRace?.id,
+  ]);
 
   useEffect(() => {
     if (stageResultsStatus === 'idle' && activeStage?.id) {
@@ -135,6 +183,28 @@ const index = () => {
   }, [resultLoading]);
 
   useEffect(() => {
+    if (competitionStatus === 'succeeded') {
+      if (activeStage?.id) {
+        dispatch(
+          fetchResultsByStageIdByType({
+            stageId: activeStage.id,
+            resultType: ResultType.STAGE,
+          }),
+        );
+        dispatch(
+          fetchResultsByStageIdByType({
+            stageId: activeStage.id,
+            resultType: ResultType.GC,
+          }),
+        );
+      }
+      if (!activeRace) return;
+      dispatch(fetchRaceResultsByRaceId(activeRace.id));
+      dispatch(resetCompetitionStatus());
+    }
+  }, [competitionStatus]);
+
+  useEffect(() => {
     if (!competition || !itemId) return;
 
     // Try to find stage or race with this id:
@@ -171,24 +241,31 @@ const index = () => {
       competitionId &&
       competition.id.toString().trim() !== competitionId.toString().trim()
     ) {
-      dispatch(fetchCompetitionById(competitionId.toString()));
+      dispatch(
+        fetchCompetitionById(
+          Number(
+            Array.isArray(competitionId) ? competitionId[0] : competitionId,
+          ),
+        ),
+      );
     }
   }, [dispatch, competition, competitionId]);
 
-  const onSelectStage = (stage: Stage) => {
+  const onSelectStage = (stage: StageDTO) => {
     setActiveStage(stage);
     setActiveRace(null);
     dispatch(resetStageResultsStatus());
-    dispatch(resetStagePointsStatus());
+    dispatch(resetPointsStatus());
     router.push(`/competities/${competitionId}/ritten/${stage.id}`, undefined, {
       shallow: true,
     });
   };
 
-  const onSelectRace = (race: Race) => {
+  const onSelectRace = (race: RaceDTO) => {
     setActiveRace(race);
     setActiveStage(null);
     dispatch(resetRaceResultsStatus());
+    dispatch(resetPointsStatus());
     router.push(`/competities/${competitionId}/ritten/${race.id}`, undefined, {
       shallow: true,
     });
@@ -196,7 +273,7 @@ const index = () => {
 
   if (!competition) {
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-surface-100 z-9999">
+      <div className="fixed inset-0 flex justify-center items-center bg-surface z-9999">
         <ProgressSpinner
           style={{ width: '100px', height: '100px' }}
           strokeWidth="8"
@@ -209,89 +286,73 @@ const index = () => {
 
   return (
     <div>
-      <div className="flex flex-col gap-12 w-full">
+      <div className="flex flex-col gap-10 w-full">
         <div className="flex flex-col gap-6">
-          <h2 className=" text-xl font-bold">
+          <h2 className=" text-xl font-bold flex gap-4 items-center">
             Ritten{' '}
             {competition.races[0].stages.length > 0
               ? competition.races[0].name
               : competition.name}
+            <Button
+              raised
+              icon={() => (
+                <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
+              )}
+              tooltip="Haal de laatste resultaten en punten op"
+              tooltipOptions={{ showDelay: 500 }}
+              aria-label="Haal de laatste data op"
+              className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
+              loading={competitionLoading}
+              onClick={() =>
+                dispatch(fetchCompetitionResultsUpdate(competition.id))
+              }
+            />
           </h2>
         </div>
 
-        <div className="flex gap-10 w-full overflow-x-auto">
+        <div className="flex gap-8 w-full overflow-x-auto">
           {competition.races[0].stages.length > 0
-            ? competition.races[0].stages.map((stage, index) => (
-                <div
-                  onClick={() => {
-                    onSelectStage(stage);
-                    dispatch(resetStageResultsStatus()); // reset before fetch effect can run
-                  }}
-                  key={stage.id}
-                  style={container}
-                  className={`cursor-pointer shrink-0 w-72 mb-4 rounded-lg p-4 border transition-all ${
-                    stage.id.toString() === itemId
-                      ? '!bg-primary-100 !border-primary-500 !text-primary-900'
-                      : ''
-                  }`}
-                >
-                  <p className="font-semibold text-lg flex items-center gap-2">
-                    Stage {index + 1}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Flag className="w-4 h-4 shrink-0" />
-                    <span className="truncate overflow-hidden whitespace-nowrap">
-                      {stage.name.split('|')[1]}
-                    </span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    {(() => {
-                      const [day, month] = stage.date.split('/').map(Number);
-                      const year = new Date(
-                        competition.races[0].startDate,
-                      ).getFullYear();
-                      const fullDate = new Date(year, month - 1, day); // Month is 0-based in JS
-                      return fullDate.toLocaleDateString('nl');
-                    })()}
-                  </p>
-                </div>
-              ))
+            ? competition.races[0].stages.map((stage, index) => {
+                const [day, month] = stage.date.split('/').map(Number);
+                const year = new Date(
+                  competition.races[0].startDate,
+                ).getFullYear();
+                const fullDate = new Date(year, month - 1, day);
+                const dateStr = fullDate.toLocaleDateString('nl');
+
+                return (
+                  <SelectableCard
+                    key={stage.id}
+                    title={`Stage ${index + 1}`}
+                    subtitle={stage.name.split('|')[1]}
+                    date={dateStr}
+                    selected={stage.id.toString() === itemId}
+                    onClick={() => {
+                      onSelectStage(stage);
+                      dispatch(resetStageResultsStatus());
+                    }}
+                  />
+                );
+              })
             : competition.races.map((race, index) => (
-                <div
+                <SelectableCard
+                  key={race.id}
+                  title={`Race ${index + 1}`}
+                  subtitle={race.name}
+                  date={new Date(race.startDate).toLocaleDateString('nl')}
+                  selected={race.id.toString() === itemId}
                   onClick={() => {
                     onSelectRace(race);
                     dispatch(resetRaceResultsStatus());
                   }}
-                  key={race.id}
-                  style={container}
-                  className={`cursor-pointer shrink-0 w-72 mb-4 rounded-lg p-4 border transition-all ${
-                    race.id.toString() === itemId
-                      ? '!bg-primary-100 !border-primary-500 !text-primary-900'
-                      : ''
-                  }`}
-                >
-                  <p className="font-semibold text-lg flex items-center gap-2">
-                    Race {index + 1}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Flag className="w-4 h-4" />
-                    <span className="truncate overflow-hidden whitespace-nowrap">
-                      {race.name}
-                    </span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    {new Date(race.startDate).toLocaleDateString('nl')}
-                  </p>
-                </div>
+                />
               ))}
         </div>
 
         {competition.races[0].stages.length > 0 ? (
           <div className="flex gap-10 w-full ">
             <div className="flex flex-1/2 flex-col gap-5">
-              <h3 className="font-semibold">Overzicht {activeStage?.name}</h3>
+              <h3 className="font-semibold">Overzicht {activeStage?.name} </h3>
               <div></div>
 
               <div className="flex w-full gap-5">
@@ -375,7 +436,7 @@ const index = () => {
                   className="flex flex-col h-full overflow-auto"
                 >
                   <DataTable
-                    value={stagePoints}
+                    value={points}
                     dataKey="userId"
                     sortField="position"
                     sortOrder={1}
@@ -397,36 +458,36 @@ const index = () => {
                   className="flex flex-col h-full overflow-auto"
                 >
                   <div className="flex gap-4">
-                    <div
+                    <Chip
+                      label="Etappe"
+                      Icon={FlagIcon}
+                      active={resultStatus === ResultType.STAGE}
                       onClick={() => setResultStatus(ResultType.STAGE)}
-                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
-                    >
-                      Etappe
-                    </div>
-                    <div
+                    />
+                    <Chip
+                      label="GC"
+                      Icon={Trophy}
+                      active={resultStatus === ResultType.GC}
                       onClick={() => setResultStatus(ResultType.GC)}
-                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
-                    >
-                      Algemeen klassement
-                    </div>
-                    <div
+                    />
+                    <Chip
+                      label="Youth"
+                      Icon={UserIcon}
+                      active={resultStatus === ResultType.YOUNG}
                       onClick={() => setResultStatus(ResultType.YOUNG)}
-                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
-                    >
-                      Jongerenklassement
-                    </div>
-                    <div
+                    />
+                    <Chip
+                      label="Points"
+                      Icon={Star}
+                      active={resultStatus === ResultType.POINTS}
                       onClick={() => setResultStatus(ResultType.POINTS)}
-                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
-                    >
-                      Puntenklassement
-                    </div>
-                    <div
+                    />
+                    <Chip
+                      label="Mountain"
+                      Icon={Mountain}
+                      active={resultStatus === ResultType.MOUNTAIN}
                       onClick={() => setResultStatus(ResultType.MOUNTAIN)}
-                      className="flex-1 font-semibold flex items-center bg-primary-100 border-1 border-primary-500 text-primary-900 px-4 py-2 cursor-pointer rounded-lg"
-                    >
-                      Bergklassement
-                    </div>
+                    />
                   </div>
                   <DataTable
                     paginator
@@ -462,7 +523,9 @@ const index = () => {
         ) : (
           <div className="flex gap-10 w-full">
             <div className="flex flex-1/2 flex-col gap-5">
-              <h3 className="font-semibold">Overzicht {activeRace?.name}</h3>
+              <h3 className="font-semibold text-lg">
+                Overzicht {activeRace?.name}
+              </h3>
               <div></div>
 
               <div className="flex w-full gap-5">
@@ -484,7 +547,7 @@ const index = () => {
                 </div>
                 <div className="flex flex-col flex-1 gap-2">
                   <h3 className="font-semibold">Type Rit</h3>
-                  <div className="flex flex-col justify-center gap-2 p-4  bg-surface-100 rounded-lg shadow-md font-semibold text-xl">
+                  <div style={container} className="font-semibold text-xl">
                     {ParcoursTypeKeyMap[
                       activeRace?.parcoursType as ParcoursType
                     ] ?? 'Niet beschikbaar'}
@@ -500,37 +563,25 @@ const index = () => {
               </div>
               <div></div>
               <div className="flex flex-col flex-1 gap-2">
-                <h3 className="font-semibold">Uitslag Rit</h3>
+                <h3 className="font-semibold">Punten verdiend per deelnemer</h3>
                 <div
                   style={container}
                   className="flex flex-col h-full overflow-auto"
                 >
                   <DataTable
-                    paginator
-                    rows={5}
-                    loading={resultLoading}
-                    value={
-                      resultStatus === ResultType.STAGE
-                        ? stageResultsState
-                        : resultStatus === ResultType.GC
-                          ? stageGCResultsState
-                          : []
-                    }
-                    dataKey="id"
+                    value={points}
+                    dataKey="userId"
                     sortField="position"
                     sortOrder={1}
                     emptyMessage="Geen resultaten gevonden"
                     className=""
                   >
-                    <Column field="position" header="Plaats" />
-                    <Column field="cyclistName" header="Naam" />
-                    {resultStatus === ResultType.STAGE ? (
-                      <Column field="time" header="Tijd" />
-                    ) : resultStatus === ResultType.GC ? (
-                      <Column field="time" header="Tijd" />
-                    ) : (
-                      []
-                    )}
+                    <Column field="fullName" header="Deelnemer" />
+                    <Column
+                      field="points"
+                      header="Punten"
+                      body={PointsChipBodyTemplate}
+                    />
                   </DataTable>
                 </div>
               </div>
@@ -549,7 +600,7 @@ const index = () => {
                     loading={resultLoading}
                     value={raceResultsState}
                     dataKey="id"
-                    sortField="ranking"
+                    sortField="position"
                     sortOrder={1}
                     emptyMessage="Geen resultaten gevonden"
                   >
