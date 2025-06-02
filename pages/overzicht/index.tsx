@@ -11,15 +11,16 @@ import { Key, useEffect } from 'react';
 import { fetchUsers } from '@/features/users/users.slice';
 import { fetchCompetitions } from '@/features/competitions/competitions.slice';
 import { CompetitionDTO } from '@/types/competition';
-import image1 from '@/public/images/1.jpg';
-import image2 from '@/public/images/2.jpg';
-import image3 from '@/public/images/3.jpg';
-import image4 from '@/public/images/4.jpg';
-import image5 from '@/public/images/5.jpg';
-import image6 from '@/public/images/6.jpg';
+import image1 from '@/public/images/1.webp';
+import image2 from '@/public/images/2.webp';
+import image3 from '@/public/images/3.webp';
+import image4 from '@/public/images/4.webp';
+import image5 from '@/public/images/5.webp';
+import image6 from '@/public/images/6.webp';
+import image7 from '@/public/images/7.webp';
 import tdfBanner from '@/public/images/tdf_banner.webp';
-import giroBanner from '@/public/images/giro_banner.jpg';
-import vueltaBanner from '@/public/images/vuelta_banner.jpg';
+import giroBanner from '@/public/images/giro_banner.webp';
+import vueltaBanner from '@/public/images/vuelta_banner.webp';
 import RaceChipBodyTemplate from '@/components/RaceChipBodyTemplate';
 
 export default function Overview() {
@@ -76,13 +77,13 @@ export default function Overview() {
         <div className="rounded-xl overflow-hidden">
           <div
             style={containerLargerPadding}
-            className="w-full h-70 !flex-row !gap-8 overflow-x-auto"
+            className="w-full !h-70 !flex-row !gap-8 overflow-x-auto"
           >
             {[...competitions]
               .sort((a, b) => a.name.localeCompare(b.name))
-              .map((competition: CompetitionDTO) => (
+              .map((competition: CompetitionDTO, index) => (
                 <div
-                  className="relative rounded-xl shadow-md overflow-hidden h-full w-full min-w-75"
+                  className="relative rounded-xl shadow-md overflow-hidden h-full w-full min-w-95"
                   key={competition.name}
                 >
                   <Link href={`competities/${competition.id}`}>
@@ -113,7 +114,8 @@ export default function Overview() {
                                   image4,
                                   image5,
                                   image6,
-                                ][competitions.indexOf(competition) % 6]
+                                  image7,
+                                ][index % 7]
                       }
                       alt={competition.name}
                       fill
