@@ -1,5 +1,5 @@
 import Chip from '@/components/chip';
-import CompetitieLayout from '@/components/competitieLayout';
+import CompetitieLayout from '@/components/layout/competitieLayout';
 import { container } from '@/const/containerStyle';
 import { ResultType } from '@/const/resultType';
 import { Column } from 'primereact/column';
@@ -52,30 +52,35 @@ const klassement = () => {
             Icon={FlagIcon}
             active={resultStatus === ResultType.STAGE}
             onClick={() => setResultStatus(ResultType.STAGE)}
+            variant={'secondary'}
           />
           <Chip
             label="GC"
             Icon={Trophy}
             active={resultStatus === ResultType.GC}
             onClick={() => setResultStatus(ResultType.GC)}
+            variant={'secondary'}
           />
           <Chip
             label="Youth"
             Icon={UserIcon}
             active={resultStatus === ResultType.YOUNG}
             onClick={() => setResultStatus(ResultType.YOUNG)}
+            variant={'secondary'}
           />
           <Chip
             label="Points"
             Icon={Star}
             active={resultStatus === ResultType.POINTS}
             onClick={() => setResultStatus(ResultType.POINTS)}
+            variant={'secondary'}
           />
           <Chip
             label="Mountain"
             Icon={Mountain}
             active={resultStatus === ResultType.MOUNTAIN}
             onClick={() => setResultStatus(ResultType.MOUNTAIN)}
+            variant={'secondary'}
           />
         </div>
         <DataTable

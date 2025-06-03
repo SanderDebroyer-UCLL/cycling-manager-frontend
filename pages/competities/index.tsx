@@ -22,7 +22,7 @@ import {
   resetCompetitionsStatus,
 } from '@/features/competitions/competitions.slice';
 import { Race } from '@/types/race';
-import LinkBodyTemplate from '@/components/LinkBodyTemplate';
+import LinkBodyTemplate from '@/components/template/LinkBodyTemplate';
 import { container } from '@/const/containerStyle';
 import { showErrorToast } from '@/services/toast.service';
 

@@ -1,4 +1,4 @@
-import CompetitieLayout from '@/components/competitieLayout';
+import CompetitieLayout from '@/components/layout/competitieLayout';
 import { container } from '@/const/containerStyle';
 import {
   fetchCompetitionById,
@@ -26,10 +26,10 @@ import LoadingOverlay from '@/components/LoadingOverlay';
 import { RaceDTO } from '@/types/race';
 import { RefreshCw } from 'lucide-react';
 import { fetchCyclistsWithDNS } from '@/features/user-teams/user-teams.slice';
-import TableChipBodyTemplate from '@/components/TableChipBodyTemplate';
-import StageTypeChipBodyTemplate from '@/components/ParcoursTypeChipBodyTemplate';
+import TableChipBodyTemplate from '@/components/template/TableChipBodyTemplate';
+import StageTypeChipBodyTemplate from '@/components/template/ParcoursTypeChipBodyTemplate';
 import { getCompetitionStatusSubtext } from '@/utils/competition-status-map';
-import DropOutReasonChipBodyTemplate from '@/components/DropOutReasonChipBodyTemplate';
+import DropOutReasonChipBodyTemplate from '@/components/template/DropOutReasonChipBodyTemplate';
 
 const index = () => {
   const router = useRouter();

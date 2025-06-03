@@ -20,6 +20,7 @@ interface PointsState {
   pointsPerCyclist: PointsPerCyclist[];
   pointsReason: PointsReason[];
   mainReservePointsCyclist: MainReservePointsCyclist | null;
+  mainReservePointsCyclistPerEvent: MainReservePointsCyclist | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
@@ -28,6 +29,7 @@ const initialPointsState: PointsState = {
   pointsPerCyclist: [],
   pointsReason: [],
   mainReservePointsCyclist: null,
+  mainReservePointsCyclistPerEvent: null,
   status: 'idle',
 };
 
@@ -99,7 +101,7 @@ const Slice = createSlice({
         fetchStagePointsForStage.fulfilled,
         (state, action: PayloadAction<MainReservePointsCyclist>) => {
           state.status = 'succeeded';
-          state.mainReservePointsCyclist = action.payload;
+          state.mainReservePointsCyclistPerEvent = action.payload;
         },
       )
       .addCase(fetchStagePointsForStage.rejected, (state) => {
@@ -125,7 +127,7 @@ const Slice = createSlice({
         fetchRacePointsForRace.fulfilled,
         (state, action: PayloadAction<MainReservePointsCyclist>) => {
           state.status = 'succeeded';
-          state.mainReservePointsCyclist = action.payload;
+          state.mainReservePointsCyclistPerEvent = action.payload;
         },
       )
       .addCase(fetchRacePointsForRace.rejected, (state) => {

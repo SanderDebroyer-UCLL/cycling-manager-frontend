@@ -7,7 +7,7 @@ import {
   Waves,
   ArrowUpRight,
 } from 'lucide-react';
-import TableChip from './TableChip'; // Adjust the import path as needed
+import TableChip from '../TableChip'; // Adjust the import path as needed
 import { ParcoursType } from '@/types/race';
 
 // Function to categorize and style cycling stage types using Material Design 3 colors

@@ -9,7 +9,7 @@ import {
   Zap,
   Shield,
 } from 'lucide-react';
-import TableChip from './TableChip'; // Adjust the import path as needed
+import TableChip from '../TableChip'; // Adjust the import path as needed
 
 // Function to categorize and style cycling race classifications using Material Design 3 colors
 const getCyclingRaceChipProps = (niveau: string) => {

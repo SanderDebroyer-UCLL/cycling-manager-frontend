@@ -13,8 +13,9 @@ import { Toast } from 'primereact/toast';
 import { toastRef } from '@/services/toast.service';
 import { NextPage } from 'next';
 import { ReactElement, ReactNode } from 'react';
-import Layout from '@/components/layout';
+import Layout from '@/components/layout/layout';
 import { locale } from 'primereact/api';
+import { CompetitionRouteWatcher } from '@/components/CompetitionRouteWatcher';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -95,6 +96,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <PrimeReactProvider value={{ ripple: true }}>
       <Provider store={store}>
+        <CompetitionRouteWatcher />
         <Toast ref={toastRef} />
         <div className="bg-surface-container-lowest">
           {getLayout(<Component {...pageProps} />)}

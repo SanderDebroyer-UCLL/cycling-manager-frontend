@@ -1,14 +1,10 @@
-// pages/index.tsx
-import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'primereact/button';
-import { AppDispatch, RootState } from '@/store/store';
-import Navbar from '@/components/navbar';
 import { Swords, Trophy } from 'lucide-react';
 import { CalendarSearch } from 'lucide-react';
 import bannerImage from '@/public/images/banner_image.avif';
 import Image from 'next/image';
 import Link from 'next/link';
-import HomeLayout from '@/components/homeLayout';
+import HomeLayout from '@/components/layout/homeLayout';
 import { ReactNode } from 'react';
 
 export default function Home() {

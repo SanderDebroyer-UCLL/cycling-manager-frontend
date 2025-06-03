@@ -1,5 +1,5 @@
 import Chip from '@/components/chip';
-import CompetitieLayout from '@/components/competitieLayout';
+import CompetitieLayout from '@/components/layout/competitieLayout';
 import SelectableCard from '@/components/SelectableCard';
 import { container } from '@/const/containerStyle';
 import { ResultType } from '@/const/resultType';
@@ -49,10 +49,8 @@ import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import React, { ReactNode, use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers } from '@/features/users/users.slice';
-import PointsChipBodyTemplate from '@/components/PointsChipBodyTemplate';
-import { UserDTO } from '@/types/user';
-import TimeBodyTemplate from '@/components/TimeBodyTemplate';
+import PointsChipBodyTemplate from '@/components/template/PointsChipBodyTemplate';
+import TimeBodyTemplate from '@/components/template/TimeBodyTemplate';
 
 const index = () => {
   const router = useRouter();
@@ -90,8 +88,6 @@ const index = () => {
   const [stageGCResultsState, setStageGCResultsState] = useState<StageResult[]>(
     [],
   );
-  const users: UserDTO[] = useSelector((state: any) => state.users.data);
-  const usersStatus = useSelector((state: any) => state.users.status);
   const [raceResultsState, setRaceResultsState] = useState<RaceResult[]>([]);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -122,16 +118,16 @@ const index = () => {
     (state: any) => state.stageResults.gcResult,
   );
   const points: MainReservePointsCyclist = useSelector(
-    (state: any) => state.points.mainReservePointsCyclist,
+    (state: any) => state.points.mainReservePointsCyclistPerEvent,
   );
 
   useEffect(() => {
-    if (!points || !users) return;
+    if (!points || !competition) return;
 
     const pointsArray = [...points.mainCyclists, ...points.reserveCyclists];
 
     const enrichedPointsList = pointsArray.map((point) => {
-      const user = users.find((u) => u.id === point.userId);
+      const user = competition.users.find((u) => u.id === point.userId);
       return {
         ...point,
         fullName:
@@ -141,13 +137,12 @@ const index = () => {
     });
 
     setEnrichedCyclistPoints(enrichedPointsList);
-    console.log('Enriched cyclist points:', enrichedPointsList);
-  }, [points, users, pointsStatus]);
+  }, [points, competition?.users, pointsStatus]);
 
   useEffect(() => {
-    if (!users) return;
+    if (!competition) return;
 
-    const allUsersWithInitialPoints = users.map((user) => ({
+    const allUsersWithInitialPoints = competition.users.map((user) => ({
       userId: user.id,
       fullName:
         `${user?.firstName || 'Unknown'} ${user?.lastName || ''}`.trim(),
@@ -195,8 +190,7 @@ const index = () => {
     });
 
     setPointsPerUser(merged);
-    console.log('Total points per user array:', merged);
-  }, [points, users, pointsStatus]);
+  }, [points, competition?.users, pointsStatus]);
 
   useEffect(() => {
     if (competitionStatus === 'loading') {
@@ -269,11 +263,6 @@ const index = () => {
     }
   }, [dispatch, stageResultsStatus, activeStage?.id]);
 
-  useEffect(() => {
-    if (usersStatus === 'idle' && users) {
-      dispatch(fetchUsers());
-    }
-  }, [dispatch, usersStatus, users]);
   useEffect(() => {
     if (raceResultsStatus === 'idle' && activeRace?.id) {
       dispatch(fetchRaceResultsByRaceId(activeRace.id));
@@ -598,7 +587,7 @@ const index = () => {
               </div>
             </div>
             <div className="flex flex-col flex-1/2 gap-10 w-full">
-              <div className="py-[10px]"></div>
+              <div className="py-[6px]"></div>
               <div className="flex flex-col flex-1 gap-2">
                 <h3 className="font-semibold gap-4 flex items-center">
                   <Chip
@@ -698,9 +687,9 @@ const index = () => {
                         <Column field="position" header="Plaats" />
                         <Column field="cyclistName" header="Naam" />
                         {resultStatus === ResultType.STAGE ? (
-                          <Column body={TimeBodyTemplate} />
+                          <Column body={TimeBodyTemplate} header="Tijd" />
                         ) : resultStatus === ResultType.GC ? (
-                          <Column body={TimeBodyTemplate} />
+                          <Column body={TimeBodyTemplate} header="Tijd" />
                         ) : (
                           []
                         )}
@@ -794,7 +783,7 @@ const index = () => {
               </div>
             </div>
             <div className="flex flex-col flex-1/2 gap-10 w-full">
-              <div className="py-[10px]"></div>
+              <div className="py-[6px]"></div>
               <div className="flex flex-col flex-1 gap-2">
                 <div className="flex gap-4">
                   <Chip
@@ -829,7 +818,7 @@ const index = () => {
                     >
                       <Column field="position" header="Plaats" />
                       <Column field="cyclistName" header="Naam" />
-                      <Column field="time" header="Tijd" />
+                      <Column body={TimeBodyTemplate} header="Tijd" />
                     </DataTable>
                   ) : (
                     <DataTable

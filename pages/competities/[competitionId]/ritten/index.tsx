@@ -1,9 +1,8 @@
-import CompetitieLayout from '@/components/competitieLayout';
+import CompetitieLayout from '@/components/layout/competitieLayout';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
 import { AppDispatch } from '@/store/store';
 import { useRouter } from 'next/router';
-import { ProgressSpinner } from 'primereact/progressspinner';
 import { ReactNode, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
