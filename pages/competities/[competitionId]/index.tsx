@@ -42,6 +42,9 @@ const index = () => {
   const competition: CompetitionDTO | null = useSelector(
     (state: any) => state.competition.competitionDTO,
   );
+  const competitionStatus = useSelector(
+    (state: RootState) => state.competition.status,
+  );
   const cyclistWithDNS = useSelector(
     (state: RootState) => state.userTeams.cyclistsWithDNS,
   );
@@ -177,7 +180,9 @@ const index = () => {
 
   // Handle race status loading state
   useEffect(() => {
-    setUpdateRaceDataLoading(raceStatus === 'loading');
+    if (raceStatus === 'loading' || competitionStatus === 'loading') {
+      setUpdateRaceDataLoading(raceStatus === 'loading');
+    }
   }, [raceStatus]);
 
   useEffect(() => {
@@ -200,14 +205,10 @@ const index = () => {
   const handleRefreshData = useCallback(() => {
     if (competitionData.hasStages && competition?.races?.length) {
       dispatch(fetchCompetitionStages(competition.id));
-      // dispatch(updateRaceData(competition.races[0].name));
     } else if (competition?.races?.length) {
       if (competition.races[0].niveau.slice(0, 1) === '2') {
         dispatch(fetchCompetitionStages(competition.id));
       }
-      // competition.races.forEach((race: RaceDTO) =>
-      //   dispatch(updateRaceData(race.name)),
-      // );
     }
   }, [competitionData.hasStages, competition, dispatch]);
 
