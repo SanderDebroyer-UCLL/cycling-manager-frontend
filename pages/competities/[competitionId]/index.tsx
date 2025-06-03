@@ -5,7 +5,7 @@ import {
   fetchCompetitionStages,
 } from '@/features/competition/competition.slice';
 import { AppDispatch, RootState } from '@/store/store';
-import { Competition, CompetitionDTO } from '@/types/competition';
+import { CompetitionDTO } from '@/types/competition';
 import { useRouter } from 'next/router';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
@@ -21,7 +21,6 @@ import React, {
   useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateRaceData } from '@/features/race/race.slice';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { RaceDTO } from '@/types/race';
 import { RefreshCw } from 'lucide-react';
@@ -216,7 +215,12 @@ const index = () => {
     [router, competitionId],
   );
 
-  if (!competition || !competitionData || !cyclistWithDNS) {
+  if (
+    !competition ||
+    !competitionData ||
+    !cyclistWithDNS ||
+    !competition.races
+  ) {
     return <LoadingOverlay />;
   }
 
