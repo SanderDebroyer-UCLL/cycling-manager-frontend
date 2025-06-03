@@ -4,7 +4,7 @@ export interface User {
   lastName?: string;
   email: string;
   password: string;
-  role?: 'admin' | 'user';
+  role?: 'ADMIN' | 'USER';
   score?: number;
   profilePicture?: string;
   jwtToken?: string;
@@ -13,7 +13,7 @@ export interface User {
 export interface JwtRes {
   jwtToken: string;
   email: string;
-  role: 'admin' | 'user';
+  role: 'ADMIN' | 'USER';
 }
 
 export interface UserDTO {
@@ -22,7 +22,7 @@ export interface UserDTO {
   lastName: string;
   email: string;
   jwtToken: string;
-  role: 'admin' | 'user';
+  role: 'ADMIN' | 'USER';
   totalPoints: number;
 }
 
