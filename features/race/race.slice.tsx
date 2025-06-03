@@ -1,7 +1,10 @@
-// src/features/race/raceSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { getAllRaces, reloadRaceData } from '@/services/race.service';
-import { Race, RaceDTO } from '@/types/race';
+import {
+  getAllRaces,
+  reloadRaceData,
+  scrapeRaces,
+} from '@/services/race.service';
+import { RaceDTO } from '@/types/race';
 
 // Define Race type based on your API response
 interface RacesState {
@@ -23,6 +26,14 @@ export const updateRaceData = createAsyncThunk(
   'race/updateRaceData',
   async (name: string) => {
     const data = await reloadRaceData(name);
+    return data;
+  },
+);
+
+export const fetchScrapeRaces = createAsyncThunk(
+  'race/fetchScrapeRaces',
+  async () => {
+    const data = await scrapeRaces();
     return data;
   },
 );

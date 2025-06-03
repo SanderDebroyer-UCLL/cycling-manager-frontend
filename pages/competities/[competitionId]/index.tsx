@@ -48,9 +48,6 @@ const index = () => {
   const cyclistWithDNS = useSelector(
     (state: RootState) => state.userTeams.cyclistsWithDNS,
   );
-  const userTeamsState = useSelector(
-    (state: RootState) => state.userTeams.status,
-  );
   const raceStatus = useSelector((state: RootState) => state.race.status);
   const dispatch = useDispatch<AppDispatch>();
   const { competitionId } = router.query;
