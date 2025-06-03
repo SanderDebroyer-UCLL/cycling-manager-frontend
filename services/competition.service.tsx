@@ -69,9 +69,29 @@ export const getCompetitionResultsUpdate = async (competitionId: number) => {
   return res.json();
 };
 
+export const scrapeCompetitionStages = async (competitionId: number) => {
+  const res = await fetch(
+    process.env.NEXT_PUBLIC_API_URL + '/competitions/scrape/' + competitionId,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
+      },
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error('Failed to scrape competition stages');
+  }
+
+  return res.json();
+};
+
 const CompetitionService = {
   createCompetition,
   getCompetitions,
+  scrapeCompetitionStages,
 };
 
 export default CompetitionService;

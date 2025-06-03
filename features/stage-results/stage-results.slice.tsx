@@ -1,6 +1,9 @@
 // src/features/user/userSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { getResultsByStageIdByType } from '@/services/results.service';
+import {
+  getResultsByStageIdByType,
+  scrapeResultsByStageId,
+} from '@/services/results.service';
 import { StageResult } from '@/types/race';
 import { ResultType } from '@/const/resultType';
 
@@ -12,6 +15,7 @@ interface StageResultsState {
   mountainResult?: StageResult[];
 
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  scrapeStatus?: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
 const initialStageResultsState: StageResultsState = {
@@ -28,12 +32,30 @@ export const fetchResultsByStageIdByType = createAsyncThunk(
   },
 );
 
+export const getResultsByStageId = createAsyncThunk(
+  'stage-results/getResultsByStageId',
+  async (stageId: number) => {
+    const results = await scrapeResultsByStageId(stageId);
+    return results;
+  },
+);
+
 const resultsSlice = createSlice({
   name: 'stage-results',
   initialState: initialStageResultsState,
   reducers: {
     resetStageResultsStatus(state) {
       state.status = 'idle';
+    },
+    resetStageResultsScrapeStatus(state) {
+      state.scrapeStatus = 'idle';
+    },
+    resetStageResultValues(state) {
+      state.etappeResult = [];
+      state.gcResult = [];
+      state.youthResult = [];
+      state.pointsResult = [];
+      state.mountainResult = [];
     },
   },
   extraReducers: (builder) => {
@@ -73,10 +95,23 @@ const resultsSlice = createSlice({
       )
       .addCase(fetchResultsByStageIdByType.rejected, (state) => {
         state.status = 'failed';
+      })
+      .addCase(getResultsByStageId.pending, (state) => {
+        state.scrapeStatus = 'loading';
+      })
+      .addCase(getResultsByStageId.fulfilled, (state) => {
+        state.scrapeStatus = 'succeeded';
+      })
+      .addCase(getResultsByStageId.rejected, (state) => {
+        state.scrapeStatus = 'failed';
       });
   },
 });
 
-export const { resetStageResultsStatus } = resultsSlice.actions;
+export const {
+  resetStageResultsStatus,
+  resetStageResultValues,
+  resetStageResultsScrapeStatus,
+} = resultsSlice.actions;
 
 export default resultsSlice.reducer;

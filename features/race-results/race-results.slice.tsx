@@ -47,6 +47,7 @@ const resultsSlice = createSlice({
   },
 });
 
-export const { resetRaceResultsStatus } = resultsSlice.actions;
+export const { resetRaceResultsStatus } =
+  resultsSlice.actions;
 
 export default resultsSlice.reducer;
