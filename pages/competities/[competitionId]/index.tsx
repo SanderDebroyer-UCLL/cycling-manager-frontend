@@ -1,6 +1,9 @@
 import CompetitieLayout from '@/components/competitieLayout';
 import { container } from '@/const/containerStyle';
-import { fetchCompetitionById } from '@/features/competition/competition.slice';
+import {
+  fetchCompetitionById,
+  fetchCompetitionStages,
+} from '@/features/competition/competition.slice';
 import { AppDispatch, RootState } from '@/store/store';
 import { Competition, CompetitionDTO } from '@/types/competition';
 import { useRouter } from 'next/router';
@@ -39,11 +42,11 @@ const index = () => {
   const competition: CompetitionDTO | null = useSelector(
     (state: any) => state.competition.competitionDTO,
   );
+  const competitionStatus = useSelector(
+    (state: RootState) => state.competition.status,
+  );
   const cyclistWithDNS = useSelector(
     (state: RootState) => state.userTeams.cyclistsWithDNS,
-  );
-  const userTeamsState = useSelector(
-    (state: RootState) => state.userTeams.status,
   );
   const raceStatus = useSelector((state: RootState) => state.race.status);
   const dispatch = useDispatch<AppDispatch>();
@@ -174,7 +177,9 @@ const index = () => {
 
   // Handle race status loading state
   useEffect(() => {
-    setUpdateRaceDataLoading(raceStatus === 'loading');
+    if (raceStatus === 'loading' || competitionStatus === 'loading') {
+      setUpdateRaceDataLoading(raceStatus === 'loading');
+    }
   }, [raceStatus]);
 
   useEffect(() => {
@@ -193,14 +198,14 @@ const index = () => {
     }
   }, [dispatch, competition, competitionIdNumber]);
 
-  // Handler functions
+  //TODO Startlijst ook ophalen
   const handleRefreshData = useCallback(() => {
     if (competitionData.hasStages && competition?.races?.length) {
-      dispatch(updateRaceData(competition.races[0].name));
+      dispatch(fetchCompetitionStages(competition.id));
     } else if (competition?.races?.length) {
-      competition.races.forEach((race: RaceDTO) =>
-        dispatch(updateRaceData(race.name)),
-      );
+      if (competition.races[0].niveau.slice(0, 1) === '2') {
+        dispatch(fetchCompetitionStages(competition.id));
+      }
     }
   }, [competitionData.hasStages, competition, dispatch]);
 
@@ -256,9 +261,8 @@ const index = () => {
             icon={() => (
               <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
             )}
-            tooltip="Haal de laatste data op"
+            tooltip="Haal alle etappes en startlijsten op"
             tooltipOptions={{ showDelay: 500 }}
-            aria-label="Haal de laatste data op"
             className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
             loading={updateRaceDataLoading}
             onClick={handleRefreshData}

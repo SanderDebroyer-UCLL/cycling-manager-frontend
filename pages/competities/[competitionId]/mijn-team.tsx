@@ -12,7 +12,6 @@ import { fetchCyclists } from '@/features/cyclists/cyclists.slice';
 import {
   fetchUserTeam,
   postUpdateUserTeamMainCyclists,
-  resetUserTeamsStatus,
   updateUserTeamCyclists,
 } from '@/features/user-teams/user-teams.slice';
 import { AppDispatch, RootState } from '@/store/store';
@@ -297,11 +296,13 @@ const index = () => {
     if (!competition || !userTeams) {
       return;
     }
-    const mainCyclistsCount = userTeams.reduce(
-      (count: number, team: UserTeamDTO) =>
-        count + team.cyclistAssignments.length,
-      0,
-    );
+    const mainCyclistsCount = userTeams
+      .filter((userTeam) => userTeam.competitionId === competition.id)
+      .reduce(
+        (count: number, team: UserTeamDTO) =>
+          count + team.cyclistAssignments.length,
+        0,
+      );
     if (mainCyclistsCount === 0) return;
     if (
       mainCyclistsCount ===

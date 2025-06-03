@@ -11,6 +11,7 @@ import {
   createCompetition,
   getCompetition,
   getCompetitionResultsUpdate,
+  scrapeCompetitionStages,
 } from '@/services/competition.service';
 
 interface CompetitionState {
@@ -48,6 +49,14 @@ export const fetchCompetitionResultsUpdate = createAsyncThunk(
   async (competitionId: number) => {
     const data = await getCompetitionResultsUpdate(competitionId);
     return data;
+  },
+);
+
+export const fetchCompetitionStages = createAsyncThunk(
+  'competition/fetchCompetitionStages',
+  async (competitionId: number) => {
+    const competition = await scrapeCompetitionStages(competitionId);
+    return competition;
   },
 );
 
@@ -144,13 +153,34 @@ const competitionSlice = createSlice({
       .addCase(fetchCompetitionResultsUpdate.pending, (state) => {
         state.status = 'loading';
       })
+      .addCase(fetchCompetitionResultsUpdate.fulfilled, (state) => {
+        state.status = 'succeeded';
+      })
+      .addCase(fetchCompetitionResultsUpdate.rejected, (state) => {
+        state.status = 'failed';
+      })
+      .addCase(fetchCompetitionStages.pending, (state) => {
+        state.status = 'loading';
+      })
       .addCase(
-        fetchCompetitionResultsUpdate.fulfilled,
-        (state, action: PayloadAction<Competition>) => {
+        fetchCompetitionStages.fulfilled,
+        (state, action: PayloadAction<CompetitionDTO>) => {
           state.status = 'succeeded';
+
+          // Clone and sort races by startDate (assuming ISO string)
+          const sortedRaces = [...action.payload.races].sort(
+            (a, b) =>
+              new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+          );
+
+          // Save modified DTO with sorted races
+          state.competitionDTO = {
+            ...action.payload,
+            races: sortedRaces,
+          };
         },
       )
-      .addCase(fetchCompetitionResultsUpdate.rejected, (state) => {
+      .addCase(fetchCompetitionStages.rejected, (state) => {
         state.status = 'failed';
       });
   },

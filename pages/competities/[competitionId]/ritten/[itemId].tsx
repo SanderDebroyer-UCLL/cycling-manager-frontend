@@ -19,7 +19,10 @@ import {
 } from '@/features/points/points.slice';
 import {
   fetchResultsByStageIdByType,
+  getResultsByStageId,
+  resetStageResultsScrapeStatus,
   resetStageResultsStatus,
+  resetStageResultValues,
 } from '@/features/stage-results/stage-results.slice';
 import { AppDispatch } from '@/store/store';
 import { CompetitionDTO } from '@/types/competition';
@@ -62,6 +65,7 @@ const index = () => {
   const [activeRace, setActiveRace] = useState<RaceDTO | null>(null);
   const [competitionLoading, setCompetitionLoading] = useState(false);
   const [resultLoading, setResultLoading] = useState(false);
+  const [scrapeResultLoading, setScrapeResultLoading] = useState(false);
   const [resultStatus, setResultStatus] = useState<ResultType>(
     ResultType.STAGE,
   );
@@ -87,6 +91,9 @@ const index = () => {
   );
   const stageResultsStatus: string = useSelector(
     (state: any) => state.stageResults.status,
+  );
+  const stageResultsScrapeStatus: string = useSelector(
+    (state: any) => state.stageResults.scrapeStatus,
   );
   const raceResultsStatus: string = useSelector(
     (state: any) => state.raceResults.status,
@@ -180,7 +187,45 @@ const index = () => {
     } else {
       setResultLoading(false);
     }
-  }, [resultLoading]);
+  }, [stageResultsStatus]);
+
+  useEffect(() => {
+    if (stageResultsScrapeStatus === 'loading') {
+      setScrapeResultLoading(true);
+    } else {
+      setScrapeResultLoading(false);
+    }
+  });
+
+  useEffect(() => {
+    if (!competition || !activeStage) return;
+    if (stageResultsScrapeStatus === 'succeeded') {
+      dispatch(
+        fetchResultsByStageIdByType({
+          stageId: activeStage.id,
+          resultType: ResultType.STAGE,
+        }),
+      );
+      dispatch(
+        fetchResultsByStageIdByType({
+          stageId: activeStage.id,
+          resultType: ResultType.GC,
+        }),
+      );
+      dispatch(
+        fetchResultsByStageIdByType({
+          stageId: activeStage.id,
+          resultType: ResultType.YOUNG,
+        }),
+      );
+      dispatch(
+        fetchResultsByStageIdByType({
+          stageId: activeStage.id,
+          resultType: ResultType.POINTS,
+        }),
+      );
+    }
+  }, [dispatch, stageResultsScrapeStatus]);
 
   useEffect(() => {
     if (competitionStatus === 'succeeded') {
@@ -255,6 +300,7 @@ const index = () => {
     setActiveStage(stage);
     setActiveRace(null);
     dispatch(resetStageResultsStatus());
+    dispatch(resetStageResultValues());
     dispatch(resetPointsStatus());
     router.push(`/competities/${competitionId}/ritten/${stage.id}`, undefined, {
       shallow: true,
@@ -298,9 +344,8 @@ const index = () => {
               icon={() => (
                 <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
               )}
-              tooltip="Haal de laatste resultaten en punten op"
+              tooltip="Haal alle resultaten en punten op"
               tooltipOptions={{ showDelay: 500 }}
-              aria-label="Haal de laatste data op"
               className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
               loading={competitionLoading}
               onClick={() =>
@@ -456,7 +501,28 @@ const index = () => {
             <div className="flex flex-col flex-1/2 gap-10 w-full">
               <div className="py-[10px]"></div>
               <div className="flex flex-col flex-1 gap-2">
-                <h3 className="font-semibold">Uitslag Rit</h3>
+                <h3 className="font-semibold flex items-center">
+                  Uitslag Rit{' '}
+                  <Button
+                    outlined
+                    icon={() => (
+                      <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
+                    )}
+                    size="small"
+                    tooltip="Haal resultaten voor deze etappe op"
+                    tooltipOptions={{ showDelay: 500 }}
+                    className="!p-0 h-[48px] w-[48px] flex items-center !border-none justify-center"
+                    loading={scrapeResultLoading}
+                    onClick={() => {
+                      resetStageResultsScrapeStatus(),
+                        dispatch(
+                          getResultsByStageId(
+                            Number(Array.isArray(itemId) ? itemId[0] : itemId),
+                          ),
+                        );
+                    }}
+                  />
+                </h3>
                 <div
                   style={container}
                   className="flex flex-col h-full overflow-auto max-h-[500px]"

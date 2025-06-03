@@ -7,7 +7,7 @@ import { container, containerLargerPadding } from '@/const/containerStyle';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import LoadingOverlay from '@/components/LoadingOverlay';
-import { Key, useEffect } from 'react';
+import { useEffect } from 'react';
 import { fetchUsers } from '@/features/users/users.slice';
 import { fetchCompetitions } from '@/features/competitions/competitions.slice';
 import { CompetitionDTO } from '@/types/competition';
