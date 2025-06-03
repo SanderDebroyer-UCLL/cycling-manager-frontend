@@ -26,22 +26,16 @@ import {
 } from '@/features/stage-results/stage-results.slice';
 import { AppDispatch } from '@/store/store';
 import { CompetitionDTO } from '@/types/competition';
-import {
-  ParcoursType,
-  Race,
-  RaceDTO,
-  Stage,
-  StageDTO,
-  StageResult,
-} from '@/types/race';
+import { ParcoursType, RaceDTO, StageDTO, StageResult } from '@/types/race';
 import { RaceResult } from '@/types/race-result';
-import { Points } from '@/types/points';
+import { MainReservePointsCyclist } from '@/types/points';
 import {
   parcoursDescriptions,
   ParcoursTypeKeyMap,
 } from '@/utils/parcours-key-map';
 import {
   FlagIcon,
+  Medal,
   Mountain,
   RefreshCw,
   Star,
@@ -53,9 +47,12 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { fetchUsers } from '@/features/users/users.slice';
 import PointsChipBodyTemplate from '@/components/PointsChipBodyTemplate';
+import { UserDTO } from '@/types/user';
+import TimeBodyTemplate from '@/components/TimeBodyTemplate';
 
 const index = () => {
   const router = useRouter();
@@ -64,8 +61,28 @@ const index = () => {
   const [activeStage, setActiveStage] = useState<StageDTO | null>(null);
   const [activeRace, setActiveRace] = useState<RaceDTO | null>(null);
   const [competitionLoading, setCompetitionLoading] = useState(false);
+  const [resultPointsToggle, setResultPointsToggle] = useState(false);
   const [resultLoading, setResultLoading] = useState(false);
   const [scrapeResultLoading, setScrapeResultLoading] = useState(false);
+  const [enrichedCyclistPoints, setEnrichedCyclistPoints] = useState<
+    {
+      fullName: string;
+      email: string;
+      points: number;
+      cyclistName: string;
+      cyclistId: number;
+      userId: number;
+      isCyclistActive: boolean;
+    }[]
+  >([]);
+  const [pointsPerUser, setPointsPerUser] = useState<
+    {
+      userId: number;
+      fullName: string;
+      email: string;
+      totalPoints: number;
+    }[]
+  >([]);
   const [resultStatus, setResultStatus] = useState<ResultType>(
     ResultType.STAGE,
   );
@@ -73,6 +90,8 @@ const index = () => {
   const [stageGCResultsState, setStageGCResultsState] = useState<StageResult[]>(
     [],
   );
+  const users: UserDTO[] = useSelector((state: any) => state.users.data);
+  const usersStatus = useSelector((state: any) => state.users.status);
   const [raceResultsState, setRaceResultsState] = useState<RaceResult[]>([]);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -102,7 +121,82 @@ const index = () => {
   const stageGCResults: StageResult[] = useSelector(
     (state: any) => state.stageResults.gcResult,
   );
-  const points: Points[] = useSelector((state: any) => state.points.points);
+  const points: MainReservePointsCyclist = useSelector(
+    (state: any) => state.points.mainReservePointsCyclist,
+  );
+
+  useEffect(() => {
+    if (!points || !users) return;
+
+    const pointsArray = [...points.mainCyclists, ...points.reserveCyclists];
+
+    const enrichedPointsList = pointsArray.map((point) => {
+      const user = users.find((u) => u.id === point.userId);
+      return {
+        ...point,
+        fullName:
+          `${user?.firstName || 'Unknown'} ${user?.lastName || ''}`.trim(),
+        email: user?.email || 'Unknown',
+      };
+    });
+
+    setEnrichedCyclistPoints(enrichedPointsList);
+    console.log('Enriched cyclist points:', enrichedPointsList);
+  }, [points, users, pointsStatus]);
+
+  useEffect(() => {
+    if (!users) return;
+
+    const allUsersWithInitialPoints = users.map((user) => ({
+      userId: user.id,
+      fullName:
+        `${user?.firstName || 'Unknown'} ${user?.lastName || ''}`.trim(),
+      email: user?.email || 'Unknown',
+      totalPoints: 0,
+    }));
+
+    if (!points) {
+      setPointsPerUser(allUsersWithInitialPoints);
+      return;
+    }
+
+    const pointsArray = [...points.mainCyclists, ...points.reserveCyclists];
+
+    const totalPointsPerUserMap = pointsArray.reduce(
+      (acc, point) => {
+        if (!acc[point.userId]) {
+          acc[point.userId] = {
+            userId: point.userId,
+            fullName: '',
+            email: '',
+            totalPoints: 0,
+          };
+        }
+        acc[point.userId].totalPoints += point.points;
+        return acc;
+      },
+      {} as {
+        [userId: number]: {
+          userId: number;
+          fullName: string;
+          email: string;
+          totalPoints: number;
+        };
+      },
+    );
+
+    // Merge with user data and fill in missing names/emails
+    const merged = allUsersWithInitialPoints.map((user) => {
+      const pointData = totalPointsPerUserMap[user.userId];
+      return {
+        ...user,
+        totalPoints: pointData ? pointData.totalPoints : 0,
+      };
+    });
+
+    setPointsPerUser(merged);
+    console.log('Total points per user array:', merged);
+  }, [points, users, pointsStatus]);
 
   useEffect(() => {
     if (competitionStatus === 'loading') {
@@ -175,6 +269,11 @@ const index = () => {
     }
   }, [dispatch, stageResultsStatus, activeStage?.id]);
 
+  useEffect(() => {
+    if (usersStatus === 'idle' && users) {
+      dispatch(fetchUsers());
+    }
+  }, [dispatch, usersStatus, users]);
   useEffect(() => {
     if (raceResultsStatus === 'idle' && activeRace?.id) {
       dispatch(fetchRaceResultsByRaceId(activeRace.id));
@@ -478,19 +577,19 @@ const index = () => {
                 <h3 className="font-semibold">Punten verdiend per deelnemer</h3>
                 <div
                   style={container}
-                  className="flex flex-col h-full overflow-auto max-h-[300px]"
+                  className="flex flex-col h-full overflow-auto max-h-[240px]"
                 >
                   <DataTable
-                    value={points}
+                    value={pointsPerUser}
                     dataKey="userId"
-                    sortField="points"
+                    sortField="totalPoints"
                     sortOrder={-1}
-                    emptyMessage="Geen resultaten gevonden"
+                    emptyMessage="Niemand heeft punten verdiend"
                     className=""
                   >
                     <Column field="fullName" header="Deelnemer" />
                     <Column
-                      field="points"
+                      field="totalPoints"
                       header="Punten"
                       body={PointsChipBodyTemplate}
                     />
@@ -501,8 +600,21 @@ const index = () => {
             <div className="flex flex-col flex-1/2 gap-10 w-full">
               <div className="py-[10px]"></div>
               <div className="flex flex-col flex-1 gap-2">
-                <h3 className="font-semibold flex items-center">
-                  Uitslag Rit{' '}
+                <h3 className="font-semibold gap-4 flex items-center">
+                  <Chip
+                    label={'Uitslag Race'}
+                    Icon={Star}
+                    active={!resultPointsToggle}
+                    variant="primary"
+                    onClick={() => setResultPointsToggle(false)}
+                  />
+                  <Chip
+                    label={'Puntentelling'}
+                    Icon={Medal}
+                    active={resultPointsToggle}
+                    variant="primary"
+                    onClick={() => setResultPointsToggle(true)}
+                  />{' '}
                   <Button
                     outlined
                     icon={() => (
@@ -511,7 +623,7 @@ const index = () => {
                     size="small"
                     tooltip="Haal resultaten voor deze etappe op"
                     tooltipOptions={{ showDelay: 500 }}
-                    className="!p-0 h-[48px] w-[48px] flex items-center !border-none justify-center"
+                    className="!p-0 -translate-x-2 h-[48px] w-[48px] flex items-center !border-none justify-center"
                     loading={scrapeResultLoading}
                     onClick={() => {
                       resetStageResultsScrapeStatus(),
@@ -525,67 +637,92 @@ const index = () => {
                 </h3>
                 <div
                   style={container}
-                  className="flex flex-col h-full overflow-auto max-h-[500px]"
+                  className="flex flex-col h-full overflow-auto"
                 >
-                  <div className="flex gap-4">
-                    <Chip
-                      label="Etappe"
-                      Icon={FlagIcon}
-                      active={resultStatus === ResultType.STAGE}
-                      onClick={() => setResultStatus(ResultType.STAGE)}
-                    />
-                    <Chip
-                      label="GC"
-                      Icon={Trophy}
-                      active={resultStatus === ResultType.GC}
-                      onClick={() => setResultStatus(ResultType.GC)}
-                    />
-                    <Chip
-                      label="Youth"
-                      Icon={UserIcon}
-                      active={resultStatus === ResultType.YOUNG}
-                      onClick={() => setResultStatus(ResultType.YOUNG)}
-                    />
-                    <Chip
-                      label="Points"
-                      Icon={Star}
-                      active={resultStatus === ResultType.POINTS}
-                      onClick={() => setResultStatus(ResultType.POINTS)}
-                    />
-                    <Chip
-                      label="Mountain"
-                      Icon={Mountain}
-                      active={resultStatus === ResultType.MOUNTAIN}
-                      onClick={() => setResultStatus(ResultType.MOUNTAIN)}
-                    />
-                  </div>
-                  <DataTable
-                    paginator
-                    rows={5}
-                    loading={resultLoading}
-                    value={
-                      resultStatus === ResultType.STAGE
-                        ? stageResultsState
-                        : resultStatus === ResultType.GC
-                          ? stageGCResultsState
-                          : []
-                    }
-                    dataKey="id"
-                    sortField="position"
-                    sortOrder={1}
-                    emptyMessage="Geen resultaten gevonden"
-                    className=""
-                  >
-                    <Column field="position" header="Plaats" />
-                    <Column field="cyclistName" header="Naam" />
-                    {resultStatus === ResultType.STAGE ? (
-                      <Column field="time" header="Tijd" />
-                    ) : resultStatus === ResultType.GC ? (
-                      <Column field="time" header="Tijd" />
-                    ) : (
-                      []
-                    )}
-                  </DataTable>
+                  {!resultPointsToggle ? (
+                    <>
+                      <div className="flex gap-4">
+                        <Chip
+                          label="Etappe"
+                          Icon={FlagIcon}
+                          variant="secondary"
+                          active={resultStatus === ResultType.STAGE}
+                          onClick={() => setResultStatus(ResultType.STAGE)}
+                        />
+                        <Chip
+                          label="GC"
+                          Icon={Trophy}
+                          variant="secondary"
+                          active={resultStatus === ResultType.GC}
+                          onClick={() => setResultStatus(ResultType.GC)}
+                        />
+                        <Chip
+                          label="Youth"
+                          Icon={UserIcon}
+                          variant="secondary"
+                          active={resultStatus === ResultType.YOUNG}
+                          onClick={() => setResultStatus(ResultType.YOUNG)}
+                        />
+                        <Chip
+                          label="Points"
+                          Icon={Star}
+                          variant="secondary"
+                          active={resultStatus === ResultType.POINTS}
+                          onClick={() => setResultStatus(ResultType.POINTS)}
+                        />
+                        <Chip
+                          label="Mountain"
+                          Icon={Mountain}
+                          variant="secondary"
+                          active={resultStatus === ResultType.MOUNTAIN}
+                          onClick={() => setResultStatus(ResultType.MOUNTAIN)}
+                        />
+                      </div>
+                      <DataTable
+                        paginator
+                        rows={5}
+                        loading={resultLoading}
+                        value={
+                          resultStatus === ResultType.STAGE
+                            ? stageResultsState
+                            : resultStatus === ResultType.GC
+                              ? stageGCResultsState
+                              : []
+                        }
+                        dataKey="id"
+                        sortField="position"
+                        sortOrder={1}
+                        emptyMessage="Geen resultaten gevonden"
+                        className=""
+                      >
+                        <Column field="position" header="Plaats" />
+                        <Column field="cyclistName" header="Naam" />
+                        {resultStatus === ResultType.STAGE ? (
+                          <Column body={TimeBodyTemplate} />
+                        ) : resultStatus === ResultType.GC ? (
+                          <Column body={TimeBodyTemplate} />
+                        ) : (
+                          []
+                        )}
+                      </DataTable>{' '}
+                    </>
+                  ) : (
+                    <DataTable
+                      paginator
+                      rows={5}
+                      loading={resultLoading}
+                      value={enrichedCyclistPoints}
+                      dataKey="id"
+                      sortField="reason"
+                      sortOrder={1}
+                      emptyMessage="Geen resultaten gevonden!"
+                    >
+                      <Column field="fullName" header="Deelnemer" />
+                      <Column field="cyclistName" header="Wielrenner" />
+                      <Column field="reason" header="Reden" />
+                      <Column field="points" header="Punten" />
+                    </DataTable>
+                  )}
                 </div>
               </div>
             </div>
@@ -639,16 +776,16 @@ const index = () => {
                   className="flex flex-col h-full overflow-auto max-h-[300px]"
                 >
                   <DataTable
-                    value={points}
+                    value={pointsPerUser}
                     dataKey="userId"
-                    sortField="points"
+                    sortField="totalPoints"
                     sortOrder={-1}
                     emptyMessage="Geen resultaten gevonden"
                     className=""
                   >
                     <Column field="fullName" header="Deelnemer" />
                     <Column
-                      field="points"
+                      field="totalPoints"
                       header="Punten"
                       body={PointsChipBodyTemplate}
                     />
@@ -659,25 +796,58 @@ const index = () => {
             <div className="flex flex-col flex-1/2 gap-10 w-full">
               <div className="py-[10px]"></div>
               <div className="flex flex-col flex-1 gap-2">
-                <h3 className="font-semibold">Uitslag Race</h3>
+                <div className="flex gap-4">
+                  <Chip
+                    label={'Uitslag Race'}
+                    Icon={Star}
+                    active={!resultPointsToggle}
+                    variant="primary"
+                    onClick={() => setResultPointsToggle(false)}
+                  />
+                  <Chip
+                    label={'Puntentelling'}
+                    Icon={Medal}
+                    active={resultPointsToggle}
+                    variant="primary"
+                    onClick={() => setResultPointsToggle(true)}
+                  />
+                </div>
                 <div
                   style={container}
                   className="flex flex-col h-full overflow-auto max-h-[500px]"
                 >
-                  <DataTable
-                    paginator
-                    rows={5}
-                    loading={resultLoading}
-                    value={raceResultsState}
-                    dataKey="id"
-                    sortField="position"
-                    sortOrder={1}
-                    emptyMessage="Geen resultaten gevonden"
-                  >
-                    <Column field="position" header="Plaats" />
-                    <Column field="cyclistName" header="Naam" />
-                    <Column field="time" header="Tijd" />
-                  </DataTable>
+                  {!resultPointsToggle ? (
+                    <DataTable
+                      paginator
+                      rows={5}
+                      loading={resultLoading}
+                      value={raceResultsState}
+                      dataKey="id"
+                      sortField="position"
+                      sortOrder={1}
+                      emptyMessage="Geen resultaten gevonden"
+                    >
+                      <Column field="position" header="Plaats" />
+                      <Column field="cyclistName" header="Naam" />
+                      <Column field="time" header="Tijd" />
+                    </DataTable>
+                  ) : (
+                    <DataTable
+                      paginator
+                      rows={5}
+                      loading={resultLoading}
+                      value={enrichedCyclistPoints}
+                      dataKey="id"
+                      sortField="reason"
+                      sortOrder={1}
+                      emptyMessage="Geen resultaten gevonden!"
+                    >
+                      <Column field="fullName" header="Deelnemer" />
+                      <Column field="cyclistName" header="Wielrenner" />
+                      <Column field="reason" header="Plaats" />
+                      <Column field="points" header="Punten" />
+                    </DataTable>
+                  )}
                 </div>
               </div>
             </div>

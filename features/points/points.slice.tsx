@@ -8,6 +8,7 @@ import {
   MainReservePointsCyclist,
   Points,
   PointsPerCyclist,
+  PointsReason,
 } from '@/types/points';
 import {
   getRacePointsForAllRaces,
@@ -17,6 +18,7 @@ import {
 interface PointsState {
   points: Points[];
   pointsPerCyclist: PointsPerCyclist[];
+  pointsReason: PointsReason[];
   mainReservePointsCyclist: MainReservePointsCyclist | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
@@ -24,6 +26,7 @@ interface PointsState {
 const initialPointsState: PointsState = {
   points: [],
   pointsPerCyclist: [],
+  pointsReason: [],
   mainReservePointsCyclist: null,
   status: 'idle',
 };
@@ -94,9 +97,9 @@ const Slice = createSlice({
       })
       .addCase(
         fetchStagePointsForStage.fulfilled,
-        (state, action: PayloadAction<Points[]>) => {
+        (state, action: PayloadAction<MainReservePointsCyclist>) => {
           state.status = 'succeeded';
-          state.points = action.payload;
+          state.mainReservePointsCyclist = action.payload;
         },
       )
       .addCase(fetchStagePointsForStage.rejected, (state) => {
@@ -120,9 +123,9 @@ const Slice = createSlice({
       })
       .addCase(
         fetchRacePointsForRace.fulfilled,
-        (state, action: PayloadAction<Points[]>) => {
+        (state, action: PayloadAction<MainReservePointsCyclist>) => {
           state.status = 'succeeded';
-          state.points = action.payload;
+          state.mainReservePointsCyclist = action.payload;
         },
       )
       .addCase(fetchRacePointsForRace.rejected, (state) => {

@@ -151,7 +151,8 @@ const getPointsChipPropsPercentile = (points: number, allPoints: number[]) => {
 
 // Body template for points column
 const PointsChipBodyTemplate = (rowData: any) => {
-  const points = rowData.points;
+  const points = rowData.totalPoints;
+  console.log('PointsChipBodyTemplate', points);
 
   if (points === undefined || points === null) {
     return <span>-</span>;

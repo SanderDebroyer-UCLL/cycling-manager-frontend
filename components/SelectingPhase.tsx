@@ -170,7 +170,7 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
                 <h2 className="text-xl font-semibold overflow-hidden text-ellipsis">
                   {userTeam.user.email === email ? 'Mijn Team' : userTeam.name}
                 </h2>
-                <div className="flex flex-col gap-2 w-full overflow-y-auto max-h-[350px] text-nowrap text-ellipsis">
+                <div className="flex flex-col gap-2 w-full overflow-y-auto max-h-[350px] text-nowrap text-ellipsis ">
                   {userTeam.cyclistAssignments
                     .filter(
                       (cyclistAssignments) =>
@@ -180,7 +180,7 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
                     .map((cyclist: CyclistDTO, index) => (
                       <div
                         key={`${cyclist.id}-${index}`}
-                        className="flex items-center border-b-1 last:border-b-0 border-surface-400 mx-2 py-2"
+                        className="flex items-center mx-2 py-2"
                       >
                         <span className="mr-2">{index + 1}.</span>
                         <span className="overflow-hidden text-ellipsis whitespace-nowrap block w-full">
@@ -188,6 +188,8 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
                         </span>
                       </div>
                     ))}
+                  <div className="border-b border-on-secondary-fixed w-full"></div>
+
                   {userTeam.cyclistAssignments
                     .filter(
                       (cyclistAssignments) =>
@@ -197,7 +199,7 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
                     .map((cyclist: CyclistDTO, index) => (
                       <div
                         key={`${cyclist.id}-${index}`}
-                        className={`flex items-center border-b-1 last:border-b-0 mx-2 py-2 border-on-secondary-container text-on-secondary-container`}
+                        className="flex items-center text-on-secondary-container mx-2 py-2"
                       >
                         <span className="mr-2">{index + 1}.</span>
                         <span className="overflow-hidden text-ellipsis whitespace-nowrap block w-full">

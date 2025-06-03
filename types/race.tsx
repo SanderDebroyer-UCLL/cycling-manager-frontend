@@ -62,6 +62,7 @@ export interface StageResult {
   rider: string;
   team: string;
   timeGap: string;
+  time: string;
   resultType: ResultType;
   scrapeResultType: ResultType;
 }
