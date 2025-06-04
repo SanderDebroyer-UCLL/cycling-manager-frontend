@@ -13,6 +13,7 @@ import {
 import {
   getRacePointsForAllRaces,
   getRacePointsForRace,
+  getStagePointsForCompetitionId,
 } from '@/services/race-points.service';
 
 interface PointsState {
@@ -66,6 +67,14 @@ export const fetchRacePointsForAllRaces = createAsyncThunk(
     const { competitionId, userId } = params;
     const racePoints = await getRacePointsForAllRaces(competitionId, userId);
     return racePoints;
+  },
+);
+
+export const fetchStagePointsForCompetitionId = createAsyncThunk(
+  'stagePoints/fetchStagePointsForCompetitionId',
+  async (competitionId: number) => {
+    const stagePoints = await getStagePointsForCompetitionId(competitionId);
+    return stagePoints;
   },
 );
 
@@ -144,6 +153,19 @@ const Slice = createSlice({
         },
       )
       .addCase(fetchRacePointsForAllRaces.rejected, (state) => {
+        state.status = 'failed';
+      })
+      .addCase(fetchStagePointsForCompetitionId.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(
+        fetchStagePointsForCompetitionId.fulfilled,
+        (state, action: PayloadAction<Points[]>) => {
+          state.status = 'succeeded';
+          state.points = action.payload;
+        },
+      )
+      .addCase(fetchStagePointsForCompetitionId.rejected, (state) => {
         state.status = 'failed';
       });
   },
