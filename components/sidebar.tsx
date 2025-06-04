@@ -1,6 +1,13 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Bike, Medal, SquareGanttChart, Users } from 'lucide-react';
+import {
+  ArrowLeft,
+  Bike,
+  ClipboardPen,
+  Medal,
+  SquareGanttChart,
+  Users,
+} from 'lucide-react';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCompetitionById } from '@/features/competition/competition.slice';
@@ -65,7 +72,7 @@ const Sidebar = () => {
       <div className="flex flex-col pb-2">
         <Link
           href={`/competities/${competitionId}`}
-          className={` ${isNotActive(['ritten', 'mijn-team', 'klassement']) ? '!border-primary !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface hover:border-primary px-6 hover:font-semibold py-2`}
+          className={` ${isNotActive(['ritten', 'mijn-team', 'klassement', 'punten']) ? '!border-primary !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface hover:border-primary px-6 hover:font-semibold py-2`}
         >
           <SquareGanttChart size={18} className="stroke-dark-700" />
           Overzicht
@@ -99,6 +106,13 @@ const Sidebar = () => {
             Klassement
           </Link>
         )}
+        <Link
+          href={`/competities/${competitionId}/punten`}
+          className={` ${isActive('punten') ? '!border-primary !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface hover:border-primary px-6 hover:font-semibold py-2`}
+        >
+          <ClipboardPen size={18} className="stroke-dark-700" />
+          Punten
+        </Link>
       </div>
     </div>
   );
