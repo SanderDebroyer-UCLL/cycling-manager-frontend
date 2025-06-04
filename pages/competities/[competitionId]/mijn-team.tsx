@@ -11,6 +11,8 @@ import { fetchCyclists } from '@/features/cyclists/cyclists.slice';
 import {
   fetchUserTeam,
   postUpdateUserTeamMainCyclists,
+  resetUserTeamsStatus,
+  resetUserTeamsUpdateStatus,
   updateUserTeamCyclists,
 } from '@/features/user-teams/user-teams.slice';
 import { AppDispatch, RootState } from '@/store/store';
@@ -45,6 +47,7 @@ import {
 } from '@/features/points/points.slice';
 import CountryBodyTemplate from '@/components/template/CountryBodyTemplate';
 import ItemTemplate from '@/components/template/ItemTemplate';
+import { showErrorToast, showSuccessToast } from '@/services/toast.service';
 
 const index = () => {
   const router = useRouter();
@@ -52,6 +55,10 @@ const index = () => {
   const [usersState, setUsersState] = useState<UserDTO[]>([]);
   const [cyclistsState, setCyclistsState] = useState<CyclistDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [userTeamsLoading, setUserTeamsLoading] = useState<boolean>(true);
+  const userTeamsError = useSelector(
+    (state: RootState) => state.userTeams.error,
+  );
   const [selectedCyclist, setSelectedCyclist] = useState<CyclistDTO | null>(
     null,
   );
@@ -66,6 +73,9 @@ const index = () => {
   const usersStatus = useSelector((state: RootState) => state.users.status);
   const userTeamsStatus = useSelector(
     (state: RootState) => state.userTeams.status,
+  );
+  const userTeamsUpdateStatus = useSelector(
+    (state: RootState) => state.userTeams.updateStatus,
   );
   const cyclistsStatus = useSelector(
     (state: RootState) => state.cyclists.status,
@@ -226,6 +236,31 @@ const index = () => {
   useEffect(() => {
     setLoading(cyclistsStatus === 'loading');
   }, [cyclistsStatus]);
+
+  useEffect(() => {
+    if (userTeamsUpdateStatus === 'loading') {
+      setUserTeamsLoading(true);
+    } else {
+      setUserTeamsLoading(false);
+    }
+  });
+
+  useEffect(() => {
+    if (userTeamsUpdateStatus === 'succeeded') {
+      showSuccessToast({
+        summary: 'Update succesvol',
+        detail: 'Je team is succesvol bijgewerkt.',
+      });
+      setInitialPoints(mainReservePointsCyclist);
+      dispatch(resetUserTeamsUpdateStatus());
+    } else if (userTeamsUpdateStatus === 'failed') {
+      showErrorToast({
+        summary: 'Update mislukt',
+        detail: userTeamsError || 'Er is iets misgegaan.',
+      });
+      dispatch(resetUserTeamsUpdateStatus());
+    }
+  }, [userTeamsUpdateStatus, userTeamsError, dispatch]);
 
   useEffect(() => {
     if (
@@ -649,6 +684,7 @@ const index = () => {
           activateCyclistTemplate={activateCyclistTemplate}
           teamChanged={teamChanged}
           mainReservePointsCyclist={mainReservePointsCyclist}
+          userTeamsLoading={userTeamsLoading}
         />
       </>
     );

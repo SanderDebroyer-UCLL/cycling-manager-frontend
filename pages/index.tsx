@@ -14,7 +14,7 @@ export default function Home() {
         <div className="w-full h-60 bg-surface-container flex items-center justify-between gap-4 rounded-xl shadow-md overflow-hidden">
           <div className="flex flex-col gap-4 py-6 px-12">
             <h1 className="text-2xl font-semibold">
-              Welkom op cycling manager{' '}
+              Welkom op cycling manager
             </h1>
             <p className="text-md">
               Race, manage je team, en leid ze tot de overwinning!

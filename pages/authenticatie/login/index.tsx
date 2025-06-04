@@ -9,7 +9,7 @@ import { loginUserRequest, resetUserStatus } from '@/features/user/user.slice';
 import { useRouter } from 'next/router';
 import { validateEmail } from '@/utils/email';
 import { showErrorToast, showSuccessToast } from '@/services/toast.service';
-import HomeLayout from '@/components/homeLayout';
+import HomeLayout from '@/components/layout/homeLayout';
 import { Mail, Lock } from 'lucide-react';
 
 export default function Login() {
@@ -23,7 +23,6 @@ export default function Login() {
   const router = useRouter();
   const status = useSelector((state: RootState) => state.user.status);
   const error = useSelector((state: RootState) => state.user.error);
-  const user = useSelector((state: RootState) => state.user.userDTO);
   const jwtRes = useSelector((state: RootState) => state.user.jwtRes);
 
   const dispatch = useDispatch<AppDispatch>();
