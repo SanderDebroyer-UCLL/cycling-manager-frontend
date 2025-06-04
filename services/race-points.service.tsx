@@ -54,9 +54,9 @@ export const getRacePointsForAllRaces = async (
   return data;
 };
 
-export const getStagePointsForCompetitionId = async (competitionId: number) => {
+export const getRacePointsForCompetitionId = async (competitionId: number) => {
   const res = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + '/stagePoints/all/users/' + competitionId,
+    process.env.NEXT_PUBLIC_API_URL + '/racePoints/all/users/' + competitionId,
     {
       method: 'GET',
       headers: {
@@ -77,7 +77,7 @@ export const getStagePointsForCompetitionId = async (competitionId: number) => {
 
 export const RacePointsService = {
   getRacePointsForRace,
-  getStagePointsForCompetitionId,
+  getRacePointsForCompetitionId,
 };
 
 export default RacePointsService;

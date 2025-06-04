@@ -111,8 +111,6 @@ const PointsChipBodyTemplate =
   (competition: CompetitionDTO) => (rowData: any) => {
     const points = rowData.points;
 
-    console.log('PointsChipBodyTemplate', points, competition);
-
     if (points === undefined || points === null) {
       return <span>-</span>;
     }

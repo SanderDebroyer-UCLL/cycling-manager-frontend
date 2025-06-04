@@ -30,7 +30,7 @@ import StageTypeChipBodyTemplate from '@/components/template/ParcoursTypeChipBod
 import { getCompetitionStatusSubtext } from '@/utils/competition-status-map';
 import DropOutReasonChipBodyTemplate from '@/components/template/DropOutReasonChipBodyTemplate';
 import {
-  fetchRacePointsForAllRaces,
+  fetchRacePointsForCompetitionId,
   fetchStagePointsForCompetitionId,
 } from '@/features/points/points.slice';
 import TotalPointsChipBodyTemplate from '@/components/template/TotalPointsChipBodyTemplate';
@@ -156,7 +156,7 @@ const index = () => {
   const competitionData = useMemo(() => {
     if (!competition?.races?.length) {
       return {
-        hasStages: false,
+        hasStages: null,
         displayName: '',
         items: [],
         itemCount: 0,
@@ -168,7 +168,7 @@ const index = () => {
     const hasStages = firstRace?.stages?.length > 0;
 
     return {
-      hasStages,
+      hasStages: hasStages,
       displayName: hasStages ? firstRace.name : competition.name,
       items: hasStages ? firstRace.stages : competition.races,
       itemCount: hasStages ? firstRace.stages.length : competition.races.length,
@@ -192,10 +192,15 @@ const index = () => {
 
   useEffect(() => {
     if (!competitionIdNumber) return;
+    if (competitionData.hasStages === null) return;
     if (pointsPerUser.length === 0 || pointsPerUserStatus === 'idle') {
-      dispatch(fetchStagePointsForCompetitionId(competitionIdNumber));
+      if (competitionData.hasStages) {
+        dispatch(fetchStagePointsForCompetitionId(competitionIdNumber));
+      } else {
+        dispatch(fetchRacePointsForCompetitionId(competitionIdNumber));
+      }
     }
-  });
+  }, [competitionData.hasStages, pointsPerUserStatus, competitionIdNumber]);
 
   useEffect(() => {
     if (competitionIdNumber) {
@@ -401,7 +406,7 @@ const index = () => {
         </div>
       </div>
       <div className="flex gap-10 w-full">
-        <div className="flex flex-col gap-2 flex-1">
+        <div className="flex flex-col gap-2 flex-1 max-h-[440px]">
           <h3 className="font-semibold">Totaal punten per deelnemer</h3>
           <div style={container} className="flex flex-row gap-4 h-full w-full">
             <DataTable
@@ -420,7 +425,7 @@ const index = () => {
             </DataTable>
           </div>
         </div>
-        <div className="flex flex-col gap-2 flex-1">
+        <div className="flex flex-col gap-2 flex-1 max-h-[440px]">
           <h3 className="font-semibold">Renners die zijn uitgevallen</h3>
           <div style={container} className="flex flex-row gap-4 h-full w-full">
             <DataTable

@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import {
   getStagePointsForAllStages,
+  getStagePointsForCompetitionId,
   getStagePointsForStage,
 } from '@/services/stage-points.service';
 import {
@@ -12,8 +13,8 @@ import {
 } from '@/types/points';
 import {
   getRacePointsForAllRaces,
+  getRacePointsForCompetitionId,
   getRacePointsForRace,
-  getStagePointsForCompetitionId,
 } from '@/services/race-points.service';
 
 interface PointsState {
@@ -75,6 +76,14 @@ export const fetchStagePointsForCompetitionId = createAsyncThunk(
   async (competitionId: number) => {
     const stagePoints = await getStagePointsForCompetitionId(competitionId);
     return stagePoints;
+  },
+);
+
+export const fetchRacePointsForCompetitionId = createAsyncThunk(
+  'racePoints/fetchRacePointsForCompetitionId',
+  async (competitionId: number) => {
+    const racePoints = await getRacePointsForCompetitionId(competitionId);
+    return racePoints;
   },
 );
 
@@ -166,6 +175,19 @@ const Slice = createSlice({
         },
       )
       .addCase(fetchStagePointsForCompetitionId.rejected, (state) => {
+        state.status = 'failed';
+      })
+      .addCase(fetchRacePointsForCompetitionId.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(
+        fetchRacePointsForCompetitionId.fulfilled,
+        (state, action: PayloadAction<Points[]>) => {
+          state.status = 'succeeded';
+          state.points = action.payload;
+        },
+      )
+      .addCase(fetchRacePointsForCompetitionId.rejected, (state) => {
         state.status = 'failed';
       });
   },
