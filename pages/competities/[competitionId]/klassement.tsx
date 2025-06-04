@@ -22,9 +22,7 @@ const klassement = () => {
   const [stageGCResultsState, setStageGCResultsState] = useState<StageResult[]>(
     [],
   );
-  const [resultStatus, setResultStatus] = useState<ResultType>(
-    ResultType.STAGE,
-  );
+  const [resultStatus, setResultStatus] = useState<ResultType>(ResultType.GC);
   const stageResults: StageResult[] = useSelector(
     (state: any) => state.stageResults.etappeResult,
   );
@@ -47,13 +45,6 @@ const klassement = () => {
       </h2>
       <div style={container} className="flex flex-col h-full overflow-auto">
         <div className="flex gap-4">
-          <Chip
-            label="Etappe"
-            Icon={FlagIcon}
-            active={resultStatus === ResultType.STAGE}
-            onClick={() => setResultStatus(ResultType.STAGE)}
-            variant={'secondary'}
-          />
           <Chip
             label="GC"
             Icon={Trophy}
