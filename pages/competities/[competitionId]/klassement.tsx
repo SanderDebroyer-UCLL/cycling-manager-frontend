@@ -54,8 +54,8 @@ const klassement = () => {
           <Chip
             label="Youth"
             Icon={UserIcon}
-            active={resultStatus === ResultType.YOUNG}
-            onClick={() => setResultStatus(ResultType.YOUNG)}
+            active={resultStatus === ResultType.YOUTH}
+            onClick={() => setResultStatus(ResultType.YOUTH)}
             variant={'secondary'}
           />
           <Chip

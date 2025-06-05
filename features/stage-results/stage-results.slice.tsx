@@ -81,7 +81,7 @@ const resultsSlice = createSlice({
             case ResultType.GC:
               state.gcResult = action.payload;
               break;
-            case ResultType.YOUNG:
+            case ResultType.YOUTH:
               state.youthResult = action.payload;
               break;
             case ResultType.POINTS:

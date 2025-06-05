@@ -1,7 +1,7 @@
 export const enum ResultType {
   STAGE = 'STAGE',
   GC = 'GC',
-  YOUNG = 'YOUNG',
+  YOUTH = 'YOUTH',
   POINTS = 'POINTS',
   MOUNTAIN = 'MOUNTAIN',
 }

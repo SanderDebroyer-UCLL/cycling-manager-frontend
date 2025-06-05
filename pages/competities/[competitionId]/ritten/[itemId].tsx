@@ -51,6 +51,7 @@ import React, { ReactNode, use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PointsChipBodyTemplate from '@/components/template/PointsChipBodyTemplate';
 import TimeBodyTemplate from '@/components/template/TimeBodyTemplate';
+import { Result } from 'postcss';
 
 const index = () => {
   const router = useRouter();
@@ -86,6 +87,15 @@ const index = () => {
   const [stageGCResultsState, setStageGCResultsState] = useState<StageResult[]>(
     [],
   );
+  const [stageYouthResultsState, setStageYouthResultsState] = useState<
+    StageResult[]
+  >([]);
+  const [stageKOMResultsState, setStageKOMResultsState] = useState<
+    StageResult[]
+  >([]);
+  const [stagePointsResultsState, setStagePointsResultsState] = useState<
+    StageResult[]
+  >([]);
   const [raceResultsState, setRaceResultsState] = useState<RaceResult[]>([]);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -114,6 +124,15 @@ const index = () => {
   const pointsStatus: string = useSelector((state: any) => state.points.status);
   const stageGCResults: StageResult[] = useSelector(
     (state: any) => state.stageResults.gcResult,
+  );
+  const stagePointsResults: StageResult[] = useSelector(
+    (state: any) => state.stageResults.pointsResult,
+  );
+  const stageKOMResults: StageResult[] = useSelector(
+    (state: any) => state.stageResults.komResult,
+  );
+  const stageYouthResults: StageResult[] = useSelector(
+    (state: any) => state.stageResults.youthResult,
   );
   const points: MainReservePointsCyclist = useSelector(
     (state: any) => state.points.mainReservePointsCyclistPerEvent,
@@ -199,6 +218,18 @@ const index = () => {
   }, [stageGCResults]);
 
   useEffect(() => {
+    setStagePointsResultsState(stagePointsResults);
+  }, [stagePointsResults]);
+
+  useEffect(() => {
+    setStageKOMResultsState(stageKOMResults);
+  }, [stageKOMResults]);
+
+  useEffect(() => {
+    setStageYouthResultsState(stageYouthResults);
+  }, [stageYouthResults]);
+
+  useEffect(() => {
     setRaceResultsState(raceResults);
   }, [raceResults]);
 
@@ -244,6 +275,18 @@ const index = () => {
           resultType: ResultType.GC,
         }),
       );
+      dispatch(
+        fetchResultsByStageIdByType({
+          stageId: activeStage.id,
+          resultType: ResultType.YOUTH,
+        }),
+      );
+      dispatch(
+        fetchResultsByStageIdByType({
+          stageId: activeStage.id,
+          resultType: ResultType.POINTS,
+        }),
+      );
     }
   }, [dispatch, stageResultsStatus, activeStage?.id]);
 
@@ -285,7 +328,7 @@ const index = () => {
       dispatch(
         fetchResultsByStageIdByType({
           stageId: activeStage.id,
-          resultType: ResultType.YOUNG,
+          resultType: ResultType.YOUTH,
         }),
       );
       dispatch(
@@ -631,8 +674,8 @@ const index = () => {
                         label="Youth"
                         Icon={UserIcon}
                         variant="secondary"
-                        active={resultStatus === ResultType.YOUNG}
-                        onClick={() => setResultStatus(ResultType.YOUNG)}
+                        active={resultStatus === ResultType.YOUTH}
+                        onClick={() => setResultStatus(ResultType.YOUTH)}
                       />
                       <Chip
                         label="Points"
@@ -658,7 +701,13 @@ const index = () => {
                           ? stageResultsState
                           : resultStatus === ResultType.GC
                             ? stageGCResultsState
-                            : []
+                            : resultStatus === ResultType.YOUTH
+                              ? stageYouthResultsState
+                              : resultStatus === ResultType.POINTS
+                                ? stagePointsResultsState
+                                : resultStatus === ResultType.MOUNTAIN
+                                  ? stageKOMResultsState
+                                  : []
                       }
                       dataKey="id"
                       sortField="position"
@@ -668,12 +717,12 @@ const index = () => {
                     >
                       <Column field="position" header="Plaats" />
                       <Column field="cyclistName" header="Naam" />
-                      {resultStatus === ResultType.STAGE ? (
-                        <Column body={TimeBodyTemplate} header="Tijd" />
-                      ) : resultStatus === ResultType.GC ? (
+                      {resultStatus === ResultType.STAGE ||
+                      resultStatus === ResultType.GC ||
+                      resultStatus === ResultType.YOUTH ? (
                         <Column body={TimeBodyTemplate} header="Tijd" />
                       ) : (
-                        []
+                        <Column field="point" header="Punten" />
                       )}
                     </DataTable>{' '}
                   </>

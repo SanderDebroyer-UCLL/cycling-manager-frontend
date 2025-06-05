@@ -1,5 +1,6 @@
 import Spacer from '@/components/Spacer';
 import { container } from '@/const/containerStyle';
+import { fetchScrapeCyclists } from '@/features/cyclists/cyclists.slice';
 import { fetchScrapeRaces } from '@/features/race/race.slice';
 import { fetchScrapeTeams } from '@/features/teams/teams.slice';
 import { AppDispatch } from '@/store/store';
@@ -29,6 +30,16 @@ const scrape = () => {
                 />
               </div>
             </div>
+            <h3 className="font-semibold text-xl">Wielrenners</h3>
+            <div className="flex items-center justify-between gap-4 w-full">
+              <p className="flex-2/3">Alle wielrenners scrapen:</p>
+              <div className="flex-1/3 w-full">
+                <Button
+                  label="Wielrenners"
+                  onClick={() => dispatch(fetchScrapeCyclists())}
+                />
+              </div>
+            </div>
             <h3 className="font-semibold text-xl">Races</h3>
             <div className="flex items-center justify-between gap-4 w-full">
               <p className="flex-2/3">Alle Races scrapen:</p>
@@ -47,15 +58,6 @@ const scrape = () => {
                 <Button label="Stages" />
               </div>
             </div>
-
-            <h3 className="font-semibold text-xl">Wielrenners</h3>
-            <div className="flex items-center justify-between gap-4 w-full">
-              <p className="flex-2/3">Alle Wielrenners:</p>
-              <div className="flex-1/3 w-full">
-                <Button label="Cyclists" />
-              </div>
-            </div>
-
             <h3 className="font-semibold text-xl">Resultaten</h3>
             <p className="font-medium text-lg">Stages</p>
             <div className="flex items-center justify-between gap-4 w-full">
