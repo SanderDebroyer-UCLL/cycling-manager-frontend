@@ -46,7 +46,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   return (
     <div className="flex h-screen w-full">
       <Sidebar />
-      <div className="max-w-[calc(100vw-320px)] w-full flex flex-col gap-12 py-12 px-8 bg-surface-container-lowest overflow-y-auto max-h-screen rounded-tl-lg rounded-bl-lg">
+      <div className="max-w-[calc(100vw-320px)] w-full flex flex-col py-12 px-8 bg-surface-container-lowest overflow-y-auto max-h-screen">
         {children}
       </div>
     </div>

@@ -17,6 +17,30 @@ body {
   @apply text-on-surface;
 }
 
+.p-orderlist-list {
+  @apply bg-surface-container border-none !rounded-xl gap-2 overflow-visible;
+}
+
+.p-orderlist-item {
+  @apply rounded-2xl;
+}
+
+.p-orderlist-item.p-highlight {
+  @apply text-on-primary-container bg-primary-container;
+}
+
+.p-orderlist-item.p-highlight:hover {
+  @apply text-on-primary-container bg-primary-container;
+}
+
+.p-orderlist-item:hover {
+  @apply bg-surface-container-highest;
+}
+
+.p-orderlist-droppoint {
+  @apply fill-primary;
+}
+
 .p-dialog-footer {
   @apply flex flex-row justify-end;
 }

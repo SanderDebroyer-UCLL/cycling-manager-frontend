@@ -126,10 +126,8 @@ export default function Overview() {
                       className="object-cover"
                     />
 
-                    {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-0" />
 
-                    {/* Text content positioned at bottom */}
                     <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col gap-2 text-white font-medium font-manrope z-10">
                       <div className="text-2xl">{competition.name}</div>
                       <div className="flex flex-wrap gap-2">

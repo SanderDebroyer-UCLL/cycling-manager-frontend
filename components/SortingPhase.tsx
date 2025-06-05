@@ -2,8 +2,9 @@ import React from 'react';
 import { OrderList } from 'primereact/orderlist';
 import { Button } from 'primereact/button';
 import { CompetitionStatus } from '@/types/competition';
-import { User, UserDTO } from '@/types/user';
+import { UserDTO } from '@/types/user';
 import { InputNumber } from 'primereact/inputnumber';
+import { containerLargerPadding } from '@/const/containerStyle';
 
 interface SortingPhaseProps {
   competition: {
@@ -35,50 +36,58 @@ const SortingPhase: React.FC<SortingPhaseProps> = ({
 
   return (
     <>
-      <div className="flex flex-col gap-12 w-full">
+      <div className="flex flex-col gap-10 w-full">
         <div className="flex flex-col gap-6">
           <h2 className=" text-xl font-bold">
             Bepaal de volgorde van het kiezen van de renners
           </h2>
         </div>
         <div className="flex flex-row gap-10">
-          <div className="flex w-[400px]">
-            <OrderList
-              dataKey="id"
-              value={usersState}
-              onChange={(e) => handleUsersChange(e.value)}
-              itemTemplate={(user) =>
-                itemTemplate(
-                  user,
-                  usersState.findIndex((u) => u.id === user.id),
-                )
-              }
-              header="Deelnemers"
-              dragdrop
-            ></OrderList>
-          </div>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <p>Aantal renners per deelnemer</p>
-              <InputNumber
-                min={1}
-                max={50}
-                value={cyclistCount}
-                onValueChange={(e) =>
-                  handleCyclistCount(e.value == null ? 0 : e.value)
+          <div className="flex flex-col gap-2">
+            <h3 className="font-semibold">Volgorde Deelnemers</h3>
+            <div style={containerLargerPadding} className="flex">
+              <OrderList
+                dataKey="id"
+                value={usersState}
+                onChange={(e) => handleUsersChange(e.value)}
+                itemTemplate={(user) =>
+                  itemTemplate(
+                    user,
+                    usersState.findIndex((u) => u.id === user.id),
+                  )
                 }
-              />
+                dragdrop
+              ></OrderList>
             </div>
-            <div className="flex flex-col gap-2">
-              <p>Aantal reserve renners per deelnemer</p>
-              <InputNumber
-                min={0}
-                max={50}
-                value={reserveCyclistCount}
-                onValueChange={(e) =>
-                  handleReserveCyclistCount(e.value == null ? 0 : e.value)
-                }
-              />
+          </div>
+          <div className="flex flex-col gap-2">
+            <h3 className="font-semibold">Aantal Renners</h3>
+            <div
+              style={containerLargerPadding}
+              className="flex flex-col !gap-6 h-full"
+            >
+              <div className="flex flex-col gap-2">
+                <p>Aantal renners per deelnemer</p>
+                <InputNumber
+                  min={1}
+                  max={50}
+                  value={cyclistCount}
+                  onValueChange={(e) =>
+                    handleCyclistCount(e.value == null ? 0 : e.value)
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <p>Aantal reserve renners per deelnemer</p>
+                <InputNumber
+                  min={0}
+                  max={50}
+                  value={reserveCyclistCount}
+                  onValueChange={(e) =>
+                    handleReserveCyclistCount(e.value == null ? 0 : e.value)
+                  }
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -244,7 +244,7 @@ const index = () => {
   }
 
   return (
-    <div className="flex flex-col gap-12 w-full">
+    <div className="flex flex-col gap-10 w-full">
       <Dialog
         header="Het is tijd om de competitie te starten!"
         visible={visible}

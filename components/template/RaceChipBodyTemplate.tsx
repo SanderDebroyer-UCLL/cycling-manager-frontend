@@ -4,12 +4,15 @@ import {
   Bike,
   Flag,
   Leaf,
-  Mountain,
   Flower,
-  CalendarCheck,
   LucideBike,
   LeafIcon,
   Crown,
+  Timer,
+  Globe,
+  MapIcon,
+  CalendarDays,
+  Landmark,
 } from 'lucide-react';
 import TableChip from '../TableChip';
 
@@ -43,25 +46,61 @@ const RaceChipBodyTemplate = (
     ) {
       return {
         type: 'tertiary-container',
-        Icon: Crown, // Represents mountains & elevation (grand tours)
+        Icon: Crown,
         label: 'Grote Ronde',
+      };
+    }
+
+    // Klassiekers (Monuments & big one-day classics)
+    if (
+      lowerName.includes('paris-roubaix') ||
+      lowerName.includes('ronde van vlaanderen') ||
+      lowerName.includes('milan-san remo') ||
+      lowerName.includes('milano-sanremo') ||
+      lowerName.includes('liège-bastogne-liège') ||
+      lowerName.includes('liege-bastogne-liege') ||
+      lowerName.includes('il lombardia') ||
+      lowerName.includes('lombardia')
+    ) {
+      return {
+        type: 'surface-container-high',
+        Icon: Landmark,
+        label: 'Klassieker',
+      };
+    }
+
+    // Wereldkampioenschap (World Championship)
+    if (niveau === 'WC') {
+      return {
+        type: 'primary',
+        Icon: Globe,
+        label: 'Wereldkampioenschap',
+      };
+    }
+
+    // Continentaal Kampioenschap (Continental Championship)
+    if (niveau === 'CC') {
+      return {
+        type: 'secondary',
+        Icon: MapIcon,
+        label: 'Continentaal Kampioenschap',
       };
     }
 
     // Voorjaarskoersen (Spring Classics)
     if ([3, 4, 5].includes(month)) {
       return {
-        type: 'secondary-container',
-        Icon: Flower, // Symbolizes springtime
+        type: 'surface-container-low',
+        Icon: Flower,
         label: 'Voorjaarskoersen',
       };
     }
 
-    // Eindjaarskoersen (End-of-year)
+    // Eindjaarskoersen (End-of-year races)
     if ([9, 10, 11].includes(month)) {
       return {
         type: 'surface-variant',
-        Icon: Leaf, // Represents end-of-year planning or schedule
+        Icon: Leaf,
         label: 'Eindjaarskoersen',
       };
     }
@@ -70,13 +109,31 @@ const RaceChipBodyTemplate = (
     if (niveau.startsWith('2')) {
       return {
         type: 'primary-container',
-        Icon: LucideBike, // A cyclist, appropriate for stage races
+        Icon: LucideBike,
         label: 'Ronde',
+      };
+    }
+
+    // Tijdrit (Time Trial)
+    if (
+      lowerName.includes('itt') ||
+      lowerName.includes('chrono') ||
+      lowerName.includes('time trial')
+    ) {
+      return {
+        type: 'secondary-container',
+        Icon: Timer,
+        label: 'Tijdrit',
       };
     }
   }
 
-  return null;
+  // Fallback for all other races (e.g., random one-day events)
+  return {
+    type: 'surface-container-low',
+    Icon: CalendarDays, // Or any icon that fits "misc. race"
+    label: 'Overige Wedstrijden',
+  };
 };
 
 // PrimeReact body template
