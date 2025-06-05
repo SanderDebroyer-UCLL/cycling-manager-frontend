@@ -11,6 +11,7 @@ import {
   createCompetition,
   getCompetition,
   getCompetitionResultsUpdate,
+  scrapeAllCompetitionResults,
   scrapeCompetitionStages,
 } from '@/services/competition.service';
 
@@ -57,6 +58,14 @@ export const fetchCompetitionStages = createAsyncThunk(
   async (competitionId: number) => {
     const competition = await scrapeCompetitionStages(competitionId);
     return competition;
+  },
+);
+
+export const fetchScrapeAllCompetitionResults = createAsyncThunk(
+  'competition/fetchScrapeAllCompetitionResults',
+  async () => {
+    const data = await scrapeAllCompetitionResults();
+    return data;
   },
 );
 

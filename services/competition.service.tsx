@@ -88,6 +88,25 @@ export const scrapeCompetitionStages = async (competitionId: number) => {
   return res.json();
 };
 
+export const scrapeAllCompetitionResults = async () => {
+  const res = await fetch(
+    process.env.NEXT_PUBLIC_API_URL + '/competitions/results/all',
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
+      },
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error('Failed to scrape all competition results');
+  }
+
+  return res.json();
+};
+
 const CompetitionService = {
   createCompetition,
   getCompetitions,
