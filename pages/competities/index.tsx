@@ -59,14 +59,9 @@ const Index = () => {
   );
   const [nodes, setNodes] = useState<TreeNode[]>([]);
   const [visible, setVisible] = React.useState(false);
-  const [competitionloading, setCompetitionLoading] = useState<boolean>(false);
   const competitionError = useSelector(
     (state: RootState) => state.competition.error,
   );
-
-  const [competitionsloading, setCompetitionsLoading] =
-    useState<boolean>(false);
-
   useEffect(() => {
     if (races.length) {
       const treeData = createTreeNodesFromRaces(races);
@@ -92,21 +87,6 @@ const Index = () => {
     }
   }, [dispatch, usersStatus]);
 
-  useEffect(() => {
-    if (competitionStatus === 'loading') {
-      setCompetitionLoading(true);
-    } else {
-      setCompetitionLoading(false);
-    }
-  }, [competitionStatus]);
-
-  useEffect(() => {
-    if (competitionsStatus === 'loading') {
-      setCompetitionsLoading(true);
-    } else {
-      setCompetitionsLoading(false);
-    }
-  }, [competitionsStatus]);
   const handleCreateCompetition = () => {
     setNameError('');
     setSelectedRacesError('');
@@ -176,7 +156,7 @@ const Index = () => {
         >
           <DataTable
             value={competitions}
-            loading={competitionsloading}
+            loading={competitionsStatus === 'loading'}
             tableStyle={{ width: '100%' }}
             sortField="name"
             sortOrder={1}
@@ -319,7 +299,7 @@ const Index = () => {
             />
             <Button
               label="Creëer Competitie"
-              loading={competitionloading}
+              loading={competitionStatus === 'loading'}
               onClick={handleCreateCompetition}
             />
           </div>

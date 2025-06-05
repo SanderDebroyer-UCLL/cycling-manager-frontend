@@ -57,6 +57,9 @@ const index = () => {
     (state: RootState) => state.points.status,
   );
   const raceStatus = useSelector((state: RootState) => state.race.status);
+  const userTeamsStatus = useSelector(
+    (state: RootState) => state.userTeams.status,
+  );
   const dispatch = useDispatch<AppDispatch>();
   const { competitionId } = router.query;
 
@@ -384,6 +387,13 @@ const index = () => {
               <DataTable
                 selectionMode="single"
                 selection={null}
+                loading={
+                  competitionData.hasStages
+                    ? competitionStatus === 'loading' &&
+                      competition.races[0].stages.length === 0
+                    : competitionStatus === 'idle' &&
+                      competition.races.length === 0
+                }
                 onSelectionChange={(e) => handleStageSelection(e.value)}
                 value={competitionData.items}
                 tableStyle={{ width: '100%' }}
@@ -429,6 +439,7 @@ const index = () => {
           <h3 className="font-semibold">Renners die zijn uitgevallen</h3>
           <div style={container} className="flex flex-row gap-4 h-full w-full">
             <DataTable
+              loading={userTeamsStatus === 'loading'}
               value={cyclistWithDNS}
               emptyMessage="Geen renners in teams die zijn uitgevallen"
             >

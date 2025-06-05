@@ -58,9 +58,7 @@ const index = () => {
 
   const [activeStage, setActiveStage] = useState<StageDTO | null>(null);
   const [activeRace, setActiveRace] = useState<RaceDTO | null>(null);
-  const [competitionLoading, setCompetitionLoading] = useState(false);
   const [resultPointsToggle, setResultPointsToggle] = useState(false);
-  const [resultLoading, setResultLoading] = useState(false);
   const [scrapeResultLoading, setScrapeResultLoading] = useState(false);
   const [enrichedCyclistPoints, setEnrichedCyclistPoints] = useState<
     {
@@ -193,14 +191,6 @@ const index = () => {
   }, [points, competition?.users, pointsStatus]);
 
   useEffect(() => {
-    if (competitionStatus === 'loading') {
-      setCompetitionLoading(true);
-    } else {
-      setCompetitionLoading(false);
-    }
-  }, [competitionStatus]);
-
-  useEffect(() => {
     setStageResultsState(stageResults);
   }, [stageResults]);
 
@@ -214,7 +204,7 @@ const index = () => {
 
   useEffect(() => {
     if (!competition || !competitionId) return;
-    if (pointsStatus === 'idle') {
+    if (pointsStatus === 'idle' || !points) {
       if (activeStage) {
         dispatch(
           fetchStagePointsForStage({
@@ -268,14 +258,6 @@ const index = () => {
       dispatch(fetchRaceResultsByRaceId(activeRace.id));
     }
   }, [dispatch, raceResultsStatus, activeRace?.id]);
-
-  useEffect(() => {
-    if (stageResultsStatus === 'loading') {
-      setResultLoading(true);
-    } else {
-      setResultLoading(false);
-    }
-  }, [stageResultsStatus]);
 
   useEffect(() => {
     if (stageResultsScrapeStatus === 'loading') {
@@ -434,7 +416,7 @@ const index = () => {
             tooltip="Haal alle resultaten en punten op"
             tooltipOptions={{ showDelay: 500 }}
             className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
-            loading={competitionLoading}
+            loading={competitionStatus === 'loading'}
             onClick={() =>
               dispatch(fetchCompetitionResultsUpdate(competition.id))
             }
@@ -571,6 +553,7 @@ const index = () => {
                   value={pointsPerUser}
                   dataKey="userId"
                   sortField="totalPoints"
+                  loading={pointsStatus === 'loading'}
                   sortOrder={-1}
                   emptyMessage="Niemand heeft punten verdiend"
                   className=""
@@ -590,7 +573,7 @@ const index = () => {
             <div className="flex flex-col flex-1 gap-2">
               <h3 className="font-semibold gap-4 flex items-center">
                 <Chip
-                  label={'Uitslag Race'}
+                  label={'Uitslag Etappe'}
                   Icon={Star}
                   active={!resultPointsToggle}
                   variant="primary"
@@ -669,7 +652,7 @@ const index = () => {
                     <DataTable
                       paginator
                       rows={5}
-                      loading={resultLoading}
+                      loading={stageResultsStatus === 'loading'}
                       value={
                         resultStatus === ResultType.STAGE
                           ? stageResultsState
@@ -698,7 +681,7 @@ const index = () => {
                   <DataTable
                     paginator
                     rows={5}
-                    loading={resultLoading}
+                    loading={stageResultsStatus === 'loading'}
                     value={enrichedCyclistPoints}
                     dataKey="id"
                     sortField="reason"
@@ -766,6 +749,7 @@ const index = () => {
                 <DataTable
                   value={pointsPerUser}
                   dataKey="userId"
+                  loading={pointsStatus === 'loading'}
                   sortField="totalPoints"
                   sortOrder={-1}
                   emptyMessage="Geen resultaten gevonden"
@@ -808,7 +792,7 @@ const index = () => {
                   <DataTable
                     paginator
                     rows={5}
-                    loading={resultLoading}
+                    loading={raceResultsStatus === 'loading'}
                     value={raceResultsState}
                     dataKey="id"
                     sortField="position"
@@ -823,7 +807,7 @@ const index = () => {
                   <DataTable
                     paginator
                     rows={5}
-                    loading={resultLoading}
+                    loading={raceResultsStatus === 'loading'}
                     value={enrichedCyclistPoints}
                     dataKey="id"
                     sortField="reason"

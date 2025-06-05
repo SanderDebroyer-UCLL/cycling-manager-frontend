@@ -94,6 +94,14 @@ const Slice = createSlice({
     resetPointsStatus(state) {
       state.status = 'idle';
     },
+    resetPointsData(state) {
+      state.points = [];
+      state.pointsPerCyclist = [];
+      state.pointsReason = [];
+      state.mainReservePointsCyclist = null;
+      state.mainReservePointsCyclistPerEvent = null;
+      state.status = 'idle';
+    },
     updateMainReservePointsCyclist(
       state,
       action: PayloadAction<MainReservePointsCyclist>,
@@ -197,6 +205,7 @@ export const {
   resetPointsStatus,
   updateMainReservePointsCyclist,
   setPointsPerCyclist,
+  resetPointsData,
 } = Slice.actions;
 
 export default Slice.reducer;

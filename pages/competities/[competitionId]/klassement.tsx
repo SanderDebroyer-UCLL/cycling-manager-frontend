@@ -17,7 +17,6 @@ import { StageResult } from '@/types/race';
 import { useSelector } from 'react-redux';
 
 const klassement = () => {
-  const [resultLoading, setResultLoading] = useState(false);
   const [stageResultsState, setStageResultsState] = useState<StageResult[]>([]);
   const [stageGCResultsState, setStageGCResultsState] = useState<StageResult[]>(
     [],
@@ -77,7 +76,6 @@ const klassement = () => {
         <DataTable
           paginator
           rows={5}
-          loading={resultLoading}
           value={
             resultStatus === ResultType.STAGE
               ? stageResultsState

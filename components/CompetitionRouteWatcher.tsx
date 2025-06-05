@@ -1,9 +1,15 @@
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
-import { resetCompetitionStatus, resetCompetitonData } from '@/features/competition/competition.slice';
+import {
+  resetCompetitionStatus,
+  resetCompetitonData,
+} from '@/features/competition/competition.slice';
 import { resetCyclistsStatus } from '@/features/cyclists/cyclists.slice';
-import { resetPointsStatus } from '@/features/points/points.slice';
+import {
+  resetPointsData,
+  resetPointsStatus,
+} from '@/features/points/points.slice';
 import { resetRaceResultsStatus } from '@/features/race-results/race-results.slice';
 import { resetRaceStatus } from '@/features/race/race.slice';
 import { resetStageResultsStatus } from '@/features/stage-results/stage-results.slice';
@@ -41,7 +47,8 @@ export function CompetitionRouteWatcher() {
         dispatch(resetCompetitionStatus());
         dispatch(resetUserTeamsStatus());
         dispatch(resetCyclistsStatus());
-        dispatch(resetCompetitonData())
+        dispatch(resetCompetitonData());
+        dispatch(resetPointsData());
       }
 
       // Update the last known competition ID (only when in a competition)
