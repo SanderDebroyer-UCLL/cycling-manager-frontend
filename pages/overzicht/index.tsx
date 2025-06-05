@@ -10,7 +10,7 @@ import LoadingOverlay from '@/components/LoadingOverlay';
 import { useEffect } from 'react';
 import { fetchUsers } from '@/features/users/users.slice';
 import { fetchCompetitions } from '@/features/competitions/competitions.slice';
-import { CompetitionDTO } from '@/types/competition';
+import { CompetitionDTO, CompetitionStatus } from '@/types/competition';
 import image1 from '@/public/images/1.webp';
 import image2 from '@/public/images/2.webp';
 import image3 from '@/public/images/3.webp';
@@ -77,7 +77,12 @@ export default function Overview() {
             style={containerLargerPadding}
             className="w-full !h-70 !flex-row !gap-8 overflow-x-auto"
           >
-            {[...competitions]
+            {[
+              ...competitions.filter(
+                (competition: CompetitionDTO) =>
+                  competition.competitionStatus !== CompetitionStatus.FINISHED,
+              ),
+            ]
               .sort((a, b) => a.name.localeCompare(b.name))
               .map((competition: CompetitionDTO, index) => (
                 <div

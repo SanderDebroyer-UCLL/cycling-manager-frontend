@@ -13,12 +13,14 @@ import {
   getCompetitionResultsUpdate,
   scrapeAllCompetitionResults,
   scrapeCompetitionStages,
+  updateCompetitionStatusPut,
 } from '@/services/competition.service';
 
 interface CompetitionState {
   competition: Competition | null;
   competitionDTO: CompetitionDTO | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  updateCompetitionStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
 
@@ -26,6 +28,7 @@ const initialCompetitionState: CompetitionState = {
   competition: null,
   competitionDTO: null,
   status: 'idle',
+  updateCompetitionStatus: 'idle',
   error: null,
 };
 
@@ -34,6 +37,22 @@ export const createCompetitionRequest = createAsyncThunk(
   async (competitionData: CreateCompetitionDetails) => {
     const competition = await createCompetition(competitionData);
     return competition;
+  },
+);
+
+export const updateCompetitionStatusRequest = createAsyncThunk(
+  'competition/updateCompetition',
+  async (params: {
+    competitionId: number;
+    competitionStatus: CompetitionStatus;
+  }) => {
+    const { competitionId, competitionStatus } = params;
+    // Assuming there's an updateCompetition service function
+    const data = await updateCompetitionStatusPut(
+      params.competitionId,
+      params.competitionStatus,
+    );
+    return data;
   },
 );
 
@@ -75,6 +94,9 @@ const competitionSlice = createSlice({
   reducers: {
     resetCompetitionStatus(state) {
       state.status = 'idle';
+    },
+    resetUpdateCompetitionStatus(state) {
+      state.updateCompetitionStatus = 'idle';
     },
     resetCompetitonData(state) {
       state.competition = null;
@@ -197,6 +219,17 @@ const competitionSlice = createSlice({
       )
       .addCase(fetchCompetitionStages.rejected, (state) => {
         state.status = 'failed';
+      })
+      .addCase(updateCompetitionStatusRequest.pending, (state) => {
+        state.updateCompetitionStatus = 'loading';
+      })
+      .addCase(updateCompetitionStatusRequest.fulfilled, (state) => {
+        state.updateCompetitionStatus = 'succeeded';
+      })
+      .addCase(updateCompetitionStatusRequest.rejected, (state) => {
+        state.updateCompetitionStatus = 'failed';
+        state.error =
+          'Mislukt om competitie status bij te werken. Probeer het later opnieuw.';
       });
   },
 });
@@ -209,5 +242,6 @@ export const {
   updateCyclistCount,
   updateReserveCyclistCount,
   resetCompetitonData,
+  resetUpdateCompetitionStatus,
 } = competitionSlice.actions;
 export default competitionSlice.reducer;

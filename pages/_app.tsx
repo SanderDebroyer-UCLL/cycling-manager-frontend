@@ -86,6 +86,8 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     ],
     today: 'Vandaag',
     clear: 'Wissen',
+    accept: 'Ja',
+    reject: 'Nee',
     //...
   });
 

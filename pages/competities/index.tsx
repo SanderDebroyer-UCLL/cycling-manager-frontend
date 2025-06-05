@@ -155,7 +155,9 @@ const Index = () => {
           className="overflow-hidden overflow-y-auto rounded-xl max-h-[75vh]"
         >
           <DataTable
-            value={competitions}
+            value={competitions.filter(
+              (competition) => competition.competitionStatus !== 'FINISHED',
+            )}
             loading={competitionsStatus === 'loading'}
             tableStyle={{ width: '100%' }}
             sortField="name"
