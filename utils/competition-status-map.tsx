@@ -7,6 +7,7 @@ export const getCompetitionStatusSubtext = (
     [CompetitionStatus.SORTING]: 'De kalme voor de storm',
     [CompetitionStatus.SELECTING]: 'Kies je droomteam samen',
     [CompetitionStatus.STARTED]: 'De wielen zijn in beweging!',
+    [CompetitionStatus.FINISHED]: 'De finishlijn is bereikt',
   };
 
   return subtexts[status] || '';
