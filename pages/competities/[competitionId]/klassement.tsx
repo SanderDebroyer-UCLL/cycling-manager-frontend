@@ -3,39 +3,77 @@ import CompetitieLayout from '@/components/layout/competitieLayout';
 import { container } from '@/const/containerStyle';
 import { ResultType } from '@/const/resultType';
 import { Column } from 'primereact/column';
-import {
-  FlagIcon,
-  Mountain,
-  RefreshCw,
-  Star,
-  Trophy,
-  UserIcon,
-} from 'lucide-react';
+import { Mountain, Star, Trophy, UserIcon } from 'lucide-react';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { StageResult } from '@/types/race';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '@/store/store';
+import {
+  fetchLastResultsByType,
+  fetchResultsByStageIdByType,
+} from '@/features/stage-results/stage-results.slice';
+import { CompetitionDTO } from '@/types/competition';
+import TimeBodyTemplate from '@/components/template/TimeBodyTemplate';
 
 const klassement = () => {
-  const [stageResultsState, setStageResultsState] = useState<StageResult[]>([]);
-  const [stageGCResultsState, setStageGCResultsState] = useState<StageResult[]>(
-    [],
-  );
+  const dispatch = useDispatch<AppDispatch>();
   const [resultStatus, setResultStatus] = useState<ResultType>(ResultType.GC);
-  const stageResults: StageResult[] = useSelector(
-    (state: any) => state.stageResults.etappeResult,
+
+  const competition: CompetitionDTO = useSelector(
+    (state: any) => state.competition.competitionDTO,
+  );
+
+  const stageYouthResults: StageResult[] = useSelector(
+    (state: any) => state.stageResults.youthResult,
+  );
+  const stagePointsResults: StageResult[] = useSelector(
+    (state: any) => state.stageResults.pointsResult,
+  );
+  const stageKOMResults: StageResult[] = useSelector(
+    (state: any) => state.stageResults.komResult,
+  );
+  const stageResultsStatus: string = useSelector(
+    (state: any) => state.stageResults.status,
   );
   const stageGCResults: StageResult[] = useSelector(
     (state: any) => state.stageResults.gcResult,
   );
 
-  useEffect(() => {
-    setStageResultsState(stageResults);
-  }, [stageResults]);
+  const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
-    setStageGCResultsState(stageGCResults);
-  }, [stageGCResults]);
+    if (!competition) return;
+    const raceId = competition.races[0].id;
+    if ((stageResultsStatus === 'idle' && raceId) || (!hasFetched && raceId)) {
+      dispatch(
+        fetchLastResultsByType({
+          raceId,
+          resultType: ResultType.STAGE,
+        }),
+      );
+      dispatch(
+        fetchLastResultsByType({
+          raceId,
+          resultType: ResultType.GC,
+        }),
+      );
+      dispatch(
+        fetchLastResultsByType({
+          raceId,
+          resultType: ResultType.YOUTH,
+        }),
+      );
+      dispatch(
+        fetchLastResultsByType({
+          raceId,
+          resultType: ResultType.POINTS,
+        }),
+      );
+
+      setHasFetched(true);
+    }
+  }, [dispatch, stageResultsStatus, competition]);
 
   return (
     <div className="flex flex-col gap-10 ">
@@ -76,12 +114,17 @@ const klassement = () => {
         <DataTable
           paginator
           rows={5}
+          loading={stageResultsStatus === 'loading'}
           value={
-            resultStatus === ResultType.STAGE
-              ? stageResultsState
-              : resultStatus === ResultType.GC
-                ? stageGCResultsState
-                : []
+            resultStatus === ResultType.GC
+              ? stageGCResults
+              : resultStatus === ResultType.YOUTH
+                ? stageYouthResults
+                : resultStatus === ResultType.POINTS
+                  ? stagePointsResults
+                  : resultStatus === ResultType.MOUNTAIN
+                    ? stageKOMResults
+                    : []
           }
           dataKey="id"
           sortField="position"
@@ -91,12 +134,12 @@ const klassement = () => {
         >
           <Column field="position" header="Plaats" />
           <Column field="cyclistName" header="Naam" />
-          {resultStatus === ResultType.STAGE ? (
-            <Column field="time" header="Tijd" />
-          ) : resultStatus === ResultType.GC ? (
-            <Column field="time" header="Tijd" />
+          {resultStatus === ResultType.STAGE ||
+          resultStatus === ResultType.GC ||
+          resultStatus === ResultType.YOUTH ? (
+            <Column body={TimeBodyTemplate} header="Tijd" />
           ) : (
-            []
+            <Column field="point" header="Punten" />
           )}
         </DataTable>
       </div>
@@ -109,3 +152,6 @@ klassement.getLayout = (page: ReactNode) => (
 );
 
 export default klassement;
+function useAppDispatch() {
+  throw new Error('Function not implemented.');
+}

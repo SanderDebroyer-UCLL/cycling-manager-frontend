@@ -1,6 +1,7 @@
 // src/features/user/userSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import {
+  getLastResultsByType,
   getResultsByStageIdByType,
   scrapeResultsByStageId,
 } from '@/services/results.service';
@@ -28,6 +29,15 @@ export const fetchResultsByStageIdByType = createAsyncThunk(
   async (params: { stageId: number; resultType: ResultType }) => {
     const { stageId, resultType } = params;
     const results = await getResultsByStageIdByType(stageId, resultType);
+    return results;
+  },
+);
+
+export const fetchLastResultsByType = createAsyncThunk(
+  'stage-results/fetchResults',
+  async (params: { raceId: number; resultType: ResultType }) => {
+    const { raceId, resultType } = params;
+    const results = await getLastResultsByType(raceId, resultType);
     return results;
   },
 );

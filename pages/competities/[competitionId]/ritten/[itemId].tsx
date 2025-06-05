@@ -51,12 +51,10 @@ import React, { ReactNode, use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PointsChipBodyTemplate from '@/components/template/PointsChipBodyTemplate';
 import TimeBodyTemplate from '@/components/template/TimeBodyTemplate';
-import { Result } from 'postcss';
 
 const index = () => {
   const router = useRouter();
   const { competitionId, itemId } = router.query;
-
   const [activeStage, setActiveStage] = useState<StageDTO | null>(null);
   const [activeRace, setActiveRace] = useState<RaceDTO | null>(null);
   const [resultPointsToggle, setResultPointsToggle] = useState(false);
