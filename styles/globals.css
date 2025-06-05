@@ -25,6 +25,10 @@ body {
   @apply rounded-2xl;
 }
 
+.p-orderlist-controls {
+  @apply p-0 !pr-6;
+}
+
 .p-orderlist-item.p-highlight {
   @apply text-on-primary-container bg-primary-container;
 }
