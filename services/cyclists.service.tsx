@@ -14,6 +14,24 @@ export const getAllCyclistss = async () => {
   return res.json();
 };
 
+export const scrapeCyclists = async () => {
+  const res = await fetch(
+    process.env.NEXT_PUBLIC_API_URL + '/cyclists/scrape',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
+      },
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error('Failed to scrape cyclists data');
+  }
+
+  return res.json();
+};
 
 const CyclistService = {
   getAllCyclistss,

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { getAllCyclistss } from '@/services/cyclists.service';
+import { getAllCyclistss, scrapeCyclists } from '@/services/cyclists.service';
 import { Cyclist, CyclistDTO } from '@/types/cyclist';
 
 // Define Cyclists type based on your API response
@@ -23,7 +23,15 @@ export const fetchCyclists = createAsyncThunk(
   'cyclists/fetchCyclists',
   async () => {
     const data = await getAllCyclistss();
-    return data as CyclistDTO[];
+    return data;
+  },
+);
+
+export const fetchScrapeCyclists = createAsyncThunk(
+  'cyclists/fetchScrapeCyclists',
+  async () => {
+    const data = await scrapeCyclists();
+    return data;
   },
 );
 
@@ -48,6 +56,15 @@ const cyclistsSlice = createSlice({
         },
       )
       .addCase(fetchCyclists.rejected, (state) => {
+        state.status = 'failed';
+      })
+      .addCase(fetchScrapeCyclists.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchScrapeCyclists.fulfilled, (state) => {
+        state.status = 'succeeded';
+      })
+      .addCase(fetchScrapeCyclists.rejected, (state) => {
         state.status = 'failed';
       });
   },
