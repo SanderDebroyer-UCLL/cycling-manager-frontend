@@ -41,4 +41,5 @@ export enum CompetitionStatus {
   SORTING = 'SORTING',
   SELECTING = 'SELECTING',
   STARTED = 'STARTED',
+  FINISHED = 'FINISHED',
 }

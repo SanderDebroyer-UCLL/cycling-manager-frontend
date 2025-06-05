@@ -10,7 +10,7 @@ import LoadingOverlay from '@/components/LoadingOverlay';
 import { useEffect } from 'react';
 import { fetchUsers } from '@/features/users/users.slice';
 import { fetchCompetitions } from '@/features/competitions/competitions.slice';
-import { CompetitionDTO } from '@/types/competition';
+import { CompetitionDTO, CompetitionStatus } from '@/types/competition';
 import image1 from '@/public/images/1.webp';
 import image2 from '@/public/images/2.webp';
 import image3 from '@/public/images/3.webp';
@@ -25,9 +25,9 @@ import RaceChipBodyTemplate from '@/components/template/RaceChipBodyTemplate';
 
 export default function Overview() {
   const dispatch = useDispatch<AppDispatch>();
-  const users = useSelector((state: RootState) => state.users.data);
+  const users: UserDTO[] = useSelector((state: RootState) => state.users.data);
   const usersStatus = useSelector((state: RootState) => state.users.status);
-  const competitions = useSelector(
+  const competitions: CompetitionDTO[] = useSelector(
     (state: RootState) => state.competitions.data,
   );
   const competitionsStatus = useSelector(
@@ -77,7 +77,12 @@ export default function Overview() {
             style={containerLargerPadding}
             className="w-full !h-70 !flex-row !gap-8 overflow-x-auto"
           >
-            {[...competitions]
+            {[
+              ...competitions.filter(
+                (competition: CompetitionDTO) =>
+                  competition.competitionStatus !== CompetitionStatus.FINISHED,
+              ),
+            ]
               .sort((a, b) => a.name.localeCompare(b.name))
               .map((competition: CompetitionDTO, index) => (
                 <div

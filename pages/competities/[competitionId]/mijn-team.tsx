@@ -11,7 +11,6 @@ import { fetchCyclists } from '@/features/cyclists/cyclists.slice';
 import {
   fetchUserTeam,
   postUpdateUserTeamMainCyclists,
-  resetUserTeamsStatus,
   resetUserTeamsUpdateStatus,
   updateUserTeamCyclists,
 } from '@/features/user-teams/user-teams.slice';

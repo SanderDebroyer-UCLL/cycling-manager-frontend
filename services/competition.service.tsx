@@ -1,3 +1,5 @@
+import { CompetitionStatus } from '@/types/competition';
+
 export const createCompetition = async (competitionData: any) => {
   const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/competitions', {
     method: 'POST',
@@ -102,6 +104,33 @@ export const scrapeAllCompetitionResults = async () => {
 
   if (!res.ok) {
     throw new Error('Failed to scrape all competition results');
+  }
+
+  return res.json();
+};
+
+export const updateCompetitionStatusPut = async (
+  competitionId: number,
+  competitionStatus: CompetitionStatus,
+) => {
+  const res = await fetch(
+    process.env.NEXT_PUBLIC_API_URL +
+      '/competitions/' +
+      competitionId +
+      '?status=' +
+      competitionStatus,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
+      },
+      body: JSON.stringify(competitionStatus),
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error('Failed to update competition status');
   }
 
   return res.json();
