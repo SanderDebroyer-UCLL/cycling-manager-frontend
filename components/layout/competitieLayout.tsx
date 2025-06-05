@@ -13,19 +13,12 @@ type CustomLayoutProps = {
 
 const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const [loading, setLoading] = useState(true);
 
   const user = useSelector((state: RootState) => state.user.userDTO);
   const userStatus = useSelector((state: RootState) => state.user.status);
 
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
-
-  useEffect(() => {
-    const email = sessionStorage.getItem('email');
-    const jwtToken = sessionStorage.getItem('jwtToken');
-    setLoading(false);
-  }, [dispatch]);
 
   useEffect(() => {
     if (!user && userStatus === 'idle') {
@@ -46,14 +39,14 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
     }
   };
 
-  if (loading || !user) {
+  if (!user) {
     return <LoadingOverlay />;
   }
 
   return (
     <div className="flex h-screen w-full">
       <Sidebar />
-      <div className="max-w-[calc(100vw-320px)] w-full flex flex-col gap-12 py-12 px-8 bg-surface-container-lowest overflow-y-auto max-h-screen rounded-tl-lg rounded-bl-lg">
+      <div className="max-w-[calc(100vw-320px)] w-full flex flex-col py-12 px-8 bg-surface-container-lowest overflow-y-auto max-h-screen">
         {children}
       </div>
     </div>

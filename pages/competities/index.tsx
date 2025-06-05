@@ -145,14 +145,14 @@ const Index = () => {
 
   return (
     <>
-      <div className="p-10 flex flex-col gap-8">
+      <div className="p-20 flex flex-col gap-8 max-w-[80vw] mx-auto">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold">Actieve competities</h2>
+          <h2 className="text-xl font-semibold">Actieve Competities</h2>
           <Button label="Creëer Competitie" onClick={() => setVisible(true)} />
         </div>
         <div
           style={container}
-          className="overflow-hidden overflow-y-auto rounded-xl max-h-[75vh]"
+          className="overflow-hidden overflow-y-auto rounded-xl max-h-[75vh] w-full"
         >
           <DataTable
             value={competitions.filter(

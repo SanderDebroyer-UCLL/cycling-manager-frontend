@@ -15,11 +15,9 @@ import { showErrorToast, showSuccessToast } from '@/services/toast.service';
 import HomeLayout from '@/components/layout/homeLayout';
 
 export default function Register() {
-  const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [repeatPassword, setRepeatPassword] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
 
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
@@ -32,7 +30,6 @@ export default function Register() {
   const router = useRouter();
   const status = useSelector((state: RootState) => state.user.status);
   const error = useSelector((state: RootState) => state.user.error);
-  const user = useSelector((state: RootState) => state.user.userDTO);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -103,14 +100,6 @@ export default function Register() {
       dispatch(resetUserStatus()); // reset status to avoid repeated error messages
     }
   }, [status, router]);
-
-  useEffect(() => {
-    if (status === 'loading') {
-      setLoading(true);
-    } else {
-      setLoading(false);
-    }
-  }, [status]);
 
   return (
     <>
@@ -188,7 +177,7 @@ export default function Register() {
           </div>
           <Button
             label="Registreer"
-            loading={loading}
+            loading={status === 'loading'}
             className="w-full"
             onClick={handleRegister}
           />

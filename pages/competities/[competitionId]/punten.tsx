@@ -25,7 +25,7 @@ const punten = () => {
     return (
       <div className="flex flex-col gap-10 w-full">
         <div className="flex flex-col gap-6">
-          <h2 className="text-xl font-bold flex gap-4 items-center">
+          <h2 className="text-xl font-bold flex gap-10 items-center">
             Punten overzicht
           </h2>
           <div className="flex gap-10">
@@ -49,7 +49,7 @@ const punten = () => {
     return (
       <div className="flex flex-col gap-10 w-full">
         <div className="flex flex-col gap-6">
-          <h2 className="text-xl font-bold flex gap-4 items-center">
+          <h2 className="text-xl font-bold flex gap-10 items-center">
             Punten overzicht
           </h2>
           <div className="flex gap-10">

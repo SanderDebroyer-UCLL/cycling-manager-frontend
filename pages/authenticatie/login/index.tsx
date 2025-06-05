@@ -15,7 +15,6 @@ import { Mail, Lock } from 'lucide-react';
 export default function Login() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
 
   const [emailError, setEmailError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
@@ -77,14 +76,6 @@ export default function Login() {
     }
   }, [status, router, dispatch, jwtRes, error]);
 
-  useEffect(() => {
-    if (status === 'loading') {
-      setLoading(true);
-    } else {
-      setLoading(false);
-    }
-  }, [status]);
-
   return (
     <>
       <main className="flex items-center justify-center max-w-[70vw] mx-auto p-20 text-dark-700">
@@ -130,7 +121,7 @@ export default function Login() {
           <Button
             label="Login"
             className="w-full"
-            loading={loading}
+            loading={status === 'loading'}
             onClick={handleLogin}
           />
         </div>

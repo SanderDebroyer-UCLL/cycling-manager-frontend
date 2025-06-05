@@ -21,6 +21,7 @@ interface CompetitionState {
   competitionDTO: CompetitionDTO | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   updateCompetitionStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+  fetchCompetitionStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
 
@@ -29,6 +30,7 @@ const initialCompetitionState: CompetitionState = {
   competitionDTO: null,
   status: 'idle',
   updateCompetitionStatus: 'idle',
+  fetchCompetitionStatus: 'idle',
   error: null,
 };
 
@@ -197,12 +199,12 @@ const competitionSlice = createSlice({
         state.status = 'failed';
       })
       .addCase(fetchCompetitionStages.pending, (state) => {
-        state.status = 'loading';
+        state.fetchCompetitionStatus = 'loading';
       })
       .addCase(
         fetchCompetitionStages.fulfilled,
         (state, action: PayloadAction<CompetitionDTO>) => {
-          state.status = 'succeeded';
+          state.fetchCompetitionStatus = 'succeeded';
 
           // Clone and sort races by startDate (assuming ISO string)
           const sortedRaces = [...action.payload.races].sort(
@@ -218,7 +220,7 @@ const competitionSlice = createSlice({
         },
       )
       .addCase(fetchCompetitionStages.rejected, (state) => {
-        state.status = 'failed';
+        state.fetchCompetitionStatus = 'failed';
       })
       .addCase(updateCompetitionStatusRequest.pending, (state) => {
         state.updateCompetitionStatus = 'loading';

@@ -58,7 +58,6 @@ const index = () => {
   const [activeStage, setActiveStage] = useState<StageDTO | null>(null);
   const [activeRace, setActiveRace] = useState<RaceDTO | null>(null);
   const [resultPointsToggle, setResultPointsToggle] = useState(false);
-  const [scrapeResultLoading, setScrapeResultLoading] = useState(false);
   const [enrichedCyclistPoints, setEnrichedCyclistPoints] = useState<
     {
       fullName: string;
@@ -299,14 +298,6 @@ const index = () => {
       dispatch(fetchRaceResultsByRaceId(activeRace.id));
     }
   }, [dispatch, raceResultsStatus, activeRace?.id]);
-
-  useEffect(() => {
-    if (stageResultsScrapeStatus === 'loading') {
-      setScrapeResultLoading(true);
-    } else {
-      setScrapeResultLoading(false);
-    }
-  });
 
   useEffect(() => {
     if (!competition || !activeStage) return;
@@ -636,7 +627,7 @@ const index = () => {
                   tooltip="Haal resultaten en punten voor deze etappe op"
                   tooltipOptions={{ showDelay: 500 }}
                   className="!p-0 -translate-x-2 h-[48px] w-[48px] flex items-center !border-none justify-center"
-                  loading={scrapeResultLoading}
+                  loading={stageResultsScrapeStatus === 'loading'}
                   onClick={() => {
                     resetStageResultsScrapeStatus(),
                       dispatch(

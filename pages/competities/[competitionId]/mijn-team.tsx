@@ -53,8 +53,6 @@ const index = () => {
   const { competitionId } = router.query;
   const [usersState, setUsersState] = useState<UserDTO[]>([]);
   const [cyclistsState, setCyclistsState] = useState<CyclistDTO[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [userTeamsLoading, setUserTeamsLoading] = useState<boolean>(true);
   const userTeamsError = useSelector(
     (state: RootState) => state.userTeams.error,
   );
@@ -225,19 +223,6 @@ const index = () => {
     competition?.competitionStatus,
     dispatch,
   ]);
-
-  // Set loading state based on cyclists status - Simplified
-  useEffect(() => {
-    setLoading(cyclistsStatus === 'loading');
-  }, [cyclistsStatus]);
-
-  useEffect(() => {
-    if (userTeamsUpdateStatus === 'loading') {
-      setUserTeamsLoading(true);
-    } else {
-      setUserTeamsLoading(false);
-    }
-  });
 
   useEffect(() => {
     if (userTeamsUpdateStatus === 'succeeded') {
@@ -653,7 +638,7 @@ const index = () => {
           mainTeamPopupVisible={mainTeamPopupVisible}
           competition={competition}
           email={email}
-          loading={loading}
+          loading={cyclistsStatus === 'loading'}
           cyclistsState={cyclistsState}
           userTeams={userTeams}
           setSelectedCyclist={setSelectedCyclist}
@@ -677,7 +662,7 @@ const index = () => {
           activateCyclistTemplate={activateCyclistTemplate}
           teamChanged={teamChanged}
           mainReservePointsCyclist={mainReservePointsCyclist}
-          userTeamsLoading={userTeamsLoading}
+          userTeamsLoading={userTeamsStatus === 'loading'}
         />
       </>
     );
