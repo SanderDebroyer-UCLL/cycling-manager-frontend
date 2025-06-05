@@ -21,7 +21,7 @@ import image7 from '@/public/images/7.webp';
 import tdfBanner from '@/public/images/tdf_banner.webp';
 import giroBanner from '@/public/images/giro_banner.webp';
 import vueltaBanner from '@/public/images/vuelta_banner.webp';
-import RaceChipBodyTemplate from '@/components/RaceChipBodyTemplate';
+import RaceChipBodyTemplate from '@/components/template/RaceChipBodyTemplate';
 
 export default function Overview() {
   const dispatch = useDispatch<AppDispatch>();
@@ -142,7 +142,7 @@ export default function Overview() {
           <h2 className="text-xl font-semibold">Klassement</h2>
           <div
             style={container}
-            className="w-fit h-80 bg-surface flex flex-col justify-center gap-6 rounded-xl shadow-md overflow-hidden p-8"
+            className="w-fit h-80 bg-surface flex flex-col justify-center gap-6 rounded-xl overflow-hidden p-8"
           >
             <div className="flex flex-row gap-8 items-end justify-center">
               {topThreeUsers.map((user: UserDTO | undefined, index) =>

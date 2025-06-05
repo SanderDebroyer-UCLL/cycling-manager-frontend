@@ -14,6 +14,7 @@ interface StartedPhaseProps {
   resetChanges: () => void;
   handleSubmitTeamChanges: () => void;
   competition: CompetitionDTO;
+  userTeamsLoading: boolean;
 }
 
 const StartedPhase: React.FC<StartedPhaseProps> = ({
@@ -24,6 +25,7 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
   resetChanges,
   handleSubmitTeamChanges,
   competition,
+  userTeamsLoading,
 }) => {
   return (
     <div className="flex flex-col gap-12 w-full">
@@ -65,6 +67,7 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
             {mainReservePointsCyclist?.mainCyclists.length ===
               competition.maxMainCyclists && (
               <Button
+                loading={userTeamsLoading}
                 label="Update team"
                 onClick={() => handleSubmitTeamChanges()}
               />

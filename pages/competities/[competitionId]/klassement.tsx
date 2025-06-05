@@ -1,5 +1,5 @@
 import Chip from '@/components/chip';
-import CompetitieLayout from '@/components/competitieLayout';
+import CompetitieLayout from '@/components/layout/competitieLayout';
 import { container } from '@/const/containerStyle';
 import { ResultType } from '@/const/resultType';
 import { Column } from 'primereact/column';
@@ -17,14 +17,11 @@ import { StageResult } from '@/types/race';
 import { useSelector } from 'react-redux';
 
 const klassement = () => {
-  const [resultLoading, setResultLoading] = useState(false);
   const [stageResultsState, setStageResultsState] = useState<StageResult[]>([]);
   const [stageGCResultsState, setStageGCResultsState] = useState<StageResult[]>(
     [],
   );
-  const [resultStatus, setResultStatus] = useState<ResultType>(
-    ResultType.STAGE,
-  );
+  const [resultStatus, setResultStatus] = useState<ResultType>(ResultType.GC);
   const stageResults: StageResult[] = useSelector(
     (state: any) => state.stageResults.etappeResult,
   );
@@ -48,40 +45,37 @@ const klassement = () => {
       <div style={container} className="flex flex-col h-full overflow-auto">
         <div className="flex gap-4">
           <Chip
-            label="Etappe"
-            Icon={FlagIcon}
-            active={resultStatus === ResultType.STAGE}
-            onClick={() => setResultStatus(ResultType.STAGE)}
-          />
-          <Chip
             label="GC"
             Icon={Trophy}
             active={resultStatus === ResultType.GC}
             onClick={() => setResultStatus(ResultType.GC)}
+            variant={'secondary'}
           />
           <Chip
             label="Youth"
             Icon={UserIcon}
             active={resultStatus === ResultType.YOUNG}
             onClick={() => setResultStatus(ResultType.YOUNG)}
+            variant={'secondary'}
           />
           <Chip
             label="Points"
             Icon={Star}
             active={resultStatus === ResultType.POINTS}
             onClick={() => setResultStatus(ResultType.POINTS)}
+            variant={'secondary'}
           />
           <Chip
             label="Mountain"
             Icon={Mountain}
             active={resultStatus === ResultType.MOUNTAIN}
             onClick={() => setResultStatus(ResultType.MOUNTAIN)}
+            variant={'secondary'}
           />
         </div>
         <DataTable
           paginator
           rows={5}
-          loading={resultLoading}
           value={
             resultStatus === ResultType.STAGE
               ? stageResultsState

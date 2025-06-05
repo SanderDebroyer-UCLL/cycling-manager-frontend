@@ -1,11 +1,11 @@
-import CompetitieLayout from '@/components/competitieLayout';
+import CompetitieLayout from '@/components/layout/competitieLayout';
 import { container } from '@/const/containerStyle';
 import {
   fetchCompetitionById,
   fetchCompetitionStages,
 } from '@/features/competition/competition.slice';
 import { AppDispatch, RootState } from '@/store/store';
-import { Competition, CompetitionDTO } from '@/types/competition';
+import { CompetitionDTO } from '@/types/competition';
 import { useRouter } from 'next/router';
 import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
@@ -21,15 +21,19 @@ import React, {
   useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateRaceData } from '@/features/race/race.slice';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import { RaceDTO } from '@/types/race';
 import { RefreshCw } from 'lucide-react';
 import { fetchCyclistsWithDNS } from '@/features/user-teams/user-teams.slice';
-import TableChipBodyTemplate from '@/components/TableChipBodyTemplate';
-import StageTypeChipBodyTemplate from '@/components/ParcoursTypeChipBodyTemplate';
+import TableChipBodyTemplate from '@/components/template/TableChipBodyTemplate';
+import StageTypeChipBodyTemplate from '@/components/template/ParcoursTypeChipBodyTemplate';
 import { getCompetitionStatusSubtext } from '@/utils/competition-status-map';
-import DropOutReasonChipBodyTemplate from '@/components/DropOutReasonChipBodyTemplate';
+import DropOutReasonChipBodyTemplate from '@/components/template/DropOutReasonChipBodyTemplate';
+import {
+  fetchRacePointsForCompetitionId,
+  fetchStagePointsForCompetitionId,
+} from '@/features/points/points.slice';
+import TotalPointsChipBodyTemplate from '@/components/template/TotalPointsChipBodyTemplate';
 
 const index = () => {
   const router = useRouter();
@@ -48,7 +52,14 @@ const index = () => {
   const cyclistWithDNS = useSelector(
     (state: RootState) => state.userTeams.cyclistsWithDNS,
   );
+  const pointsPerUser = useSelector((state: RootState) => state.points.points);
+  const pointsPerUserStatus = useSelector(
+    (state: RootState) => state.points.status,
+  );
   const raceStatus = useSelector((state: RootState) => state.race.status);
+  const userTeamsStatus = useSelector(
+    (state: RootState) => state.userTeams.status,
+  );
   const dispatch = useDispatch<AppDispatch>();
   const { competitionId } = router.query;
 
@@ -148,7 +159,7 @@ const index = () => {
   const competitionData = useMemo(() => {
     if (!competition?.races?.length) {
       return {
-        hasStages: false,
+        hasStages: null,
         displayName: '',
         items: [],
         itemCount: 0,
@@ -160,7 +171,7 @@ const index = () => {
     const hasStages = firstRace?.stages?.length > 0;
 
     return {
-      hasStages,
+      hasStages: hasStages,
       displayName: hasStages ? firstRace.name : competition.name,
       items: hasStages ? firstRace.stages : competition.races,
       itemCount: hasStages ? firstRace.stages.length : competition.races.length,
@@ -181,6 +192,18 @@ const index = () => {
       setUpdateRaceDataLoading(raceStatus === 'loading');
     }
   }, [raceStatus]);
+
+  useEffect(() => {
+    if (!competitionIdNumber) return;
+    if (competitionData.hasStages === null) return;
+    if (pointsPerUser.length === 0 || pointsPerUserStatus === 'idle') {
+      if (competitionData.hasStages) {
+        dispatch(fetchStagePointsForCompetitionId(competitionIdNumber));
+      } else {
+        dispatch(fetchRacePointsForCompetitionId(competitionIdNumber));
+      }
+    }
+  }, [competitionData.hasStages, pointsPerUserStatus, competitionIdNumber]);
 
   useEffect(() => {
     if (competitionIdNumber) {
@@ -216,7 +239,12 @@ const index = () => {
     [router, competitionId],
   );
 
-  if (!competition || !competitionData || !cyclistWithDNS) {
+  if (
+    !competition ||
+    !competitionData ||
+    !cyclistWithDNS ||
+    !competition.races
+  ) {
     return <LoadingOverlay />;
   }
 
@@ -359,6 +387,13 @@ const index = () => {
               <DataTable
                 selectionMode="single"
                 selection={null}
+                loading={
+                  competitionData.hasStages
+                    ? competitionStatus === 'loading' &&
+                      competition.races[0].stages.length === 0
+                    : competitionStatus === 'idle' &&
+                      competition.races.length === 0
+                }
                 onSelectionChange={(e) => handleStageSelection(e.value)}
                 value={competitionData.items}
                 tableStyle={{ width: '100%' }}
@@ -380,18 +415,39 @@ const index = () => {
           </div>
         </div>
       </div>
-
-      <div className="flex flex-col gap-2">
-        <h3 className="font-semibold">Renners die zijn uitgevallen</h3>
-        <div style={container} className="flex flex-row gap-4 h-full w-full">
-          <DataTable
-            value={cyclistWithDNS}
-            emptyMessage="Geen renners in teams die zijn uitgevallen"
-          >
-            <Column field="name" header="Naam" />
-            <Column field="team.name" header="Team" />
-            <Column header="Reden" body={DropOutReasonChipBodyTemplate} />
-          </DataTable>
+      <div className="flex gap-10 w-full">
+        <div className="flex flex-col gap-2 flex-1 max-h-[440px]">
+          <h3 className="font-semibold">Totaal punten per deelnemer</h3>
+          <div style={container} className="flex flex-row gap-4 h-full w-full">
+            <DataTable
+              loading={pointsPerUserStatus === 'loading'}
+              value={pointsPerUser}
+              emptyMessage="Geen punten gevonden"
+              sortField="points"
+              sortOrder={-1}
+            >
+              <Column field="fullName" header="Naam" />
+              <Column
+                field="points"
+                header="Points"
+                body={TotalPointsChipBodyTemplate(competition)} // ← call it here!
+              />
+            </DataTable>
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 flex-1 max-h-[440px]">
+          <h3 className="font-semibold">Renners die zijn uitgevallen</h3>
+          <div style={container} className="flex flex-row gap-4 h-full w-full">
+            <DataTable
+              loading={userTeamsStatus === 'loading'}
+              value={cyclistWithDNS}
+              emptyMessage="Geen renners in teams die zijn uitgevallen"
+            >
+              <Column field="name" header="Naam" />
+              <Column field="team.name" header="Team" />
+              <Column header="Reden" body={DropOutReasonChipBodyTemplate} />
+            </DataTable>
+          </div>
         </div>
       </div>
     </div>

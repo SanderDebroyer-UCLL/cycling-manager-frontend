@@ -12,7 +12,7 @@ import { InputText } from 'primereact/inputtext';
 import { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { showErrorToast, showSuccessToast } from '@/services/toast.service';
-import HomeLayout from '@/components/homeLayout';
+import HomeLayout from '@/components/layout/homeLayout';
 
 export default function Register() {
   const [name, setName] = useState<string>('');

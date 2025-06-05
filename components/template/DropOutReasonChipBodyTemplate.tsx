@@ -1,13 +1,6 @@
 import React from 'react';
-import {
-  UserX,
-  Ban,
-  Clock,
-  Wrench,
-  X,
-  HelpCircle,
-} from 'lucide-react';
-import TableChip from './TableChip'; // Adjust the import path as needed
+import { UserX, Ban, Clock, Wrench, X, HelpCircle } from 'lucide-react';
+import TableChip from '../TableChip'; // Adjust the import path as needed
 import { DropOutReason } from '@/types/cyclist';
 
 const getDropOutReasonChipProps = (reason: string) => {

@@ -1,7 +1,6 @@
-import CompetitieLayout from '@/components/competitieLayout';
+import CompetitieLayout from '@/components/layout/competitieLayout';
 import {
   fetchCompetitionById,
-  resetCompetitionStatus,
   updateCompetition,
   updateCompetitionPick,
   updateCompetitionStatus,
@@ -12,6 +11,8 @@ import { fetchCyclists } from '@/features/cyclists/cyclists.slice';
 import {
   fetchUserTeam,
   postUpdateUserTeamMainCyclists,
+  resetUserTeamsStatus,
+  resetUserTeamsUpdateStatus,
   updateUserTeamCyclists,
 } from '@/features/user-teams/user-teams.slice';
 import { AppDispatch, RootState } from '@/store/store';
@@ -25,7 +26,6 @@ import { UserTeamDTO } from '@/types/user-team';
 import { useRouter } from 'next/router';
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { countryAbbreviationMap } from '@/utils/country-abbreviation-map-lowercase';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import { UserDTO } from '@/types/user';
@@ -45,6 +45,9 @@ import {
   resetPointsStatus,
   updateMainReservePointsCyclist,
 } from '@/features/points/points.slice';
+import CountryBodyTemplate from '@/components/template/CountryBodyTemplate';
+import ItemTemplate from '@/components/template/ItemTemplate';
+import { showErrorToast, showSuccessToast } from '@/services/toast.service';
 
 const index = () => {
   const router = useRouter();
@@ -52,6 +55,10 @@ const index = () => {
   const [usersState, setUsersState] = useState<UserDTO[]>([]);
   const [cyclistsState, setCyclistsState] = useState<CyclistDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [userTeamsLoading, setUserTeamsLoading] = useState<boolean>(true);
+  const userTeamsError = useSelector(
+    (state: RootState) => state.userTeams.error,
+  );
   const [selectedCyclist, setSelectedCyclist] = useState<CyclistDTO | null>(
     null,
   );
@@ -66,6 +73,9 @@ const index = () => {
   const usersStatus = useSelector((state: RootState) => state.users.status);
   const userTeamsStatus = useSelector(
     (state: RootState) => state.userTeams.status,
+  );
+  const userTeamsUpdateStatus = useSelector(
+    (state: RootState) => state.userTeams.updateStatus,
   );
   const cyclistsStatus = useSelector(
     (state: RootState) => state.cyclists.status,
@@ -89,6 +99,7 @@ const index = () => {
   );
   const competitionRef = useRef<CompetitionDTO | null>(null);
   const stompClientRef = useRef<Client | null>(null);
+  const hasFetched = useRef(false);
   const email = sessionStorage.getItem('email');
   const dispatch = useDispatch<AppDispatch>();
 
@@ -99,12 +110,36 @@ const index = () => {
     }
   }, [competition]);
 
-  // Set initial points when data is first available
   useEffect(() => {
-    if (mainReservePointsCyclist && !initialPoints) {
-      setInitialPoints(mainReservePointsCyclist);
-    }
-  }, [mainReservePointsCyclist, initialPoints]);
+    if (!competition || !user || hasFetched.current) return;
+
+    const fetchAction =
+      competition?.races[0]?.stages.length === 0
+        ? fetchRacePointsForAllRaces
+        : fetchStagePointsForAllStages;
+
+    dispatch(
+      fetchAction({
+        competitionId: competition.id,
+        userId: user.id,
+      }),
+    );
+
+    hasFetched.current = true;
+  }, [competition, user, dispatch]);
+
+  // Reset when competition changes AND cleanup on unmount
+  useEffect(() => {
+    // Reset when competition ID changes
+    setInitialPoints(null);
+    setTeamChanged(false);
+
+    // Also cleanup on unmount
+    return () => {
+      setInitialPoints(null);
+      setTeamChanged(false);
+    };
+  }, [competitionId]);
 
   // Filter cyclists and set cyclist limits when data is available
   useEffect(() => {
@@ -157,16 +192,20 @@ const index = () => {
     if (!cyclists || cyclistsStatus === 'idle') {
       dispatch(fetchCyclists());
     }
-    if (!mainReservePointsCyclist || pointsStatus === 'idle') {
+    if (
+      competition?.competitionStatus === CompetitionStatus.STARTED &&
+      pointsStatus === 'idle' &&
+      user &&
+      competition
+    ) {
       const fetchAction =
         competition?.races[0].stages.length === 0
           ? fetchRacePointsForAllRaces
           : fetchStagePointsForAllStages;
-      if (!user || !competition) return;
       dispatch(
         fetchAction({
-          competitionId: competition?.id,
-          userId: user?.id,
+          competitionId: competition.id,
+          userId: user.id,
         }),
       );
     }
@@ -181,6 +220,10 @@ const index = () => {
     userTeams,
     userTeamsStatus,
     pointsStatus,
+    mainReservePointsCyclist,
+    user,
+    competition,
+    competition?.competitionStatus,
     dispatch,
   ]);
 
@@ -188,6 +231,31 @@ const index = () => {
   useEffect(() => {
     setLoading(cyclistsStatus === 'loading');
   }, [cyclistsStatus]);
+
+  useEffect(() => {
+    if (userTeamsUpdateStatus === 'loading') {
+      setUserTeamsLoading(true);
+    } else {
+      setUserTeamsLoading(false);
+    }
+  });
+
+  useEffect(() => {
+    if (userTeamsUpdateStatus === 'succeeded') {
+      showSuccessToast({
+        summary: 'Update succesvol',
+        detail: 'Je team is succesvol bijgewerkt.',
+      });
+      setInitialPoints(mainReservePointsCyclist);
+      dispatch(resetUserTeamsUpdateStatus());
+    } else if (userTeamsUpdateStatus === 'failed') {
+      showErrorToast({
+        summary: 'Update mislukt',
+        detail: userTeamsError || 'Er is iets misgegaan.',
+      });
+      dispatch(resetUserTeamsUpdateStatus());
+    }
+  }, [userTeamsUpdateStatus, userTeamsError, dispatch]);
 
   useEffect(() => {
     if (
@@ -258,7 +326,6 @@ const index = () => {
           }
 
           dispatch(updateCompetitionStatus(competitionStatus));
-          console.log(`Competition status updated to: ${competitionStatus}`);
           dispatch(resetPointsStatus());
         });
         stompClient.subscribe('/topic/count', (message) => {
@@ -420,7 +487,9 @@ const index = () => {
       return;
     }
 
-    const { cyclistId, cyclistName } = PointsPerCyclist;
+    setInitialPoints(mainReservePointsCyclist);
+
+    const { cyclistId, cyclistName, points } = PointsPerCyclist;
 
     const updatedMainReservePointsCyclist: MainReservePointsCyclist = {
       mainCyclists: mainReservePointsCyclist.mainCyclists.filter(
@@ -431,7 +500,7 @@ const index = () => {
         {
           cyclistName,
           cyclistId,
-          points: 0,
+          points,
           isCyclistActive: false,
           userId: 0,
         },
@@ -491,33 +560,6 @@ const index = () => {
         reserveCyclistIds,
         userTeamId: userTeam.id,
       }),
-    );
-  };
-
-  const itemTemplate = (user: UserDTO, index: number) => {
-    return (
-      <div className="flex flex-wrap p-2 align-items-center gap-3">
-        <span className="w-6 text-right font-bold text-primary-500">
-          {index + 1}.
-        </span>
-        <div className="flex-1 flex flex-column gap-2 xl:mr-8">
-          <span className="font-bold">{user.firstName}</span>
-          <span className="font-bold">{user.lastName}</span>
-        </div>
-      </div>
-    );
-  };
-
-  const countryBodyTemplate = (rowData: CyclistDTO) => {
-    return (
-      <div className="flex align-items-center gap-2">
-        <img
-          alt="flag"
-          src={`https://flagcdn.com/w40/${countryAbbreviationMap[rowData.country]}.png`}
-          style={{ height: '20px', borderRadius: '2px' }}
-        />
-        <span>{rowData.country}</span>
-      </div>
     );
   };
 
@@ -598,7 +640,7 @@ const index = () => {
           usersState={usersState}
           handleUsersChange={handleUsersChange}
           stompClientRef={stompClientRef}
-          itemTemplate={itemTemplate}
+          itemTemplate={ItemTemplate}
         />
       </>
     );
@@ -617,7 +659,7 @@ const index = () => {
           userTeams={userTeams}
           setSelectedCyclist={setSelectedCyclist}
           setConfirmTarget={setConfirmTarget}
-          countryBodyTemplate={countryBodyTemplate}
+          countryBodyTemplate={CountryBodyTemplate}
           stompClientRef={stompClientRef}
           container={container}
         />
@@ -636,6 +678,7 @@ const index = () => {
           activateCyclistTemplate={activateCyclistTemplate}
           teamChanged={teamChanged}
           mainReservePointsCyclist={mainReservePointsCyclist}
+          userTeamsLoading={userTeamsLoading}
         />
       </>
     );

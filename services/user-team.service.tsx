@@ -34,7 +34,6 @@ export const updateUserTeamMainCyclists = async (
   const data = await res.json();
 
   if (!res.ok) {
-    // throw the error message so it triggers rejected action
     throw new Error(data.error || 'Er is iets misgegaan.');
   }
 

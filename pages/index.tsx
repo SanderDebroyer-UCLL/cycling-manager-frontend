@@ -1,14 +1,10 @@
-// pages/index.tsx
-import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'primereact/button';
-import { AppDispatch, RootState } from '@/store/store';
-import Navbar from '@/components/navbar';
 import { Swords, Trophy } from 'lucide-react';
 import { CalendarSearch } from 'lucide-react';
 import bannerImage from '@/public/images/banner_image.avif';
 import Image from 'next/image';
 import Link from 'next/link';
-import HomeLayout from '@/components/homeLayout';
+import HomeLayout from '@/components/layout/homeLayout';
 import { ReactNode } from 'react';
 
 export default function Home() {
@@ -18,7 +14,7 @@ export default function Home() {
         <div className="w-full h-60 bg-surface-container flex items-center justify-between gap-4 rounded-xl shadow-md overflow-hidden">
           <div className="flex flex-col gap-4 py-6 px-12">
             <h1 className="text-2xl font-semibold">
-              Welkom op cycling manager{' '}
+              Welkom op cycling manager
             </h1>
             <p className="text-md">
               Race, manage je team, en leid ze tot de overwinning!

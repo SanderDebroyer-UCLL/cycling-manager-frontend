@@ -11,9 +11,9 @@ import {
   LeafIcon,
   Crown,
 } from 'lucide-react';
-import TableChip from './TableChip';
+import TableChip from '../TableChip';
 
-import type { TableChipProps } from './TableChip';
+import type { TableChipProps } from '../TableChip';
 import type { CompetitionDTO } from '@/types/competition';
 import { parseISO } from 'date-fns';
 

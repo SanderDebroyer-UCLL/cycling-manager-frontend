@@ -1,5 +1,5 @@
 import Chip from '@/components/chip';
-import CompetitieLayout from '@/components/competitieLayout';
+import CompetitieLayout from '@/components/layout/competitieLayout';
 import SelectableCard from '@/components/SelectableCard';
 import { container } from '@/const/containerStyle';
 import { ResultType } from '@/const/resultType';
@@ -26,22 +26,16 @@ import {
 } from '@/features/stage-results/stage-results.slice';
 import { AppDispatch } from '@/store/store';
 import { CompetitionDTO } from '@/types/competition';
-import {
-  ParcoursType,
-  Race,
-  RaceDTO,
-  Stage,
-  StageDTO,
-  StageResult,
-} from '@/types/race';
+import { ParcoursType, RaceDTO, StageDTO, StageResult } from '@/types/race';
 import { RaceResult } from '@/types/race-result';
-import { Points } from '@/types/points';
+import { MainReservePointsCyclist } from '@/types/points';
 import {
   parcoursDescriptions,
   ParcoursTypeKeyMap,
 } from '@/utils/parcours-key-map';
 import {
   FlagIcon,
+  Medal,
   Mountain,
   RefreshCw,
   Star,
@@ -53,9 +47,10 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import PointsChipBodyTemplate from '@/components/PointsChipBodyTemplate';
+import PointsChipBodyTemplate from '@/components/template/PointsChipBodyTemplate';
+import TimeBodyTemplate from '@/components/template/TimeBodyTemplate';
 
 const index = () => {
   const router = useRouter();
@@ -63,9 +58,27 @@ const index = () => {
 
   const [activeStage, setActiveStage] = useState<StageDTO | null>(null);
   const [activeRace, setActiveRace] = useState<RaceDTO | null>(null);
-  const [competitionLoading, setCompetitionLoading] = useState(false);
-  const [resultLoading, setResultLoading] = useState(false);
+  const [resultPointsToggle, setResultPointsToggle] = useState(false);
   const [scrapeResultLoading, setScrapeResultLoading] = useState(false);
+  const [enrichedCyclistPoints, setEnrichedCyclistPoints] = useState<
+    {
+      fullName: string;
+      email: string;
+      points: number;
+      cyclistName: string;
+      cyclistId: number;
+      userId: number;
+      isCyclistActive: boolean;
+    }[]
+  >([]);
+  const [pointsPerUser, setPointsPerUser] = useState<
+    {
+      userId: number;
+      fullName: string;
+      email: string;
+      totalPoints: number;
+    }[]
+  >([]);
   const [resultStatus, setResultStatus] = useState<ResultType>(
     ResultType.STAGE,
   );
@@ -102,15 +115,80 @@ const index = () => {
   const stageGCResults: StageResult[] = useSelector(
     (state: any) => state.stageResults.gcResult,
   );
-  const points: Points[] = useSelector((state: any) => state.points.points);
+  const points: MainReservePointsCyclist = useSelector(
+    (state: any) => state.points.mainReservePointsCyclistPerEvent,
+  );
 
   useEffect(() => {
-    if (competitionStatus === 'loading') {
-      setCompetitionLoading(true);
-    } else {
-      setCompetitionLoading(false);
+    if (!points || !competition) return;
+
+    const pointsArray = [...points.mainCyclists, ...points.reserveCyclists];
+
+    const enrichedPointsList = pointsArray.map((point) => {
+      const user = competition.users.find((u) => u.id === point.userId);
+      return {
+        ...point,
+        fullName:
+          `${user?.firstName || 'Unknown'} ${user?.lastName || ''}`.trim(),
+        email: user?.email || 'Unknown',
+      };
+    });
+
+    setEnrichedCyclistPoints(enrichedPointsList);
+  }, [points, competition?.users, pointsStatus]);
+
+  useEffect(() => {
+    if (!competition) return;
+
+    const allUsersWithInitialPoints = competition.users.map((user) => ({
+      userId: user.id,
+      fullName:
+        `${user?.firstName || 'Unknown'} ${user?.lastName || ''}`.trim(),
+      email: user?.email || 'Unknown',
+      totalPoints: 0,
+    }));
+
+    if (!points) {
+      setPointsPerUser(allUsersWithInitialPoints);
+      return;
     }
-  }, [competitionStatus]);
+
+    const pointsArray = [...points.mainCyclists, ...points.reserveCyclists];
+
+    const totalPointsPerUserMap = pointsArray.reduce(
+      (acc, point) => {
+        if (!acc[point.userId]) {
+          acc[point.userId] = {
+            userId: point.userId,
+            fullName: '',
+            email: '',
+            totalPoints: 0,
+          };
+        }
+        acc[point.userId].totalPoints += point.points;
+        return acc;
+      },
+      {} as {
+        [userId: number]: {
+          userId: number;
+          fullName: string;
+          email: string;
+          totalPoints: number;
+        };
+      },
+    );
+
+    // Merge with user data and fill in missing names/emails
+    const merged = allUsersWithInitialPoints.map((user) => {
+      const pointData = totalPointsPerUserMap[user.userId];
+      return {
+        ...user,
+        totalPoints: pointData ? pointData.totalPoints : 0,
+      };
+    });
+
+    setPointsPerUser(merged);
+  }, [points, competition?.users, pointsStatus]);
 
   useEffect(() => {
     setStageResultsState(stageResults);
@@ -126,7 +204,7 @@ const index = () => {
 
   useEffect(() => {
     if (!competition || !competitionId) return;
-    if (pointsStatus === 'idle') {
+    if (pointsStatus === 'idle' || !points) {
       if (activeStage) {
         dispatch(
           fetchStagePointsForStage({
@@ -180,14 +258,6 @@ const index = () => {
       dispatch(fetchRaceResultsByRaceId(activeRace.id));
     }
   }, [dispatch, raceResultsStatus, activeRace?.id]);
-
-  useEffect(() => {
-    if (stageResultsStatus === 'loading') {
-      setResultLoading(true);
-    } else {
-      setResultLoading(false);
-    }
-  }, [stageResultsStatus]);
 
   useEffect(() => {
     if (stageResultsScrapeStatus === 'loading') {
@@ -331,343 +401,398 @@ const index = () => {
   }
 
   return (
-    <div>
-      <div className="flex flex-col gap-10 w-full">
-        <div className="flex flex-col gap-6">
-          <h2 className=" text-xl font-bold flex gap-4 items-center">
-            Ritten{' '}
-            {competition.races[0].stages.length > 0
-              ? competition.races[0].name
-              : competition.name}
-            <Button
-              raised
-              icon={() => (
-                <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
-              )}
-              tooltip="Haal alle resultaten en punten op"
-              tooltipOptions={{ showDelay: 500 }}
-              className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
-              loading={competitionLoading}
-              onClick={() =>
-                dispatch(fetchCompetitionResultsUpdate(competition.id))
-              }
-            />
-          </h2>
-        </div>
-
-        <div className="flex gap-8 w-full overflow-x-auto">
+    <div className="flex flex-col gap-10 w-full">
+      <div className="flex flex-col gap-6">
+        <h2 className=" text-xl font-bold flex gap-4 items-center">
+          Ritten{' '}
           {competition.races[0].stages.length > 0
-            ? competition.races[0].stages.map((stage, index) => {
-                const [day, month] = stage.date.split('/').map(Number);
-                const year = new Date(
-                  competition.races[0].startDate,
-                ).getFullYear();
-                const fullDate = new Date(year, month - 1, day);
-                const dateStr = fullDate.toLocaleDateString('nl');
+            ? competition.races[0].name
+            : competition.name}
+          <Button
+            raised
+            icon={() => (
+              <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
+            )}
+            tooltip="Haal alle resultaten en punten op"
+            tooltipOptions={{ showDelay: 500 }}
+            className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
+            loading={competitionStatus === 'loading'}
+            onClick={() =>
+              dispatch(fetchCompetitionResultsUpdate(competition.id))
+            }
+          />
+        </h2>
+      </div>
 
-                return (
-                  <SelectableCard
-                    key={stage.id}
-                    title={`Stage ${index + 1}`}
-                    subtitle={stage.name.split('|')[1]}
-                    date={dateStr}
-                    selected={stage.id.toString() === itemId}
-                    onClick={() => {
-                      onSelectStage(stage);
-                      dispatch(resetStageResultsStatus());
-                    }}
-                  />
-                );
-              })
-            : competition.races.map((race, index) => (
+      <div className="flex gap-8 w-full overflow-x-auto">
+        {competition.races[0].stages.length > 0
+          ? competition.races[0].stages.map((stage, index) => {
+              const [day, month] = stage.date.split('/').map(Number);
+              const year = new Date(
+                competition.races[0].startDate,
+              ).getFullYear();
+              const fullDate = new Date(year, month - 1, day);
+              const dateStr = fullDate.toLocaleDateString('nl');
+
+              return (
                 <SelectableCard
-                  key={race.id}
-                  title={`Race ${index + 1}`}
-                  subtitle={race.name}
-                  date={new Date(race.startDate).toLocaleDateString('nl')}
-                  selected={race.id.toString() === itemId}
+                  key={stage.id}
+                  title={`Stage ${index + 1}`}
+                  subtitle={stage.name.split('|')[1]}
+                  date={dateStr}
+                  selected={stage.id.toString() === itemId}
                   onClick={() => {
-                    onSelectRace(race);
-                    dispatch(resetRaceResultsStatus());
+                    onSelectStage(stage);
+                    dispatch(resetStageResultsStatus());
                   }}
                 />
-              ))}
-        </div>
+              );
+            })
+          : competition.races.map((race, index) => (
+              <SelectableCard
+                key={race.id}
+                title={`Race ${index + 1}`}
+                subtitle={race.name}
+                date={new Date(race.startDate).toLocaleDateString('nl')}
+                selected={race.id.toString() === itemId}
+                onClick={() => {
+                  onSelectRace(race);
+                  dispatch(resetRaceResultsStatus());
+                }}
+              />
+            ))}
+      </div>
 
-        {competition.races[0].stages.length > 0 ? (
-          <div className="flex gap-10 w-full ">
-            <div className="flex flex-1/2 flex-col gap-5">
-              <h3 className="font-semibold">Overzicht {activeStage?.name} </h3>
-              <div></div>
+      {competition.races[0].stages.length > 0 ? (
+        <div className="flex gap-10 w-full ">
+          <div className="flex flex-1/2 flex-col gap-5">
+            <h3 className="font-semibold">Overzicht {activeStage?.name} </h3>
+            <div></div>
 
-              <div className="flex w-full gap-5">
-                <div className="flex flex-col flex-1 gap-2">
-                  <h3 className="font-semibold">Afstand</h3>
-                  <div style={container} className="font-semibold text-xl">
-                    {activeStage?.distance} km
-                    <span className="text-sm font-normal">
-                      {activeStage?.distance !== undefined &&
-                        (Number(activeStage?.distance) < 8
-                          ? 'Proloog'
-                          : Number(activeStage?.distance) < 140
-                            ? 'Korte rit'
-                            : Number(activeStage?.distance) < 180
-                              ? 'Gemiddelde rit'
-                              : Number(activeStage?.distance) < 210
-                                ? 'Lange rit'
-                                : 'Koninklijke rit')}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex flex-col flex-1 gap-2">
-                  <h3 className="font-semibold">Hoogtemeters</h3>
-                  <div style={container} className="font-semibold text-xl">
-                    {activeStage?.verticalMeters} m
-                    <span className="text-sm font-normal">
-                      {activeStage?.verticalMeters !== undefined &&
-                        (Number(activeStage.verticalMeters) < 500
-                          ? 'Vlakke rit'
-                          : Number(activeStage.verticalMeters) < 1000
-                            ? 'Licht geaccidenteerd'
-                            : Number(activeStage.verticalMeters) < 2000
-                              ? 'Geaccidenteerd'
-                              : Number(activeStage.verticalMeters) < 3000
-                                ? 'Bergachtig'
-                                : 'Zware bergrit')}
-                    </span>
-                  </div>
+            <div className="flex w-full gap-5">
+              <div className="flex flex-col flex-1 gap-2">
+                <h3 className="font-semibold">Afstand</h3>
+                <div style={container} className="font-semibold text-xl">
+                  {activeStage?.distance} km
+                  <span className="text-sm font-normal">
+                    {activeStage?.distance !== undefined &&
+                      (Number(activeStage?.distance) < 8
+                        ? 'Proloog'
+                        : Number(activeStage?.distance) < 140
+                          ? 'Korte rit'
+                          : Number(activeStage?.distance) < 180
+                            ? 'Gemiddelde rit'
+                            : Number(activeStage?.distance) < 210
+                              ? 'Lange rit'
+                              : 'Koninklijke rit')}
+                  </span>
                 </div>
               </div>
-              <div className="flex w-full gap-5">
-                <div className="flex flex-col flex-1 gap-2">
-                  <h3 className="font-semibold">Lokale Starttijd</h3>
-                  <div style={container} className="font-semibold text-xl">
+              <div className="flex flex-col flex-1 gap-2">
+                <h3 className="font-semibold">Hoogtemeters</h3>
+                <div style={container} className="font-semibold text-xl">
+                  {activeStage?.verticalMeters} m
+                  <span className="text-sm font-normal">
+                    {activeStage?.verticalMeters !== undefined &&
+                      (Number(activeStage.verticalMeters) < 500
+                        ? 'Vlakke rit'
+                        : Number(activeStage.verticalMeters) < 1000
+                          ? 'Licht geaccidenteerd'
+                          : Number(activeStage.verticalMeters) < 2000
+                            ? 'Geaccidenteerd'
+                            : Number(activeStage.verticalMeters) < 3000
+                              ? 'Bergachtig'
+                              : 'Zware bergrit')}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="flex w-full gap-5">
+              <div className="flex flex-col flex-1 gap-2">
+                <h3 className="font-semibold">Lokale Starttijd</h3>
+                <div style={container} className="font-semibold text-xl">
+                  {activeStage?.startTime &&
+                  activeStage.startTime !== '-' &&
+                  activeStage.startTime.includes('(')
+                    ? activeStage.startTime.split('(')[0]
+                    : 'Nog niet beschikbaar'}
+
+                  <span className="text-sm font-normal">
                     {activeStage?.startTime &&
                     activeStage.startTime !== '-' &&
                     activeStage.startTime.includes('(')
-                      ? activeStage.startTime.split('(')[0]
-                      : 'Nog niet beschikbaar'}
-
-                    <span className="text-sm font-normal">
-                      {activeStage?.startTime &&
-                      activeStage.startTime !== '-' &&
-                      activeStage.startTime.includes('(')
-                        ? activeStage.startTime.split('(')[1].split(')')[0]
-                        : 'Wordt later aangekondigd'}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex flex-col flex-1 gap-2">
-                  <h3 className="font-semibold">Type Rit</h3>
-                  <div style={container} className="font-semibold text-xl">
-                    {ParcoursTypeKeyMap[
-                      activeStage?.parcoursType as ParcoursType
-                    ] ?? 'Niet beschikbaar'}
-                    <span className="text-sm font-normal">
-                      {activeStage?.parcoursType
-                        ? parcoursDescriptions[
-                            activeStage.parcoursType as ParcoursType
-                          ]
-                        : 'Geen parcoursinformatie'}
-                    </span>
-                  </div>
+                      ? activeStage.startTime.split('(')[1].split(')')[0]
+                      : 'Wordt later aangekondigd'}
+                  </span>
                 </div>
               </div>
-              <div></div>
               <div className="flex flex-col flex-1 gap-2">
-                <h3 className="font-semibold">Punten verdiend per deelnemer</h3>
-                <div
-                  style={container}
-                  className="flex flex-col h-full overflow-auto max-h-[300px]"
-                >
-                  <DataTable
-                    value={points}
-                    dataKey="userId"
-                    sortField="points"
-                    sortOrder={-1}
-                    emptyMessage="Geen resultaten gevonden"
-                    className=""
-                  >
-                    <Column field="fullName" header="Deelnemer" />
-                    <Column
-                      field="points"
-                      header="Punten"
-                      body={PointsChipBodyTemplate}
-                    />
-                  </DataTable>
+                <h3 className="font-semibold">Type Rit</h3>
+                <div style={container} className="font-semibold text-xl">
+                  {ParcoursTypeKeyMap[
+                    activeStage?.parcoursType as ParcoursType
+                  ] ?? 'Niet beschikbaar'}
+                  <span className="text-sm font-normal">
+                    {activeStage?.parcoursType
+                      ? parcoursDescriptions[
+                          activeStage.parcoursType as ParcoursType
+                        ]
+                      : 'Geen parcoursinformatie'}
+                  </span>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col flex-1/2 gap-10 w-full">
-              <div className="py-[10px]"></div>
-              <div className="flex flex-col flex-1 gap-2">
-                <h3 className="font-semibold flex items-center">
-                  Uitslag Rit{' '}
-                  <Button
-                    outlined
-                    icon={() => (
-                      <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
-                    )}
-                    size="small"
-                    tooltip="Haal resultaten voor deze etappe op"
-                    tooltipOptions={{ showDelay: 500 }}
-                    className="!p-0 h-[48px] w-[48px] flex items-center !border-none justify-center"
-                    loading={scrapeResultLoading}
-                    onClick={() => {
-                      resetStageResultsScrapeStatus(),
-                        dispatch(
-                          getResultsByStageId(
-                            Number(Array.isArray(itemId) ? itemId[0] : itemId),
-                          ),
-                        );
-                    }}
-                  />
-                </h3>
-                <div
-                  style={container}
-                  className="flex flex-col h-full overflow-auto max-h-[500px]"
+            <div></div>
+            <div className="flex flex-col flex-1 gap-2">
+              <h3 className="font-semibold">Punten verdiend per deelnemer</h3>
+              <div
+                style={container}
+                className="flex flex-col h-full overflow-auto max-h-[240px]"
+              >
+                <DataTable
+                  value={pointsPerUser}
+                  dataKey="userId"
+                  sortField="totalPoints"
+                  loading={pointsStatus === 'loading'}
+                  sortOrder={-1}
+                  emptyMessage="Niemand heeft punten verdiend"
+                  className=""
                 >
-                  <div className="flex gap-4">
-                    <Chip
-                      label="Etappe"
-                      Icon={FlagIcon}
-                      active={resultStatus === ResultType.STAGE}
-                      onClick={() => setResultStatus(ResultType.STAGE)}
-                    />
-                    <Chip
-                      label="GC"
-                      Icon={Trophy}
-                      active={resultStatus === ResultType.GC}
-                      onClick={() => setResultStatus(ResultType.GC)}
-                    />
-                    <Chip
-                      label="Youth"
-                      Icon={UserIcon}
-                      active={resultStatus === ResultType.YOUNG}
-                      onClick={() => setResultStatus(ResultType.YOUNG)}
-                    />
-                    <Chip
-                      label="Points"
-                      Icon={Star}
-                      active={resultStatus === ResultType.POINTS}
-                      onClick={() => setResultStatus(ResultType.POINTS)}
-                    />
-                    <Chip
-                      label="Mountain"
-                      Icon={Mountain}
-                      active={resultStatus === ResultType.MOUNTAIN}
-                      onClick={() => setResultStatus(ResultType.MOUNTAIN)}
-                    />
-                  </div>
-                  <DataTable
-                    paginator
-                    rows={5}
-                    loading={resultLoading}
-                    value={
-                      resultStatus === ResultType.STAGE
-                        ? stageResultsState
-                        : resultStatus === ResultType.GC
-                          ? stageGCResultsState
-                          : []
-                    }
-                    dataKey="id"
-                    sortField="position"
-                    sortOrder={1}
-                    emptyMessage="Geen resultaten gevonden"
-                    className=""
-                  >
-                    <Column field="position" header="Plaats" />
-                    <Column field="cyclistName" header="Naam" />
-                    {resultStatus === ResultType.STAGE ? (
-                      <Column field="time" header="Tijd" />
-                    ) : resultStatus === ResultType.GC ? (
-                      <Column field="time" header="Tijd" />
-                    ) : (
-                      []
-                    )}
-                  </DataTable>
-                </div>
+                  <Column field="fullName" header="Deelnemer" />
+                  <Column
+                    field="totalPoints"
+                    header="Punten"
+                    body={PointsChipBodyTemplate}
+                  />
+                </DataTable>
               </div>
             </div>
           </div>
-        ) : (
-          <div className="flex gap-10 w-full">
-            <div className="flex flex-1/2 flex-col gap-5">
-              <h3 className="font-semibold text-lg">
-                Overzicht {activeRace?.name}
+          <div className="flex flex-col flex-1/2 gap-10 w-full">
+            <div className="py-[6px]"></div>
+            <div className="flex flex-col flex-1 gap-2">
+              <h3 className="font-semibold gap-4 flex items-center">
+                <Chip
+                  label={'Uitslag Etappe'}
+                  Icon={Star}
+                  active={!resultPointsToggle}
+                  variant="primary"
+                  onClick={() => setResultPointsToggle(false)}
+                />
+                <Chip
+                  label={'Puntentelling'}
+                  Icon={Medal}
+                  active={resultPointsToggle}
+                  variant="primary"
+                  onClick={() => setResultPointsToggle(true)}
+                />{' '}
+                <Button
+                  outlined
+                  icon={() => (
+                    <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
+                  )}
+                  size="small"
+                  tooltip="Haal resultaten voor deze etappe op"
+                  tooltipOptions={{ showDelay: 500 }}
+                  className="!p-0 -translate-x-2 h-[48px] w-[48px] flex items-center !border-none justify-center"
+                  loading={scrapeResultLoading}
+                  onClick={() => {
+                    resetStageResultsScrapeStatus(),
+                      dispatch(
+                        getResultsByStageId(
+                          Number(Array.isArray(itemId) ? itemId[0] : itemId),
+                        ),
+                      );
+                  }}
+                />
               </h3>
-              <div></div>
-
-              <div className="flex w-full gap-5">
-                <div className="flex flex-col flex-1 gap-2">
-                  <h3 className="font-semibold">Afstand</h3>
-                  <div style={container} className="font-semibold text-xl">
-                    {activeRace?.distance} km
-                    <span className="text-sm font-normal">
-                      {activeRace?.distance !== undefined &&
-                        (Number(activeRace.distance) < 120
-                          ? 'Korte afstand'
-                          : Number(activeRace.distance) < 180
-                            ? 'Gemiddelde afstand'
-                            : Number(activeRace.distance) < 220
-                              ? 'Lange afstand'
-                              : 'Zeer lange afstand')}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex flex-col flex-1 gap-2">
-                  <h3 className="font-semibold">Type Rit</h3>
-                  <div style={container} className="font-semibold text-xl">
-                    {ParcoursTypeKeyMap[
-                      activeRace?.parcoursType as ParcoursType
-                    ] ?? 'Niet beschikbaar'}
-                    <span className="text-sm font-normal">
-                      {activeStage?.parcoursType
-                        ? parcoursDescriptions[
-                            activeRace?.parcoursType as ParcoursType
-                          ]
-                        : 'Geen parcoursinformatie'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div></div>
-              <div className="flex flex-col flex-1 gap-2">
-                <h3 className="font-semibold">Punten verdiend per deelnemer</h3>
-                <div
-                  style={container}
-                  className="flex flex-col h-full overflow-auto max-h-[300px]"
-                >
-                  <DataTable
-                    value={points}
-                    dataKey="userId"
-                    sortField="points"
-                    sortOrder={-1}
-                    emptyMessage="Geen resultaten gevonden"
-                    className=""
-                  >
-                    <Column field="fullName" header="Deelnemer" />
-                    <Column
-                      field="points"
-                      header="Punten"
-                      body={PointsChipBodyTemplate}
-                    />
-                  </DataTable>
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col flex-1/2 gap-10 w-full">
-              <div className="py-[10px]"></div>
-              <div className="flex flex-col flex-1 gap-2">
-                <h3 className="font-semibold">Uitslag Race</h3>
-                <div
-                  style={container}
-                  className="flex flex-col h-full overflow-auto max-h-[500px]"
-                >
+              <div
+                style={container}
+                className="flex flex-col h-full overflow-auto"
+              >
+                {!resultPointsToggle ? (
+                  <>
+                    <div className="flex gap-4">
+                      <Chip
+                        label="Etappe"
+                        Icon={FlagIcon}
+                        variant="secondary"
+                        active={resultStatus === ResultType.STAGE}
+                        onClick={() => setResultStatus(ResultType.STAGE)}
+                      />
+                      <Chip
+                        label="GC"
+                        Icon={Trophy}
+                        variant="secondary"
+                        active={resultStatus === ResultType.GC}
+                        onClick={() => setResultStatus(ResultType.GC)}
+                      />
+                      <Chip
+                        label="Youth"
+                        Icon={UserIcon}
+                        variant="secondary"
+                        active={resultStatus === ResultType.YOUNG}
+                        onClick={() => setResultStatus(ResultType.YOUNG)}
+                      />
+                      <Chip
+                        label="Points"
+                        Icon={Star}
+                        variant="secondary"
+                        active={resultStatus === ResultType.POINTS}
+                        onClick={() => setResultStatus(ResultType.POINTS)}
+                      />
+                      <Chip
+                        label="Mountain"
+                        Icon={Mountain}
+                        variant="secondary"
+                        active={resultStatus === ResultType.MOUNTAIN}
+                        onClick={() => setResultStatus(ResultType.MOUNTAIN)}
+                      />
+                    </div>
+                    <DataTable
+                      paginator
+                      rows={5}
+                      loading={stageResultsStatus === 'loading'}
+                      value={
+                        resultStatus === ResultType.STAGE
+                          ? stageResultsState
+                          : resultStatus === ResultType.GC
+                            ? stageGCResultsState
+                            : []
+                      }
+                      dataKey="id"
+                      sortField="position"
+                      sortOrder={1}
+                      emptyMessage="Geen resultaten gevonden"
+                      className=""
+                    >
+                      <Column field="position" header="Plaats" />
+                      <Column field="cyclistName" header="Naam" />
+                      {resultStatus === ResultType.STAGE ? (
+                        <Column body={TimeBodyTemplate} header="Tijd" />
+                      ) : resultStatus === ResultType.GC ? (
+                        <Column body={TimeBodyTemplate} header="Tijd" />
+                      ) : (
+                        []
+                      )}
+                    </DataTable>{' '}
+                  </>
+                ) : (
                   <DataTable
                     paginator
                     rows={5}
-                    loading={resultLoading}
+                    loading={stageResultsStatus === 'loading'}
+                    value={enrichedCyclistPoints}
+                    dataKey="id"
+                    sortField="reason"
+                    sortOrder={1}
+                    emptyMessage="Geen resultaten gevonden!"
+                  >
+                    <Column field="fullName" header="Deelnemer" />
+                    <Column field="cyclistName" header="Wielrenner" />
+                    <Column field="reason" header="Reden" />
+                    <Column field="points" header="Punten" />
+                  </DataTable>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex gap-10 w-full">
+          <div className="flex flex-1/2 flex-col gap-5">
+            <h3 className="font-semibold text-lg">
+              Overzicht {activeRace?.name}
+            </h3>
+            <div></div>
+
+            <div className="flex w-full gap-5">
+              <div className="flex flex-col flex-1 gap-2">
+                <h3 className="font-semibold">Afstand</h3>
+                <div style={container} className="font-semibold text-xl">
+                  {activeRace?.distance} km
+                  <span className="text-sm font-normal">
+                    {activeRace?.distance !== undefined &&
+                      (Number(activeRace.distance) < 120
+                        ? 'Korte afstand'
+                        : Number(activeRace.distance) < 180
+                          ? 'Gemiddelde afstand'
+                          : Number(activeRace.distance) < 220
+                            ? 'Lange afstand'
+                            : 'Zeer lange afstand')}
+                  </span>
+                </div>
+              </div>
+              <div className="flex flex-col flex-1 gap-2">
+                <h3 className="font-semibold">Type Rit</h3>
+                <div style={container} className="font-semibold text-xl">
+                  {ParcoursTypeKeyMap[
+                    activeRace?.parcoursType as ParcoursType
+                  ] ?? 'Niet beschikbaar'}
+                  <span className="text-sm font-normal">
+                    {activeStage?.parcoursType
+                      ? parcoursDescriptions[
+                          activeRace?.parcoursType as ParcoursType
+                        ]
+                      : 'Geen parcoursinformatie'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div></div>
+            <div className="flex flex-col flex-1 gap-2">
+              <h3 className="font-semibold">Punten verdiend per deelnemer</h3>
+              <div
+                style={container}
+                className="flex flex-col h-full overflow-auto max-h-[300px]"
+              >
+                <DataTable
+                  value={pointsPerUser}
+                  dataKey="userId"
+                  loading={pointsStatus === 'loading'}
+                  sortField="totalPoints"
+                  sortOrder={-1}
+                  emptyMessage="Geen resultaten gevonden"
+                  className=""
+                >
+                  <Column field="fullName" header="Deelnemer" />
+                  <Column
+                    field="totalPoints"
+                    header="Punten"
+                    body={PointsChipBodyTemplate}
+                  />
+                </DataTable>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col flex-1/2 gap-10 w-full">
+            <div className="py-[6px]"></div>
+            <div className="flex flex-col flex-1 gap-2">
+              <div className="flex gap-4">
+                <Chip
+                  label={'Uitslag Race'}
+                  Icon={Star}
+                  active={!resultPointsToggle}
+                  variant="primary"
+                  onClick={() => setResultPointsToggle(false)}
+                />
+                <Chip
+                  label={'Puntentelling'}
+                  Icon={Medal}
+                  active={resultPointsToggle}
+                  variant="primary"
+                  onClick={() => setResultPointsToggle(true)}
+                />
+              </div>
+              <div
+                style={container}
+                className="flex flex-col h-full overflow-auto max-h-[500px]"
+              >
+                {!resultPointsToggle ? (
+                  <DataTable
+                    paginator
+                    rows={5}
+                    loading={raceResultsStatus === 'loading'}
                     value={raceResultsState}
                     dataKey="id"
                     sortField="position"
@@ -676,14 +801,30 @@ const index = () => {
                   >
                     <Column field="position" header="Plaats" />
                     <Column field="cyclistName" header="Naam" />
-                    <Column field="time" header="Tijd" />
+                    <Column body={TimeBodyTemplate} header="Tijd" />
                   </DataTable>
-                </div>
+                ) : (
+                  <DataTable
+                    paginator
+                    rows={5}
+                    loading={raceResultsStatus === 'loading'}
+                    value={enrichedCyclistPoints}
+                    dataKey="id"
+                    sortField="reason"
+                    sortOrder={1}
+                    emptyMessage="Geen resultaten gevonden!"
+                  >
+                    <Column field="fullName" header="Deelnemer" />
+                    <Column field="cyclistName" header="Wielrenner" />
+                    <Column field="reason" header="Plaats" />
+                    <Column field="points" header="Punten" />
+                  </DataTable>
+                )}
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { requestLoggedInUser, setUser } from '@/features/user/user.slice';
 import { usePathname } from 'next/navigation';
 import router from 'next/router';
-import LoadingOverlay from './LoadingOverlay';
+import LoadingOverlay from '../LoadingOverlay';
 
 type CustomLayoutProps = {
   children: ReactNode;
@@ -37,7 +37,6 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
     if (userStatus === 'not-authenticated') {
       shouldBeRedirected();
       dispatch(setUser(null));
-      console.log('User not logged in', user);
     }
   }, [userStatus]);
 

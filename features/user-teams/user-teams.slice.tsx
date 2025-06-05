@@ -15,12 +15,16 @@ interface UserTeamsState {
   data: UserTeamDTO[];
   cyclistsWithDNS: CyclistDTO[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  updateStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+  error: string | null;
 }
 
 const initialState: UserTeamsState = {
   data: [],
   cyclistsWithDNS: [],
   status: 'idle',
+  updateStatus: 'idle',
+  error: null,
 };
 
 export const fetchUserTeam = createAsyncThunk(
@@ -164,6 +168,9 @@ const userTeamsSlice = createSlice({
     resetUserTeamsStatus: (state) => {
       state.status = 'idle';
     },
+    resetUserTeamsUpdateStatus: (state) => {
+      state.updateStatus = 'idle';
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -192,6 +199,15 @@ const userTeamsSlice = createSlice({
       )
       .addCase(fetchCyclistsWithDNS.rejected, (state) => {
         state.status = 'failed';
+      })
+      .addCase(postUpdateUserTeamMainCyclists.pending, (state) => {
+        state.updateStatus = 'loading';
+      })
+      .addCase(postUpdateUserTeamMainCyclists.fulfilled, (state) => {
+        state.updateStatus = 'succeeded';
+      })
+      .addCase(postUpdateUserTeamMainCyclists.rejected, (state) => {
+        state.updateStatus = 'failed';
       });
   },
 });
@@ -201,5 +217,6 @@ export const {
   removeCyclistFromUserTeamCylists,
   setUserTeams,
   resetUserTeamsStatus,
+  resetUserTeamsUpdateStatus,
 } = userTeamsSlice.actions;
 export default userTeamsSlice.reducer;

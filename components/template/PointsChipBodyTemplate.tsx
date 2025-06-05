@@ -9,7 +9,7 @@ import {
   Circle,
   Minus,
 } from 'lucide-react';
-import TableChip from './TableChip'; // Adjust the import path as needed
+import TableChip from '../TableChip'; // Adjust the import path as needed
 
 // Function to categorize and style points based on ranges
 const getPointsChipProps = (points: number) => {
@@ -151,7 +151,7 @@ const getPointsChipPropsPercentile = (points: number, allPoints: number[]) => {
 
 // Body template for points column
 const PointsChipBodyTemplate = (rowData: any) => {
-  const points = rowData.points;
+  const points = rowData.totalPoints;
 
   if (points === undefined || points === null) {
     return <span>-</span>;

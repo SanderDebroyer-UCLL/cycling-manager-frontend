@@ -67,6 +67,12 @@ const competitionSlice = createSlice({
     resetCompetitionStatus(state) {
       state.status = 'idle';
     },
+    resetCompetitonData(state) {
+      state.competition = null;
+      state.competitionDTO = null;
+      state.status = 'idle';
+      state.error = null;
+    },
     updateCompetition(
       state,
       action: PayloadAction<{
@@ -193,5 +199,6 @@ export const {
   updateCompetitionPick,
   updateCyclistCount,
   updateReserveCyclistCount,
+  resetCompetitonData,
 } = competitionSlice.actions;
 export default competitionSlice.reducer;

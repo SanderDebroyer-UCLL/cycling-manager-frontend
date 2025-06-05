@@ -1,12 +1,12 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import Navbar from './navbar';
 import { useDispatch, useSelector } from 'react-redux';
 import { requestLoggedInUser, setUser } from '@/features/user/user.slice';
 import { AppDispatch, RootState } from '@/store/store';
 import { usePathname } from 'next/navigation';
 import router from 'next/router';
 import Head from 'next/head';
-import LoadingOverlay from './LoadingOverlay';
+import LoadingOverlay from '../LoadingOverlay';
+import Navbar from '../navbar';
 
 type LayoutProps = {
   children: ReactNode;
@@ -42,7 +42,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (userStatus === 'not-authenticated') {
       shouldBeRedirected();
       dispatch(setUser(null));
-      console.log('User not logged in', user);
     }
   }, [userStatus]);
 
