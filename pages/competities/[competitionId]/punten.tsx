@@ -99,7 +99,7 @@ const punten = () => {
                 style={container}
                 className="flex flex-col h-full overflow-auto max-h-[75vh]"
               >
-                <DataTable value={eindAlgemeen}>
+                <DataTable value={eindPunten}>
                   <Column field="position" header="Positie" />
                   <Column field="points" header="Punten" />
                 </DataTable>

@@ -128,12 +128,6 @@ const index = () => {
     hasFetched.current = true;
   }, [competition, user, dispatch]);
 
-  useEffect(() => {
-    if (mainReservePointsCyclist && !initialPoints) {
-      setInitialPoints(mainReservePointsCyclist);
-    }
-  }, [mainReservePointsCyclist, initialPoints]);
-
   // Reset when competition changes AND cleanup on unmount
   useEffect(() => {
     // Reset when competition ID changes
@@ -199,7 +193,7 @@ const index = () => {
       dispatch(fetchCyclists());
     }
     if (
-      !mainReservePointsCyclist &&
+      competition?.competitionStatus === CompetitionStatus.STARTED &&
       pointsStatus === 'idle' &&
       user &&
       competition
@@ -229,6 +223,7 @@ const index = () => {
     mainReservePointsCyclist,
     user,
     competition,
+    competition?.competitionStatus,
     dispatch,
   ]);
 
@@ -492,6 +487,8 @@ const index = () => {
       return;
     }
 
+    setInitialPoints(mainReservePointsCyclist);
+
     const { cyclistId, cyclistName } = PointsPerCyclist;
 
     const updatedMainReservePointsCyclist: MainReservePointsCyclist = {
@@ -570,7 +567,6 @@ const index = () => {
     if (!initialPoints) {
       return;
     }
-    console.log('Resetting changes to initial points', initialPoints);
     dispatch(updateMainReservePointsCyclist(initialPoints));
   };
 
@@ -623,9 +619,7 @@ const index = () => {
     (competition.competitionStatus === CompetitionStatus.STARTED &&
       cyclistsState.length === 0) ||
     (competition.competitionStatus === CompetitionStatus.STARTED &&
-      !mainReservePointsCyclist) ||
-    (competition.competitionStatus === CompetitionStatus.STARTED &&
-      !initialPoints)
+      !mainReservePointsCyclist)
   ) {
     return (
       <>
