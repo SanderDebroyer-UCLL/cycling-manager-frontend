@@ -18,7 +18,7 @@ export const scrapeCyclists = async () => {
   const res = await fetch(
     process.env.NEXT_PUBLIC_API_URL + '/cyclists/scrape',
     {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
