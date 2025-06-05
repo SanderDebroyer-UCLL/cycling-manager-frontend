@@ -25,9 +25,9 @@ import RaceChipBodyTemplate from '@/components/template/RaceChipBodyTemplate';
 
 export default function Overview() {
   const dispatch = useDispatch<AppDispatch>();
-  const users = useSelector((state: RootState) => state.users.data);
+  const users: UserDTO[] = useSelector((state: RootState) => state.users.data);
   const usersStatus = useSelector((state: RootState) => state.users.status);
-  const competitions = useSelector(
+  const competitions: CompetitionDTO[] = useSelector(
     (state: RootState) => state.competitions.data,
   );
   const competitionsStatus = useSelector(
