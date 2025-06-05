@@ -13,19 +13,12 @@ type CustomLayoutProps = {
 
 const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const [loading, setLoading] = useState(true);
 
   const user = useSelector((state: RootState) => state.user.userDTO);
   const userStatus = useSelector((state: RootState) => state.user.status);
 
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
-
-  useEffect(() => {
-    const email = sessionStorage.getItem('email');
-    const jwtToken = sessionStorage.getItem('jwtToken');
-    setLoading(false);
-  }, [dispatch]);
 
   useEffect(() => {
     if (!user && userStatus === 'idle') {
@@ -46,7 +39,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
     }
   };
 
-  if (loading || !user) {
+  if (!user) {
     return <LoadingOverlay />;
   }
 

@@ -49,6 +49,9 @@ const index = () => {
   const competitionStatus = useSelector(
     (state: RootState) => state.competition.status,
   );
+  const fetchCompetitionStatus = useSelector(
+    (state: RootState) => state.competition.fetchCompetitionStatus,
+  );
   const cyclistWithDNS = useSelector(
     (state: RootState) => state.userTeams.cyclistsWithDNS,
   );
@@ -56,7 +59,6 @@ const index = () => {
   const pointsPerUserStatus = useSelector(
     (state: RootState) => state.points.status,
   );
-  const raceStatus = useSelector((state: RootState) => state.race.status);
   const userTeamsStatus = useSelector(
     (state: RootState) => state.userTeams.status,
   );
@@ -186,13 +188,6 @@ const index = () => {
     setDates(competitionStats.dateRange);
   }, [competitionStats]);
 
-  // Handle race status loading state
-  useEffect(() => {
-    if (raceStatus === 'loading' || competitionStatus === 'loading') {
-      setUpdateRaceDataLoading(raceStatus === 'loading');
-    }
-  }, [raceStatus]);
-
   useEffect(() => {
     if (!competitionIdNumber) return;
     if (competitionData.hasStages === null) return;
@@ -292,7 +287,7 @@ const index = () => {
             tooltip="Haal alle etappes en startlijsten op"
             tooltipOptions={{ showDelay: 500 }}
             className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
-            loading={updateRaceDataLoading}
+            loading={fetchCompetitionStatus === 'loading'}
             onClick={handleRefreshData}
           />
         </h2>

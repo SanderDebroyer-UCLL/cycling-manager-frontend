@@ -3,7 +3,7 @@ import CompetitieLayout from '@/components/layout/competitieLayout';
 import { container } from '@/const/containerStyle';
 import { ResultType } from '@/const/resultType';
 import { Column } from 'primereact/column';
-import { Mountain, Star, Trophy, UserIcon } from 'lucide-react';
+import { Mountain, Star, Trophy, UserIcon, Users } from 'lucide-react';
 import React, { ReactNode, use, useEffect, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { StageResult } from '@/types/race';
@@ -122,7 +122,7 @@ const klassement = () => {
           />
           <Chip
             label="Teams"
-            Icon={UserIcon}
+            Icon={Users}
             active={!competitionResults}
             onClick={() => setCompetitionResults(false)}
             variant={'primary'}
