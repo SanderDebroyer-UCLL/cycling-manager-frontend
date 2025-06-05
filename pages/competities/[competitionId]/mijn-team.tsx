@@ -489,7 +489,7 @@ const index = () => {
 
     setInitialPoints(mainReservePointsCyclist);
 
-    const { cyclistId, cyclistName } = PointsPerCyclist;
+    const { cyclistId, cyclistName, points } = PointsPerCyclist;
 
     const updatedMainReservePointsCyclist: MainReservePointsCyclist = {
       mainCyclists: mainReservePointsCyclist.mainCyclists.filter(
@@ -500,7 +500,7 @@ const index = () => {
         {
           cyclistName,
           cyclistId,
-          points: 0,
+          points,
           isCyclistActive: false,
           userId: 0,
         },
