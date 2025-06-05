@@ -722,7 +722,7 @@ const index = () => {
                       resultStatus === ResultType.YOUTH ? (
                         <Column body={TimeBodyTemplate} header="Tijd" />
                       ) : (
-                        <></>
+                        <Column field="point" header="Punten" />
                       )}
                     </DataTable>{' '}
                   </>
