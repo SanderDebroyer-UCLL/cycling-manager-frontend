@@ -382,6 +382,8 @@ const index = () => {
               <DataTable
                 selectionMode="single"
                 selection={null}
+                sortField="name"
+                sortOrder={1}
                 loading={
                   competitionData.hasStages
                     ? competitionStatus === 'loading' &&
