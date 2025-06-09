@@ -12,24 +12,19 @@ export const containerShadow: CSSProperties = {
   border: '1px solid #b3c4d6',
 };
 
-export const container: CSSProperties = {
+export const container: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   backgroundColor: '#ECEEF4',
   borderRadius: '0.75rem',
   padding: '1rem',
   gap: '0.5rem',
-  // border: '1px solid #b3c4d6',
+  animation: 'fadeIn 500ms cubic-bezier(0.22, 1, 0.36, 1)',
 };
 
-export const containerLargerPadding: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  backgroundColor: '#ECEEF4',
-  borderRadius: '0.75rem',
+export const containerLargerPadding: React.CSSProperties = {
+  ...container,
   padding: '1.5rem',
-  gap: '0.5rem',
-  // border: '1px solid #b3c4d6',
 };
 
 export const oldContainer: CSSProperties = {

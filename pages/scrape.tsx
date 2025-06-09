@@ -1,3 +1,4 @@
+import AnimatedContent from '@/components/AnimatedContent';
 import Spacer from '@/components/Spacer';
 import { container } from '@/const/containerStyle';
 import { fetchScrapeAllCompetitionResults } from '@/features/competition/competition.slice';
@@ -14,9 +15,21 @@ const scrape = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   return (
-    <div className="p-10 flex flex-col gap-8 max-w-[70vw] mx-auto">
-      <h2 className="text-xl font-bold">Overzicht van alle scrapes</h2>
-      <div className="flex gap-10">
+    <div className="p-20 flex flex-col gap-4 max-w-[80vw] mx-auto">
+      <AnimatedContent
+        distance={15}
+        direction="vertical"
+        reverse={false}
+        duration={0.7}
+        ease="power3.out"
+        initialOpacity={0}
+        animateOpacity
+        scale={1}
+        delay={0}
+      >
+        <h2 className="text-xl font-bold">Overzicht van alle scrapes</h2>
+      </AnimatedContent>
+      <div className="flex gap-10 w-full">
         <div style={container} className="!p-10 rounded-xl">
           <div className="flex gap-8">
             {/* First Column */}

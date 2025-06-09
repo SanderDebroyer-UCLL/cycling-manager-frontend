@@ -18,10 +18,12 @@ import image4 from '@/public/images/4.webp';
 import image5 from '@/public/images/5.webp';
 import image6 from '@/public/images/6.webp';
 import image7 from '@/public/images/7.webp';
+import image8 from '@/public/images/8.webp';
 import tdfBanner from '@/public/images/tdf_banner.webp';
 import giroBanner from '@/public/images/giro_banner.webp';
 import vueltaBanner from '@/public/images/vuelta_banner.webp';
 import RaceChipBodyTemplate from '@/components/template/RaceChipBodyTemplate';
+import AnimatedContent from '@/components/AnimatedContent';
 
 export default function Overview() {
   const dispatch = useDispatch<AppDispatch>();
@@ -69,13 +71,25 @@ export default function Overview() {
   }
 
   return (
-    <main className="max-w-[80vw] mx-auto p-20 text-dark-700 class flex flex-col gap-12">
+    <main className="p-20 flex flex-col gap-4 max-w-[80vw] mx-auto">
       <div className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold">Actieve Competities</h2>
+        <AnimatedContent
+          distance={15}
+          direction="vertical"
+          reverse={false}
+          duration={0.7}
+          ease="power3.out"
+          initialOpacity={0}
+          animateOpacity
+          scale={1}
+          delay={0}
+        >
+          <h2 className="text-xl font-semibold ">Actieve Competities</h2>
+        </AnimatedContent>
         <div className="rounded-xl overflow-hidden">
           <div
             style={containerLargerPadding}
-            className="w-full !h-70 !flex-row !gap-8 overflow-x-auto"
+            className="w-full !h-70 !flex-row !gap-8 overflow-x-auto overflow-y-hidden"
           >
             {[
               ...competitions.filter(
@@ -85,64 +99,87 @@ export default function Overview() {
             ]
               .sort((a, b) => a.name.localeCompare(b.name))
               .map((competition: CompetitionDTO, index) => (
-                <div
-                  className="relative rounded-xl shadow-md overflow-hidden h-full w-full min-w-95"
+                <AnimatedContent
+                  distance={0}
+                  direction="vertical"
+                  reverse={false}
+                  duration={1}
+                  ease="power3.out"
+                  initialOpacity={0.7}
+                  animateOpacity
+                  scale={0.98}
+                  delay={index * 0.2}
                   key={competition.name}
                 >
-                  <Link href={`competities/${competition.id}`}>
-                    <Image
-                      src={
-                        competition.races.some((race) =>
-                          race.name
-                            .toLocaleLowerCase()
-                            .includes('tour de france'),
-                        )
-                          ? tdfBanner
-                          : competition.races.some((race) =>
-                                race.name
-                                  .toLocaleLowerCase()
-                                  .includes("giro d'italia"),
-                              )
-                            ? giroBanner
+                  <div className="relative rounded-xl shadow-md overflow-hidden h-full w-full min-w-95">
+                    <Link href={`competities/${competition.id}`}>
+                      <Image
+                        src={
+                          competition.races.some((race) =>
+                            race.name
+                              .toLocaleLowerCase()
+                              .includes('tour de france'),
+                          )
+                            ? tdfBanner
                             : competition.races.some((race) =>
                                   race.name
                                     .toLocaleLowerCase()
-                                    .includes('vuelta'),
+                                    .includes("giro d'italia"),
                                 )
-                              ? vueltaBanner
-                              : [
-                                  image1,
-                                  image2,
-                                  image3,
-                                  image4,
-                                  image5,
-                                  image6,
-                                  image7,
-                                ][index % 7]
-                      }
-                      alt={competition.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover"
-                    />
+                              ? giroBanner
+                              : competition.races.some((race) =>
+                                    race.name
+                                      .toLocaleLowerCase()
+                                      .includes('vuelta'),
+                                  )
+                                ? vueltaBanner
+                                : [
+                                    image1,
+                                    image2,
+                                    image8,
+                                    image3,
+                                    image4,
+                                    image5,
+                                    image6,
+                                    image7,
+                                  ][index % 8]
+                        }
+                        alt={competition.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover"
+                      />
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-0" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-0" />
 
-                    <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col gap-2 text-white font-medium font-manrope z-10">
-                      <div className="text-2xl">{competition.name}</div>
-                      <div className="flex flex-wrap gap-2">
-                        <RaceChipBodyTemplate competition={competition} />
+                      <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col gap-2 text-white font-medium font-manrope z-10">
+                        <div className="text-2xl">{competition.name}</div>
+                        <div className="flex flex-wrap gap-2">
+                          <RaceChipBodyTemplate competition={competition} />
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                </div>
+                    </Link>
+                  </div>
+                </AnimatedContent>
               ))}
           </div>
         </div>
       </div>
       <div className="flex flex-row gap-4">
         <div className="flex flex-col gap-4 w-full flex-1/4">
-          <h2 className="text-xl font-semibold">Klassement</h2>
+          <AnimatedContent
+            distance={15}
+            direction="vertical"
+            reverse={false}
+            duration={0.7}
+            ease="power3.out"
+            initialOpacity={0}
+            animateOpacity
+            scale={1}
+            delay={0}
+          >
+            <h2 className="text-xl font-semibold">Klassement</h2>
+          </AnimatedContent>
           <div
             style={container}
             className="w-fit h-80 bg-surface flex flex-col justify-center gap-6 rounded-xl overflow-hidden p-8"
@@ -189,7 +226,19 @@ export default function Overview() {
           </div>
         </div>
         <div className="flex flex-col gap-4 w-full flex-3/4">
-          <h2 className="text-xl font-semibold">Algemeen klassement</h2>
+          <AnimatedContent
+            distance={15}
+            direction="vertical"
+            reverse={false}
+            duration={0.7}
+            ease="power3.out"
+            initialOpacity={0}
+            animateOpacity
+            scale={1}
+            delay={0}
+          >
+            <h2 className="text-xl font-semibold">Algemeen klassement</h2>
+          </AnimatedContent>
           <div className="overflow-hidden rounded-xl">
             <div
               style={container}
