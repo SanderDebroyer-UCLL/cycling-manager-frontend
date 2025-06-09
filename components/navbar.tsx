@@ -74,7 +74,7 @@ const navbar = () => {
                 <li
                   className={`h-16 flex items-center border-b-4 border-transparent pt-1 ${isActive('/scrape') ? '!border-primary' : 'text-dark-700'}`}
                 >
-                  Data Ophalen
+                  Admin
                 </li>
               </Link>
             )}

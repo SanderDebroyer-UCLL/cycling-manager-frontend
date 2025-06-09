@@ -34,6 +34,7 @@ import {
   fetchStagePointsForCompetitionId,
 } from '@/features/points/points.slice';
 import TotalPointsChipBodyTemplate from '@/components/template/TotalPointsChipBodyTemplate';
+import CountUp from '@/components/CountUp';
 
 const index = () => {
   const router = useRouter();
@@ -238,7 +239,8 @@ const index = () => {
     !competition ||
     !competitionData ||
     !cyclistWithDNS ||
-    !competition.races
+    !competition.races ||
+    !dates
   ) {
     return <LoadingOverlay />;
   }
@@ -312,7 +314,17 @@ const index = () => {
                 style={container}
                 className="flex flex-col justify-center gap-2 font-semibold text-xl"
               >
-                {totalDistance} km
+                <div className="">
+                  <CountUp
+                    from={0}
+                    to={totalDistance}
+                    separator=","
+                    direction="up"
+                    duration={0.15}
+                    className="count-up-text"
+                  />{' '}
+                  km
+                </div>
                 <span className="text-sm font-normal">
                   verdeeld over {competitionData.itemCount}{' '}
                   {competitionData.itemType}
@@ -330,28 +342,50 @@ const index = () => {
                 style={container}
                 className="flex flex-col justify-center gap-2 font-semibold text-xl"
               >
-                {competitionData.hasStages
-                  ? `${totalElevation} m`
-                  : `${Math.ceil(
-                      (new Date(
-                        [...(competitionData.items as RaceDTO[])].sort(
-                          (a, b) =>
-                            new Date(a.startDate).getTime() -
-                            new Date(b.startDate).getTime(),
-                        )[competitionData.items.length - 1].endDate,
-                      ).getTime() -
-                        new Date(
+                {competitionData.hasStages ? (
+                  <p>
+                    <CountUp
+                      from={0}
+                      to={totalElevation}
+                      separator=","
+                      direction="up"
+                      duration={0.15}
+                      className="count-up-text"
+                    />
+                    m
+                  </p>
+                ) : (
+                  <p>
+                    <CountUp
+                      from={0}
+                      to={Math.ceil(
+                        (new Date(
                           [...(competitionData.items as RaceDTO[])].sort(
                             (a, b) =>
                               new Date(a.startDate).getTime() -
                               new Date(b.startDate).getTime(),
-                          )[0].startDate,
-                        ).getTime()) /
-                        (1000 * 60 * 60 * 24),
-                    )} dagen`}
+                          )[competitionData.items.length - 1].endDate,
+                        ).getTime() -
+                          new Date(
+                            [...(competitionData.items as RaceDTO[])].sort(
+                              (a, b) =>
+                                new Date(a.startDate).getTime() -
+                                new Date(b.startDate).getTime(),
+                            )[0].startDate,
+                          ).getTime()) /
+                          (1000 * 60 * 60 * 24),
+                      )}
+                      separator=","
+                      direction="up"
+                      duration={0.15}
+                      className="count-up-text"
+                    />{' '}
+                    dagen
+                  </p>
+                )}
                 <span className="text-sm font-normal">
                   {competitionData.hasStages
-                    ? `Dat is ${(totalElevation / 1.82).toFixed(0)} keer Niels`
+                    ? `Dat is ${(totalElevation / 1909).toFixed(0)} keer de Mont Ventoux`
                     : `Van eerste tot laatste koers`}
                 </span>
               </div>

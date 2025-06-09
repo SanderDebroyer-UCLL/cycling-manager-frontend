@@ -25,6 +25,7 @@ import { Race } from '@/types/race';
 import LinkBodyTemplate from '@/components/template/LinkBodyTemplate';
 import { container } from '@/const/containerStyle';
 import { showErrorToast } from '@/services/toast.service';
+import AnimatedContent from '@/components/AnimatedContent';
 
 const Index = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -145,10 +146,37 @@ const Index = () => {
 
   return (
     <>
-      <div className="p-20 flex flex-col gap-8 max-w-[80vw] mx-auto">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Actieve Competities</h2>
-          <Button label="Creëer Competitie" onClick={() => setVisible(true)} />
+      <div className="p-20 flex flex-col gap-4 max-w-[80vw] mx-auto">
+        <div className="flex justify-between items-center  h-[28px]">
+          <AnimatedContent
+            distance={15}
+            direction="vertical"
+            reverse={false}
+            duration={0.7}
+            ease="power3.out"
+            initialOpacity={0}
+            animateOpacity
+            scale={1}
+            delay={0}
+          >
+            <h2 className="text-xl font-semibold">Actieve Competities</h2>
+          </AnimatedContent>
+          <AnimatedContent
+            distance={0}
+            direction="vertical"
+            reverse={false}
+            duration={0.7}
+            ease="power3.out"
+            initialOpacity={0}
+            animateOpacity
+            scale={1}
+            delay={0}
+          >
+            <Button
+              label="Creëer Competitie"
+              onClick={() => setVisible(true)}
+            />
+          </AnimatedContent>
         </div>
         <div
           style={container}

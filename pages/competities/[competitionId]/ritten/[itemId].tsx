@@ -51,6 +51,8 @@ import React, { ReactNode, use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PointsChipBodyTemplate from '@/components/template/PointsChipBodyTemplate';
 import TimeBodyTemplate from '@/components/template/TimeBodyTemplate';
+import AnimatedContent from '@/components/AnimatedContent';
+import { format, isValid, parse } from 'date-fns';
 
 const index = () => {
   const router = useRouter();
@@ -419,7 +421,7 @@ const index = () => {
     });
   };
 
-  if (!competition) {
+  if (!competition || competition.races.length === 0) {
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-surface z-9999">
         <ProgressSpinner
@@ -467,17 +469,29 @@ const index = () => {
               const dateStr = fullDate.toLocaleDateString('nl');
 
               return (
-                <SelectableCard
+                <AnimatedContent
+                  distance={0}
+                  direction="vertical"
+                  reverse={false}
+                  duration={1}
+                  ease="power3.out"
+                  initialOpacity={0.3}
+                  animateOpacity
+                  scale={1}
+                  delay={index * 0.05 + 0.1}
                   key={stage.id}
-                  title={`Stage ${index + 1}`}
-                  subtitle={stage.name.split('|')[1]}
-                  date={dateStr}
-                  selected={stage.id.toString() === itemId}
-                  onClick={() => {
-                    onSelectStage(stage);
-                    dispatch(resetStageResultsStatus());
-                  }}
-                />
+                >
+                  <SelectableCard
+                    title={`Stage ${index + 1}`}
+                    subtitle={stage.name.split('|')[1]}
+                    date={dateStr}
+                    selected={stage.id.toString() === itemId}
+                    onClick={() => {
+                      onSelectStage(stage);
+                      dispatch(resetStageResultsStatus());
+                    }}
+                  />
+                </AnimatedContent>
               );
             })
           : competition.races.map((race, index) => (
@@ -504,7 +518,10 @@ const index = () => {
             <div className="flex w-full gap-5">
               <div className="flex flex-col flex-1 gap-2">
                 <h3 className="font-semibold">Afstand</h3>
-                <div style={container} className="font-semibold text-xl">
+                <div
+                  style={container}
+                  className="font-semibold text-xl min-h-[88px]"
+                >
                   {activeStage?.distance} km
                   <span className="text-sm font-normal">
                     {activeStage?.distance !== undefined &&
@@ -522,7 +539,10 @@ const index = () => {
               </div>
               <div className="flex flex-col flex-1 gap-2">
                 <h3 className="font-semibold">Hoogtemeters</h3>
-                <div style={container} className="font-semibold text-xl">
+                <div
+                  style={container}
+                  className="font-semibold text-xl min-h-[88px]"
+                >
                   {activeStage?.verticalMeters} m
                   <span className="text-sm font-normal">
                     {activeStage?.verticalMeters !== undefined &&
@@ -542,25 +562,51 @@ const index = () => {
             <div className="flex w-full gap-5">
               <div className="flex flex-col flex-1 gap-2">
                 <h3 className="font-semibold">Lokale Starttijd</h3>
-                <div style={container} className="font-semibold text-xl">
-                  {activeStage?.startTime &&
-                  activeStage.startTime !== '-' &&
-                  activeStage.startTime.includes('(')
-                    ? activeStage.startTime.split('(')[0]
-                    : 'Nog niet beschikbaar'}
+                <div
+                  style={container}
+                  className="font-semibold text-xl min-h-[88px]"
+                >
+                  {(() => {
+                    const st = activeStage?.startTime;
+                    if (!st || st === '-') return 'Nog niet beschikbaar';
+
+                    const hasOffset = st.includes('(');
+                    const mainTimeStr = hasOffset
+                      ? st.split('(')[0].trim()
+                      : st.trim();
+                    const offsetStr = hasOffset
+                      ? st.split('(')[1].split(')')[0]
+                      : null;
+
+                    const parsedTime = parse(mainTimeStr, 'HH:mm', new Date());
+                    if (!isValid(parsedTime)) return 'Nog niet beschikbaar';
+
+                    return format(parsedTime, 'HH:mm');
+                  })()}
 
                   <span className="text-sm font-normal">
-                    {activeStage?.startTime &&
-                    activeStage.startTime !== '-' &&
-                    activeStage.startTime.includes('(')
-                      ? activeStage.startTime.split('(')[1].split(')')[0]
-                      : 'Wordt later aangekondigd'}
+                    {(() => {
+                      const st = activeStage?.startTime;
+                      if (!st || st === '-' || !st.includes('('))
+                        return 'Geen tijdzone info';
+
+                      const offsetPart = st.split('(')[1].split(')')[0];
+                      // Simple validation: check if offsetPart matches something like "HH:mm CET" loosely
+                      const offsetRegex = /^\d{2}:\d{2} [A-Z]{3}$/;
+                      if (!offsetRegex.test(offsetPart))
+                        return 'Geen tijdzone info';
+
+                      return offsetPart;
+                    })()}
                   </span>
                 </div>
               </div>
               <div className="flex flex-col flex-1 gap-2">
                 <h3 className="font-semibold">Type Rit</h3>
-                <div style={container} className="font-semibold text-xl">
+                <div
+                  style={container}
+                  className="font-semibold text-xl min-h-[88px]"
+                >
                   {ParcoursTypeKeyMap[
                     activeStage?.parcoursType as ParcoursType
                   ] ?? 'Niet beschikbaar'}
@@ -747,7 +793,10 @@ const index = () => {
             <div className="flex w-full gap-5">
               <div className="flex flex-col flex-1 gap-2">
                 <h3 className="font-semibold">Afstand</h3>
-                <div style={container} className="font-semibold text-xl">
+                <div
+                  style={container}
+                  className="font-semibold text-xl min-h-[88px]"
+                >
                   {activeRace?.distance} km
                   <span className="text-sm font-normal">
                     {activeRace?.distance !== undefined &&
@@ -763,7 +812,10 @@ const index = () => {
               </div>
               <div className="flex flex-col flex-1 gap-2">
                 <h3 className="font-semibold">Type Rit</h3>
-                <div style={container} className="font-semibold text-xl">
+                <div
+                  style={container}
+                  className="font-semibold text-xl min-h-[88px]"
+                >
                   {ParcoursTypeKeyMap[
                     activeRace?.parcoursType as ParcoursType
                   ] ?? 'Niet beschikbaar'}
@@ -814,6 +866,7 @@ const index = () => {
                   variant="primary"
                   onClick={() => setResultPointsToggle(false)}
                 />
+
                 <Chip
                   label={'Puntentelling'}
                   Icon={Medal}

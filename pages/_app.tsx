@@ -103,6 +103,18 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
         <div className="bg-surface-container-lowest">
           {getLayout(<Component {...pageProps} />)}
         </div>
+        <style>
+          {`
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  `}
+        </style>
       </Provider>
     </PrimeReactProvider>
   );
