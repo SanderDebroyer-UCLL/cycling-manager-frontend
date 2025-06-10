@@ -107,7 +107,7 @@ const Index = () => {
     }
 
     if (!selectedUsers || selectedUsers.length === 0) {
-      setSelectedUsersError('Selecteer ten minste 1 deelnemer');
+      setSelectedUsersError('Selecteer ten minste 1 deelnFemer');
       hasError = true;
     }
 

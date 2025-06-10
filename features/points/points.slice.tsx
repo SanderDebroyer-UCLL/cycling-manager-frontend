@@ -1,6 +1,7 @@
 // src/features/user/userSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import {
+  createStagePoints,
   getStagePointsForAllStages,
   getStagePointsForCompetitionId,
   getStagePointsForStage,
@@ -12,6 +13,7 @@ import {
   PointsReason,
 } from '@/types/points';
 import {
+  createRacePoints,
   getRacePointsForAllRaces,
   getRacePointsForCompetitionId,
   getRacePointsForRace,
@@ -24,6 +26,8 @@ interface PointsState {
   mainReservePointsCyclist: MainReservePointsCyclist | null;
   mainReservePointsCyclistPerEvent: MainReservePointsCyclist | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  createPointsStatus?: 'idle' | 'loading' | 'succeeded' | 'failed';
+  error: string | null;
 }
 
 const initialPointsState: PointsState = {
@@ -33,7 +37,36 @@ const initialPointsState: PointsState = {
   mainReservePointsCyclist: null,
   mainReservePointsCyclistPerEvent: null,
   status: 'idle',
+  error: null,
 };
+
+type PointType = 'Stage' | 'Race';
+
+interface CreatePointsParams {
+  stageId?: number;
+  raceId?: number;
+  competitionId: number;
+  value: number;
+  reason: string;
+  type: PointType;
+}
+
+export const postCreatePoints = createAsyncThunk(
+  'points/createPoints',
+  async (params: CreatePointsParams) => {
+    const { stageId, raceId, competitionId, value, reason, type } = params;
+
+    if (type === 'Stage') {
+      if (!stageId) throw new Error('stageId is required for stage points');
+      return await createStagePoints({ stageId, competitionId, value, reason });
+    } else if (type === 'Race') {
+      if (!raceId) throw new Error('raceId is required for race points');
+      return await createRacePoints({ raceId, competitionId, value, reason });
+    } else {
+      throw new Error('Invalid point type');
+    }
+  },
+);
 
 export const fetchStagePointsForStage = createAsyncThunk(
   'stagePointss/fetchStagePoints',
@@ -93,6 +126,9 @@ const Slice = createSlice({
   reducers: {
     resetPointsStatus(state) {
       state.status = 'idle';
+    },
+    resetCreatePointsStatus(state) {
+      state.createPointsStatus = 'idle';
     },
     resetPointsData(state) {
       state.points = [];
@@ -197,6 +233,20 @@ const Slice = createSlice({
       )
       .addCase(fetchRacePointsForCompetitionId.rejected, (state) => {
         state.status = 'failed';
+      })
+      .addCase(postCreatePoints.pending, (state) => {
+        state.createPointsStatus = 'loading';
+      })
+      .addCase(
+        postCreatePoints.fulfilled,
+        (state, action: PayloadAction<Points>) => {
+          state.createPointsStatus = 'succeeded';
+          state.points.push(action.payload);
+        },
+      )
+      .addCase(postCreatePoints.rejected, (state, action) => {
+        state.createPointsStatus = 'failed';
+        state.error = action.error.message || 'Mislukt om punten aan te maken';
       });
   },
 });
@@ -206,6 +256,7 @@ export const {
   updateMainReservePointsCyclist,
   setPointsPerCyclist,
   resetPointsData,
+  resetCreatePointsStatus,
 } = Slice.actions;
 
 export default Slice.reducer;

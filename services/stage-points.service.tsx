@@ -75,6 +75,37 @@ export const getStagePointsForAllStages = async (
   return data;
 };
 
+export const createStagePoints = async (params: {
+  stageId: number;
+  competitionId: number;
+  value: number;
+  reason: string;
+}) => {
+  const { stageId, competitionId, value, reason } = params;
+
+  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/stagePoints', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
+    },
+    body: JSON.stringify({
+      stageId,
+      competitionId,
+      value,
+      reason,
+    }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error('Failed to create stage points');
+  }
+
+  return data;
+};
+
 export const StagePointsService = {
   getStagePointsForStage,
   getStagePointsForCompetitionId,
