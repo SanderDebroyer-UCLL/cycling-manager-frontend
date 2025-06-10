@@ -133,7 +133,7 @@ const Sidebar = () => {
         </Link>
 
         <div className="px-6 py-1 flex flex-col gap-4 uppercase text-md font-bold">
-          Wedstrijden
+          {competition.races[0].stages.length > 1 ? 'Wedstrijd' : 'Wedstrijden'}
         </div>
         <div className="flex flex-col pb-2">
           <Link
