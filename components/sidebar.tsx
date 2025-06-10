@@ -133,7 +133,7 @@ const Sidebar = () => {
         </Link>
 
         <div className="px-6 py-1 flex flex-col gap-4 uppercase text-md font-bold">
-          Wedstrijd
+          Wedstrijden
         </div>
         <div className="flex flex-col pb-2">
           <Link
@@ -148,7 +148,7 @@ const Sidebar = () => {
             className={` ${isActive('ritten') ? '!border-primary !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface hover:border-primary px-6 hover:font-semibold py-2`}
           >
             <Bike size={18} className="stroke-dark-700" />
-            Ritten
+            {competition.races[0].stages.length > 1 ? 'Etappes' : 'Wedstrijden'}
           </Link>
         </div>
 

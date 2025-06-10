@@ -200,7 +200,7 @@ const scrape = () => {
                 <label htmlFor="dd-stage">Stage Id</label>
               </FloatLabel>
               {errors.stageId && (
-                <small className="text-red-500">{errors.stageId}</small>
+                <small className="text-error">{errors.stageId}</small>
               )}
             </div>
           ) : (
@@ -215,7 +215,7 @@ const scrape = () => {
                 <label htmlFor="dd-race">Race Id</label>
               </FloatLabel>
               {errors.raceId && (
-                <small className="text-red-500">{errors.raceId}</small>
+                <small className="text-error">{errors.raceId}</small>
               )}
             </div>
           )}
@@ -230,7 +230,7 @@ const scrape = () => {
               <label htmlFor="">Hoeveelheid</label>
             </FloatLabel>
             {errors.value && (
-              <small className="text-red-500">{errors.value}</small>
+              <small className="text-error">{errors.value}</small>
             )}
           </div>
 
@@ -244,7 +244,7 @@ const scrape = () => {
               <label htmlFor="">Reden</label>
             </FloatLabel>
             {errors.reason && (
-              <small className="text-red-500">{errors.reason}</small>
+              <small className="text-error">{errors.reason}</small>
             )}
           </div>
           <div className="flex flex-col w-full gap-1">
@@ -272,7 +272,7 @@ const scrape = () => {
               <label htmlFor="dd-competition">Selecteer Competitie</label>
             </FloatLabel>
             {errors.competition && (
-              <small className="text-red-500">{errors.competition}</small>
+              <small className="text-error">{errors.competition}</small>
             )}
           </div>
 

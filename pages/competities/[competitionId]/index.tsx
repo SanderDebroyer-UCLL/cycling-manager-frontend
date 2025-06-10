@@ -408,7 +408,7 @@ const index = () => {
           </div>
 
           <div className="flex flex-col gap-2 flex-2/3">
-            <h3 className="font-semibold">Ritten</h3>
+            <h3 className="font-semibold">Etappes</h3>
             <div
               style={container}
               className="flex flex-col h-full overflow-auto"

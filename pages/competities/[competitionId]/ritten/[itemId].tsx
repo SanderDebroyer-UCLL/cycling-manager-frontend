@@ -438,10 +438,9 @@ const index = () => {
     <div className="flex flex-col gap-10 w-full">
       <div className="flex flex-col gap-6">
         <h2 className=" text-xl font-bold flex gap-4 items-center">
-          Ritten{' '}
           {competition.races[0].stages.length > 0
-            ? competition.races[0].name
-            : competition.name}
+            ? `Etappes ${competition.races[0].name}`
+            : `Wedstrijden ${competition.name}`}
           <Button
             raised
             icon={() => (
