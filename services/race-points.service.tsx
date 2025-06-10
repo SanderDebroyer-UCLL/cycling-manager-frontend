@@ -75,6 +75,40 @@ export const getRacePointsForCompetitionId = async (competitionId: number) => {
   return data;
 };
 
+export const createRacePoints = async ({
+  raceId,
+  competitionId,
+  value,
+  reason,
+}: {
+  raceId: number;
+  competitionId: number;
+  value: number;
+  reason: string;
+}) => {
+  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/racePoints', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: 'Bearer ' + sessionStorage.getItem('jwtToken'),
+    },
+    body: JSON.stringify({
+      raceId,
+      competitionId,
+      value,
+      reason,
+    }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error('Failed to create race points');
+  }
+
+  return data;
+};
+
 export const RacePointsService = {
   getRacePointsForRace,
   getRacePointsForCompetitionId,
