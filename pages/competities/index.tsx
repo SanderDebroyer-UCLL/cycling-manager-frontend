@@ -26,6 +26,7 @@ import LinkBodyTemplate from '@/components/template/LinkBodyTemplate';
 import { container } from '@/const/containerStyle';
 import { showErrorToast } from '@/services/toast.service';
 import AnimatedContent from '@/components/AnimatedContent';
+import { FloatLabel } from 'primereact/floatlabel';
 
 const Index = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -215,86 +216,101 @@ const Index = () => {
         className="md:w-20rem w-full max-w-[600px] top-5"
         position="top"
       >
-        <div className="flex gap-4 flex-col">
+        <div className="flex gap-8 py-6 px-2 flex-col">
           <div className="flex flex-col w-full gap-2">
-            <label htmlFor="">Naam</label>
-            <InputText value={name} onChange={(e) => setName(e.target.value)} />
-            {nameError && (
-              <div className="text-error text-sm mt-2">{nameError}</div>
-            )}
+            <FloatLabel className="w-full md:w-20rem">
+              <InputText
+                value={name}
+                id="name"
+                onChange={(e) => setName(e.target.value)}
+                className="w-full"
+              />
+              <label htmlFor="name">Naam</label>
+              {nameError && (
+                <div className="text-error text-sm mt-2">{nameError}</div>
+              )}
+            </FloatLabel>
           </div>
           <div className="flex flex-col w-full gap-2">
-            <label htmlFor="">Race(s)</label>
-            <TreeSelect
-              filter
-              value={selectedRaces}
-              showClear
-              onChange={(e) => {
-                const newValue = e.value as TreeSelectSelectionKeysType | null;
+            <FloatLabel className="w-full md:w-20rem">
+              <TreeSelect
+                filter
+                value={selectedRaces}
+                showClear
+                inputId="treeselect"
+                onChange={(e) => {
+                  const newValue =
+                    e.value as TreeSelectSelectionKeysType | null;
 
-                // If nothing selected (deselected all)
-                if (!newValue || Object.keys(newValue).length === 0) {
-                  setSelectedRaces(null);
-                  return;
-                }
-
-                const newKeys = Object.keys(newValue);
-                const oldKeys = selectedRaces ? Object.keys(selectedRaces) : [];
-
-                // Detect added key (in new but not old)
-                const addedKey = newKeys.find((key) => !oldKeys.includes(key));
-                // Detect removed key (in old but not new)
-                const removedKey = oldKeys.find(
-                  (key) => !newKeys.includes(key),
-                );
-
-                const oldSelectedNodes = findSelectedRaceData(oldKeys, nodes);
-                const addedNode = addedKey
-                  ? findSelectedRaceData([addedKey], nodes)[0]
-                  : null;
-
-                const oldHasNiveau2 = oldSelectedNodes.some((node) =>
-                  node.data?.niveau?.startsWith('2'),
-                );
-
-                const addedIsNiveau2 = addedNode?.data?.niveau?.startsWith('2');
-
-                if (removedKey) {
-                  // User deselected something
-                  // Just update selection to newValue as is, no forcing
-                  setSelectedRaces(newValue);
-                  return;
-                }
-
-                if (oldHasNiveau2) {
-                  if (addedIsNiveau2) {
-                    // Switching niveau 2 race: keep only that
-                    setSelectedRaces({ [addedKey!]: true });
-                  } else {
-                    // Trying to add non-niveau 2 while niveau 2 selected -> ignore, keep old
-                    setSelectedRaces(
-                      oldKeys.reduce(
-                        (acc, key) => ({ ...acc, [key]: true }),
-                        {},
-                      ),
-                    );
+                  // If nothing selected (deselected all)
+                  if (!newValue || Object.keys(newValue).length === 0) {
+                    setSelectedRaces(null);
+                    return;
                   }
-                } else {
-                  if (addedIsNiveau2) {
-                    // New niveau 2 selected: force single select
-                    setSelectedRaces({ [addedKey!]: true });
-                  } else {
-                    // Normal multi-select
+
+                  const newKeys = Object.keys(newValue);
+                  const oldKeys = selectedRaces
+                    ? Object.keys(selectedRaces)
+                    : [];
+
+                  // Detect added key (in new but not old)
+                  const addedKey = newKeys.find(
+                    (key) => !oldKeys.includes(key),
+                  );
+                  // Detect removed key (in old but not new)
+                  const removedKey = oldKeys.find(
+                    (key) => !newKeys.includes(key),
+                  );
+
+                  const oldSelectedNodes = findSelectedRaceData(oldKeys, nodes);
+                  const addedNode = addedKey
+                    ? findSelectedRaceData([addedKey], nodes)[0]
+                    : null;
+
+                  const oldHasNiveau2 = oldSelectedNodes.some((node) =>
+                    node.data?.niveau?.startsWith('2'),
+                  );
+
+                  const addedIsNiveau2 =
+                    addedNode?.data?.niveau?.startsWith('2');
+
+                  if (removedKey) {
+                    // User deselected something
+                    // Just update selection to newValue as is, no forcing
                     setSelectedRaces(newValue);
+                    return;
                   }
-                }
-              }}
-              options={nodes}
-              className="md:w-20rem w-full"
-              placeholder="Selecteer race(s)"
-              selectionMode="multiple"
-              unselectable="on"
-            ></TreeSelect>
+
+                  if (oldHasNiveau2) {
+                    if (addedIsNiveau2) {
+                      // Switching niveau 2 race: keep only that
+                      setSelectedRaces({ [addedKey!]: true });
+                    } else {
+                      // Trying to add non-niveau 2 while niveau 2 selected -> ignore, keep old
+                      setSelectedRaces(
+                        oldKeys.reduce(
+                          (acc, key) => ({ ...acc, [key]: true }),
+                          {},
+                        ),
+                      );
+                    }
+                  } else {
+                    if (addedIsNiveau2) {
+                      // New niveau 2 selected: force single select
+                      setSelectedRaces({ [addedKey!]: true });
+                    } else {
+                      // Normal multi-select
+                      setSelectedRaces(newValue);
+                    }
+                  }
+                }}
+                options={nodes}
+                className="md:w-20rem w-full"
+                selectionMode="multiple"
+                unselectable="on"
+              ></TreeSelect>
+              <label htmlFor="treeselect">Selecteer races</label>
+            </FloatLabel>
             {selectedRacesError && (
               <div className="text-error text-sm mt-2">
                 {selectedRacesError}
@@ -302,23 +318,21 @@ const Index = () => {
             )}
           </div>
           <div className="flex flex-col w-full gap-2">
-            <label htmlFor="">Deelnemers</label>
-            <MultiSelect
-              value={selectedUsers}
-              options={users}
-              onChange={(e) => setSelectedUsers(e.value)}
-              itemTemplate={(user) => `${user.firstName} ${user.lastName}`}
-              selectedItemTemplate={(user) =>
-                user ? `${user.firstName} ${user.lastName} ` : ''
-              }
-              placeholder="Selecteer deelnemers"
-              className="w-full md:w-20rem"
-            />
-            {selectedUsersError && (
-              <div className="text-error text-sm mt-2">
-                {selectedUsersError}
-              </div>
-            )}
+            <FloatLabel className="w-full md:w-20rem">
+              <MultiSelect
+                value={selectedUsers}
+                onChange={(e) => setSelectedUsers(e.value)}
+                options={users}
+                optionLabel="firstName"
+                className="w-full md:w-20rem"
+              />
+              <label htmlFor="users">Deelnemers</label>
+              {selectedUsersError && (
+                <div className="text-error text-sm mt-2">
+                  {selectedUsersError}
+                </div>
+              )}
+            </FloatLabel>
           </div>
 
           <div className="flex gap-8 justify-between">

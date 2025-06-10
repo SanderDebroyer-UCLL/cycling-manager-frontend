@@ -5,7 +5,7 @@ import store from '@/store/store';
 import '@/styles/globals.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
-import 'primereact/resources/themes/lara-light-blue/theme.css';
+import 'primereact/resources/themes/md-light-indigo/theme.css';
 import { addLocale, PrimeReactProvider } from 'primereact/api';
 import { Inter, Manrope, Anton } from 'next/font/google';
 import { useRouter } from 'next/router';

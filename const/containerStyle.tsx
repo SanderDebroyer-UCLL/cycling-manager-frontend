@@ -15,7 +15,7 @@ export const containerShadow: CSSProperties = {
 export const container: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  backgroundColor: '#ECEEF4',
+  backgroundColor: '#efedf4',
   borderRadius: '0.75rem',
   padding: '1rem',
   gap: '0.5rem',

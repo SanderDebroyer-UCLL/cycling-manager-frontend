@@ -8,27 +8,113 @@ import { fetchScrapeStages } from '@/features/stages/stage.slice';
 import { fetchScrapeTeams } from '@/features/teams/teams.slice';
 import { AppDispatch } from '@/store/store';
 import { Button } from 'primereact/button';
-import React from 'react';
+import { Dialog } from 'primereact/dialog';
+import { Dropdown } from 'primereact/dropdown';
+import { InputText } from 'primereact/inputtext';
+import { MultiSelect } from 'primereact/multiselect';
+import { RadioButton } from 'primereact/radiobutton';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 const scrape = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const [visible, setVisible] = useState(false);
+  const [type, setType] = useState<String>('Race');
 
   return (
     <div className="p-20 flex flex-col gap-4 max-w-[80vw] mx-auto">
-      <AnimatedContent
-        distance={15}
-        direction="vertical"
-        reverse={false}
-        duration={0.7}
-        ease="power3.out"
-        initialOpacity={0}
-        animateOpacity
-        scale={1}
-        delay={0}
+      <Dialog
+        header="Punten Toevoegen"
+        visible={visible}
+        onHide={() => {
+          if (!visible) return;
+          setVisible(false);
+        }}
+        className="md:w-20rem w-full max-w-[600px] top-5"
+        position="top"
       >
-        <h2 className="text-xl font-bold">Overzicht van alle scrapes</h2>
-      </AnimatedContent>
+        <div className="flex align-items-center">
+          <RadioButton
+            inputId="pointsType1"
+            name="pointsType"
+            value="Race"
+            onChange={(e) => setType(e.value)}
+            checked={type === 'Race'}
+          />
+          <label htmlFor="ingredient2" className="ml-2">
+            Race
+          </label>
+        </div>
+        <div className="flex align-items-center">
+          <RadioButton
+            inputId="pointsType2"
+            name="pointsType"
+            value="Stage"
+            onChange={(e) => setType(e.value)}
+            checked={type === 'Stage'}
+          />
+          <label htmlFor="ingredient3" className="ml-2">
+            Stage
+          </label>
+        </div>
+        <div className="flex gap-4 flex-col">
+          <div className="flex flex-col w-full gap-2">
+            <label htmlFor="">Reden</label>
+            <InputText value={''} />
+          </div>
+          <div className="flex flex-col w-full gap-2">
+            <label htmlFor="">Competitie</label>
+            <Dropdown
+              value={''}
+              options={[]}
+              optionLabel="Naam competitie"
+              placeholder="Selecteer een competitie"
+              className="w-full md:w-14rem"
+            />
+          </div>
+
+          <div className="flex gap-8 justify-between">
+            <Button
+              label="Annuleer"
+              onClick={() => setVisible(false)}
+              outlined
+            />
+            <Button
+              label="Creëer Competitie"
+              // loading={competitionStatus === 'loading'}
+              // onClick={handleCreateCompetition}
+            />
+          </div>
+        </div>
+      </Dialog>
+      <div className="flex justify-between h-[28px] items-center">
+        <AnimatedContent
+          distance={15}
+          direction="vertical"
+          reverse={false}
+          duration={0.7}
+          ease="power3.out"
+          initialOpacity={0}
+          animateOpacity
+          scale={1}
+          delay={0}
+        >
+          <h2 className="text-xl font-bold">Overzicht van alle scrapes</h2>
+        </AnimatedContent>
+        <AnimatedContent
+          distance={0}
+          direction="vertical"
+          reverse={false}
+          duration={0.7}
+          ease="power3.out"
+          initialOpacity={0}
+          animateOpacity
+          scale={1}
+          delay={0}
+        >
+          <Button label="Punten toevoegen" onClick={() => setVisible(true)} />
+        </AnimatedContent>
+      </div>
       <div className="flex gap-10 w-full">
         <div style={container} className="!p-10 rounded-xl">
           <div className="flex gap-8">
