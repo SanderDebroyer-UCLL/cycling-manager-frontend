@@ -117,7 +117,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-[320px] flex flex-col text-lg font-regular bg-surface py-8 text-dark-900 ">
+    <div className="w-[280px] flex flex-col text-lg font-regular bg-surface py-8 text-dark-900 ">
       <ConfirmDialog />
 
       <div className="flex flex-col gap-4 content-between h-full">
@@ -163,15 +163,13 @@ const Sidebar = () => {
             <Users size={18} className="stroke-dark-700" />
             Mijn team
           </Link>
-          {competition.races[0].stages.length > 0 && (
-            <Link
-              href={`/competities/${competitionId}/klassement`}
-              className={` ${isActive('klassement') ? '!border-primary !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface hover:border-primary px-6 hover:font-semibold py-2`}
-            >
-              <Medal size={18} className="stroke-dark-700" />
-              Klassement
-            </Link>
-          )}
+          <Link
+            href={`/competities/${competitionId}/klassement`}
+            className={` ${isActive('klassement') ? '!border-primary !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface hover:border-primary px-6 hover:font-semibold py-2`}
+          >
+            <Medal size={18} className="stroke-dark-700" />
+            Klassement
+          </Link>
           <Link
             href={`/competities/${competitionId}/punten`}
             className={` ${isActive('punten') ? '!border-primary !font-semibold' : ''} flex gap-3 items-center border-l-4 border-surface hover:border-primary px-6 hover:font-semibold py-2`}
