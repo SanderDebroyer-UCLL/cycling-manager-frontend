@@ -16,6 +16,7 @@ import TotalPointsChipBodyTemplate from '@/components/template/TotalPointsChipBo
 import { fetchStagePointsForCompetitionId } from '@/features/points/points.slice';
 import { UserTeamDTO } from '@/types/user-team';
 import { fetchUserTeam } from '@/features/user-teams/user-teams.slice';
+import LoadingOverlay from '@/components/LoadingOverlay';
 
 const klassement = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -101,10 +102,23 @@ const klassement = () => {
 
   useEffect(() => {
     if (!competition) return;
+    if (competition.races[0].stages.length > 0) {
+      setCompetitionResults(true);
+    } else {
+      setCompetitionResults(false);
+    }
+  }, [competition]);
+
+  useEffect(() => {
+    if (!competition) return;
     if (pointsPerUser.length === 0 || pointsPerUserStatus === 'idle') {
       dispatch(fetchStagePointsForCompetitionId(competition.id));
     }
   }, [pointsPerUserStatus, competition, dispatch]);
+
+  if (!competition || !userTeams) {
+    return <LoadingOverlay />;
+  }
 
   return (
     <div className="flex flex-col gap-10 ">
@@ -112,22 +126,24 @@ const klassement = () => {
         Overzicht klassementen
       </h2>
       <div className="flex flex-col gap-2">
-        <div className="flex gap-4">
-          <Chip
-            label="Competitie"
-            Icon={Trophy}
-            active={competitionResults}
-            onClick={() => setCompetitionResults(true)}
-            variant={'primary'}
-          />
-          <Chip
-            label="Teams"
-            Icon={Users}
-            active={!competitionResults}
-            onClick={() => setCompetitionResults(false)}
-            variant={'primary'}
-          />
-        </div>
+        {competition.races[0].stages.length > 1 && (
+          <div className="flex gap-4">
+            <Chip
+              label="Competitie"
+              Icon={Trophy}
+              active={competitionResults}
+              onClick={() => setCompetitionResults(true)}
+              variant={'primary'}
+            />
+            <Chip
+              label="Teams"
+              Icon={Users}
+              active={!competitionResults}
+              onClick={() => setCompetitionResults(false)}
+              variant={'primary'}
+            />
+          </div>
+        )}
         <div style={container} className="flex flex-col overflow-auto">
           {competitionResults ? (
             <>
@@ -213,7 +229,7 @@ const klassement = () => {
       </div>
 
       {!competitionResults && (
-        <div className="flex gap-8 overflow-x-auto max-w-[calc(100vw-350px-2rem)]">
+        <div className="flex gap-8 overflow-x-auto max-w-[calc(100vw-280px-2rem)]">
           {userTeams
             .filter((userTeam) => userTeam.competitionId === competition.id)
             .map((userTeam) => {

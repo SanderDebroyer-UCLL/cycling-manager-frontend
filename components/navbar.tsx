@@ -27,15 +27,8 @@ const navbar = () => {
 
   const items: MenuItem[] = [
     {
-      label: 'Profiel',
+      label: user?.firstName + ' ' + user?.lastName,
       items: [
-        {
-          label: 'Instellingen',
-          icon: 'pi pi-cog',
-          command: () => {
-            router.push('/profiel');
-          },
-        },
         {
           label: 'Logout',
           icon: 'pi pi-sign-out',

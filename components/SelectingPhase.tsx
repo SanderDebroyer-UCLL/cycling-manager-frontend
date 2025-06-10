@@ -146,7 +146,7 @@ const SelectingPhase: React.FC<SelectingPhaseProps> = ({
           <Column header="Ranking" field="ranking" />
         </DataTable>
       </div>
-      <div className="flex gap-8 overflow-x-auto max-w-[calc(100vw-350px-2rem)]">
+      <div className="flex gap-8 overflow-x-auto max-w-[calc(100vw-280npx-2rem)]">
         {userTeams.length > 0 &&
           userTeams
             .filter(
