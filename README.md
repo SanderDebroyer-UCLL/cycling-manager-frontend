@@ -1,40 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# 🚴‍♀️ Installatiehandleiding – Frontend (Cycling Manager)
 
-## Getting Started
+Volg deze stappen om de frontend van het project correct te deployen op Vercel en te verbinden met de backend.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🌍 Frontend deployen op Vercel
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Ga naar [https://vercel.com](https://vercel.com) en maak een account aan (bijv. via GitHub).
+2. Ga naar je **Projecten** en klik op **New Project**.
+3. Importeer het frontend-project vanuit je Git repository.
+4. Geef het project een naam en klik op **Deploy**.
+5. Wacht tot de deployment is voltooid.
+6. Kopieer de URL van de gedeployde frontend (bijvoorbeeld `https://jouw-projectnaam.vercel.app`).
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+---
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## 🔄 Backend bijwerken met de nieuwe frontend-URL
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+1. Ga naar de backend repository van **Cycling Manager Scraper**.
+2. Navigeer naar:
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```
+   src/main/java/ucll/be/procyclingscraper/controller
+   ```
 
-## Learn More
+3. Open **alle bestanden** in deze map die de volgende regel bevatten:
 
-To learn more about Next.js, take a look at the following resources:
+   ```java
+   @CrossOrigin(origins = "https://cycling-manager-frontend-psi.vercel.app")
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+4. Vervang deze regel in elk bestand met:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```java
+   @CrossOrigin(origins = "https://JOUW-NIEUWE-FRONTEND-URL.vercel.app")
+   ```
 
-## Deploy on Vercel
+   > ❗ Vergeet niet om `"https://JOUW-NIEUWE-FRONTEND-URL.vercel.app"` te vervangen met jouw werkelijke Vercel frontend URL.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Sla deze wijzigingen op en deploy de backend opnieuw als nodig.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+---
+
+## ✅ Klaar!
+
+De frontend is nu live op Vercel en correct verbonden met de backend via CORS-configuratie.
