@@ -623,7 +623,7 @@ const index = () => {
               <h3 className="font-semibold">Punten verdiend per deelnemer</h3>
               <div
                 style={container}
-                className="flex flex-col h-full overflow-auto max-h-[240px]"
+                className="flex flex-col h-full overflow-auto max-h-[300px]"
               >
                 <DataTable
                   value={pointsPerUser}
