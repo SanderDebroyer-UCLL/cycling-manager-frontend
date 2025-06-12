@@ -97,7 +97,7 @@ const resultsSlice = createSlice({
             case ResultType.POINTS:
               state.pointsResult = action.payload;
               break;
-            case ResultType.MOUNTAIN:
+            case ResultType.KOM:
               state.mountainResult = action.payload;
               break;
           }

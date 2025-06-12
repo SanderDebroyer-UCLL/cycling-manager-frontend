@@ -172,8 +172,8 @@ const klassement = () => {
                 <Chip
                   label="Mountain"
                   Icon={Mountain}
-                  active={resultStatus === ResultType.MOUNTAIN}
-                  onClick={() => setResultStatus(ResultType.MOUNTAIN)}
+                  active={resultStatus === ResultType.KOM}
+                  onClick={() => setResultStatus(ResultType.KOM)}
                   variant={'secondary'}
                 />
               </div>
@@ -188,7 +188,7 @@ const klassement = () => {
                       ? stageYouthResults
                       : resultStatus === ResultType.POINTS
                         ? stagePointsResults
-                        : resultStatus === ResultType.MOUNTAIN
+                        : resultStatus === ResultType.KOM
                           ? stageKOMResults
                           : []
                 }

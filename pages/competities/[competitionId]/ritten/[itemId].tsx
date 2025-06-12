@@ -128,7 +128,7 @@ const index = () => {
     (state: any) => state.stageResults.pointsResult,
   );
   const stageKOMResults: StageResult[] = useSelector(
-    (state: any) => state.stageResults.komResult,
+    (state: any) => state.stageResults.mountainResult,
   );
   const stageYouthResults: StageResult[] = useSelector(
     (state: any) => state.stageResults.youthResult,
@@ -284,6 +284,12 @@ const index = () => {
         fetchResultsByStageIdByType({
           stageId: activeStage.id,
           resultType: ResultType.POINTS,
+        }),
+      );
+      dispatch(
+        fetchResultsByStageIdByType({
+          stageId: activeStage.id,
+          resultType: ResultType.KOM,
         }),
       );
     }
@@ -720,8 +726,8 @@ const index = () => {
                         label="Mountain"
                         Icon={Mountain}
                         variant="secondary"
-                        active={resultStatus === ResultType.MOUNTAIN}
-                        onClick={() => setResultStatus(ResultType.MOUNTAIN)}
+                        active={resultStatus === ResultType.KOM}
+                        onClick={() => setResultStatus(ResultType.KOM)}
                       />
                     </div>
                     <DataTable
@@ -737,7 +743,7 @@ const index = () => {
                               ? stageYouthResultsState
                               : resultStatus === ResultType.POINTS
                                 ? stagePointsResultsState
-                                : resultStatus === ResultType.MOUNTAIN
+                                : resultStatus === ResultType.KOM
                                   ? stageKOMResultsState
                                   : []
                       }
