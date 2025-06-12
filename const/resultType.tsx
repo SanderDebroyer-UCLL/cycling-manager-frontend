@@ -3,5 +3,5 @@ export const enum ResultType {
   GC = 'GC',
   YOUTH = 'YOUTH',
   POINTS = 'POINTS',
-  MOUNTAIN = 'MOUNTAIN',
+  KOM = 'KOM',
 }
