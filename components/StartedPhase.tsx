@@ -37,6 +37,7 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
           <h3 className="font-semibold">Huidige Selectie</h3>
           <div style={container} className="max-h-[70vh] overflow-y-auto">
             <DataTable
+              emptyMessage="Geen renners gevonden."
               key={Date.now()}
               value={mainReservePointsCyclist?.mainCyclists}
             >
@@ -50,6 +51,7 @@ const StartedPhase: React.FC<StartedPhaseProps> = ({
           <h3 className="font-semibold">Reserve renners</h3>
           <div style={container} className="max-h-[70vh] overflow-y-auto">
             <DataTable
+              emptyMessage="Geen renners gevonden."
               key={Date.now()} // or another unique key that changes when needed
               value={mainReservePointsCyclist?.reserveCyclists}
             >

@@ -447,7 +447,6 @@ const index = () => {
               <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
             )}
             tooltip="Haal alle resultaten en punten op"
-            tooltipOptions={{ showDelay: 500 }}
             className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
             loading={competitionStatus === 'loading'}
             onClick={() =>
@@ -624,7 +623,7 @@ const index = () => {
               <h3 className="font-semibold">Punten verdiend per deelnemer</h3>
               <div
                 style={container}
-                className="flex flex-col h-full overflow-auto max-h-[240px]"
+                className="flex flex-col h-full overflow-auto max-h-[300px]"
               >
                 <DataTable
                   value={pointsPerUser}
@@ -670,7 +669,6 @@ const index = () => {
                   )}
                   size="small"
                   tooltip="Haal resultaten en punten voor deze etappe op"
-                  tooltipOptions={{ showDelay: 500 }}
                   className="!p-0 -translate-x-2 h-[48px] w-[48px] flex items-center !border-none justify-center"
                   loading={stageResultsScrapeStatus === 'loading'}
                   onClick={() => {
@@ -902,7 +900,7 @@ const index = () => {
                     dataKey="id"
                     sortField="reason"
                     sortOrder={1}
-                    emptyMessage="Geen resultaten gevonden!"
+                    emptyMessage="Geen resultaten gevonden."
                   >
                     <Column field="fullName" header="Deelnemer" />
                     <Column field="cyclistName" header="Wielrenner" />

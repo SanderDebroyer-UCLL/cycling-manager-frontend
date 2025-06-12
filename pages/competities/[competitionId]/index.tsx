@@ -287,7 +287,6 @@ const index = () => {
               <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
             )}
             tooltip="Haal alle etappes en startlijsten op"
-            tooltipOptions={{ showDelay: 500 }}
             className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
             loading={fetchCompetitionStatus === 'loading'}
             onClick={handleRefreshData}
@@ -296,7 +295,7 @@ const index = () => {
       </div>
 
       <div className="flex gap-10 w-full">
-        <div className="flex flex-1/4 flex-col gap-2 max-h-[440px]">
+        <div className="flex flex-1/4 flex-col gap-2 max-h-[460px]">
           <h3 className="font-semibold">Duur Competitie</h3>
           <Calendar
             value={dates}
@@ -306,7 +305,7 @@ const index = () => {
           />
         </div>
 
-        <div className="flex flex-row flex-3/4 gap-10 w-full max-h-[440px]">
+        <div className="flex flex-row flex-3/4 gap-10 w-full max-h-[460px]">
           <div className="flex flex-col justify-between gap-2 flex-1/3">
             <div className="flex flex-col gap-2">
               <h3 className="font-semibold">Totale afstand</h3>
@@ -397,7 +396,19 @@ const index = () => {
                 style={container}
                 className="flex flex-col justify-center gap-2 font-semibold text-xl capitalize"
               >
-                {competition.competitionStatus.toLocaleLowerCase()}
+                {(() => {
+                  const statusTranslations = {
+                    STARTED: 'gestart',
+                    SORTING: 'sorteren',
+                    SELECTING: 'selecteren',
+                    FINISHED: 'afgelopen',
+                  };
+                  return (
+                    statusTranslations[
+                      competition.competitionStatus as keyof typeof statusTranslations
+                    ] || competition.competitionStatus.toLowerCase()
+                  );
+                })()}
                 <span className="text-sm font-normal normal-case">
                   {getCompetitionStatusSubtext(
                     competition.competitionStatus,
@@ -447,9 +458,12 @@ const index = () => {
         </div>
       </div>
       <div className="flex gap-10 w-full">
-        <div className="flex flex-col gap-2 flex-1 max-h-[440px]">
+        <div className="flex flex-col gap-2 flex-1 max-h-[460px]">
           <h3 className="font-semibold">Totaal punten per deelnemer</h3>
-          <div style={container} className="flex flex-row gap-4 h-full w-full">
+          <div
+            style={container}
+            className="flex flex-row gap-4 h-full w-full max-h-[300px]"
+          >
             <DataTable
               loading={pointsPerUserStatus === 'loading'}
               value={pointsPerUser}
@@ -460,15 +474,18 @@ const index = () => {
               <Column field="fullName" header="Naam" />
               <Column
                 field="points"
-                header="Points"
+                header="Punten"
                 body={TotalPointsChipBodyTemplate(competition)} // ← call it here!
               />
             </DataTable>
           </div>
         </div>
-        <div className="flex flex-col gap-2 flex-1 max-h-[440px]">
+        <div className="flex flex-col gap-2 flex-1 max-h-[460px]">
           <h3 className="font-semibold">Renners die zijn uitgevallen</h3>
-          <div style={container} className="flex flex-row gap-4 h-full w-full">
+          <div
+            style={container}
+            className="flex flex-row gap-4 h-full w-full max-h-[300px]"
+          >
             <DataTable
               loading={userTeamsStatus === 'loading'}
               value={cyclistWithDNS}
