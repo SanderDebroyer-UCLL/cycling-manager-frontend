@@ -447,7 +447,6 @@ const index = () => {
               <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
             )}
             tooltip="Haal alle resultaten en punten op"
-            tooltipOptions={{ showDelay: 500 }}
             className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
             loading={competitionStatus === 'loading'}
             onClick={() =>
@@ -670,7 +669,6 @@ const index = () => {
                   )}
                   size="small"
                   tooltip="Haal resultaten en punten voor deze etappe op"
-                  tooltipOptions={{ showDelay: 500 }}
                   className="!p-0 -translate-x-2 h-[48px] w-[48px] flex items-center !border-none justify-center"
                   loading={stageResultsScrapeStatus === 'loading'}
                   onClick={() => {

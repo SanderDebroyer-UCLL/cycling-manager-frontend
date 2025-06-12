@@ -287,7 +287,6 @@ const index = () => {
               <RefreshCw size={16} className="h-4 w-4 stroke-[2.5]" />
             )}
             tooltip="Haal alle etappes en startlijsten op"
-            tooltipOptions={{ showDelay: 500 }}
             className="!p-0 h-[48px] w-[48px] flex items-center justify-center"
             loading={fetchCompetitionStatus === 'loading'}
             onClick={handleRefreshData}
