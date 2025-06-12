@@ -50,7 +50,7 @@ De frontend is nu live op Vercel en correct verbonden met de backend via CORS-co
 \
 \
 \
-\
+ 
 
 # 🚴‍♂️ Cycling Manager – Lokale Opstartinstructies
 
