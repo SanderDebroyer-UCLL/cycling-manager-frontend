@@ -900,7 +900,7 @@ const index = () => {
                     dataKey="id"
                     sortField="reason"
                     sortOrder={1}
-                    emptyMessage="Geen resultaten gevonden!"
+                    emptyMessage="Geen resultaten gevonden."
                   >
                     <Column field="fullName" header="Deelnemer" />
                     <Column field="cyclistName" header="Wielrenner" />
