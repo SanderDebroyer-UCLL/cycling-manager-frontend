@@ -45,13 +45,14 @@ Volg deze stappen om de frontend van het project correct te deployen op Vercel e
 ## ✅ Klaar!
 
 De frontend is nu live op Vercel en correct verbonden met de backend via CORS-configuratie.
+‎‎
+‎
+‎
 
-U+00A0
-U+00A0
-U+00A0
-U+00A0
-U+00A0
+‎
 
+‎
+‎
 # 🚴‍♂️ Cycling Manager – Lokale Opstartinstructies
 
 Deze handleiding beschrijft stap voor stap hoe je het Cycling Manager-project lokaal opstart.
