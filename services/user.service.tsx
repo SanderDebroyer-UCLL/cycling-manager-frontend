@@ -38,18 +38,4 @@ const UserService = {
 };
 
 export default UserService;
-//test test autist niels<>bram
-//Hey bram
-//Hoe gaat het met jou?
-//Shaken met harman? 
-//We like ros haar
-//Ik ben hier OVERUREN aant doen
-//nog meer?!?!
-//Goede morgen morgen goededag
-//NU EEN MERGE 
-//Couou!
-//commmit
-//Niet vergeten Bram 
-//Niels ik heb honger
-//SANDErrrrrrrrrrrrrr
-//whoohoo
+
