@@ -220,7 +220,7 @@ const klassement = () => {
               <Column field="fullName" header="Naam" />
               <Column
                 field="points"
-                header="Points"
+                header="Punten"
                 body={TotalPointsChipBodyTemplate(competition)} // ← call it here!
               />
             </DataTable>

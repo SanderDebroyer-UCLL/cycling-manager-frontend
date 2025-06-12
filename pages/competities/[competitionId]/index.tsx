@@ -396,7 +396,19 @@ const index = () => {
                 style={container}
                 className="flex flex-col justify-center gap-2 font-semibold text-xl capitalize"
               >
-                {competition.competitionStatus.toLocaleLowerCase()}
+                {(() => {
+                  const statusTranslations = {
+                    STARTED: 'gestart',
+                    SORTING: 'sorteren',
+                    SELECTING: 'selecteren',
+                    FINISHED: 'afgelopen',
+                  };
+                  return (
+                    statusTranslations[
+                      competition.competitionStatus as keyof typeof statusTranslations
+                    ] || competition.competitionStatus.toLowerCase()
+                  );
+                })()}
                 <span className="text-sm font-normal normal-case">
                   {getCompetitionStatusSubtext(
                     competition.competitionStatus,
@@ -459,7 +471,7 @@ const index = () => {
               <Column field="fullName" header="Naam" />
               <Column
                 field="points"
-                header="Points"
+                header="Punten"
                 body={TotalPointsChipBodyTemplate(competition)} // ← call it here!
               />
             </DataTable>
