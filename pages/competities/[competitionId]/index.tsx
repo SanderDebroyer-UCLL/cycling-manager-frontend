@@ -462,7 +462,7 @@ const index = () => {
           <h3 className="font-semibold">Totaal punten per deelnemer</h3>
           <div
             style={container}
-            className="flex flex-row gap-4 h-full w-full max-h-[300px]"
+            className="flex flex-row gap-4 h-full w-full max-h-[300px] overflow-auto"
           >
             <DataTable
               loading={pointsPerUserStatus === 'loading'}
@@ -484,7 +484,7 @@ const index = () => {
           <h3 className="font-semibold">Renners die zijn uitgevallen</h3>
           <div
             style={container}
-            className="flex flex-row gap-4 h-full w-full max-h-[300px]"
+            className="flex flex-row gap-4 h-full w-full max-h-[300px] overflow-auto"
           >
             <DataTable
               loading={userTeamsStatus === 'loading'}
