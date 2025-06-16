@@ -30,7 +30,7 @@ const navbar = () => {
       label: user?.firstName + ' ' + user?.lastName,
       items: [
         {
-          label: 'Logout',
+          label: 'Uitloggen',
           icon: 'pi pi-sign-out',
           command: () => {
             logoutHandler();
